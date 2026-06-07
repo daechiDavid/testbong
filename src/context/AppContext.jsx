@@ -236,6 +236,18 @@ export function AppProvider({ children }) {
           });
         }
         dispatch({ type: 'SET_ATTENDANCE_MAP', payload: attMap });
+
+        // Auth state listener
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          if (session) {
+            dispatch({ type: 'TOGGLE_ADMIN', payload: true });
+          }
+        });
+
+        supabase.auth.onAuthStateChange((_event, session) => {
+          dispatch({ type: 'TOGGLE_ADMIN', payload: !!session });
+        });
+
       } catch (err) {
         console.error('DB Fetch Error:', err);
         showToast('데이터베이스를 불러오는 데 실패했습니다.', 'error');

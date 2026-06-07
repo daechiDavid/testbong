@@ -1,24 +1,29 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { supabase } from '../utils/supabase';
 
 export function useAdminMode() {
   const { state, dispatch, showToast } = useApp();
   const { isAdmin, settings } = state;
   const [showPinModal, setShowPinModal] = useState(false);
-  const [pinInput, setPinInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
 
-  const login = (pin) => {
-    if (pin === settings.adminPin) {
-      dispatch({ type: 'TOGGLE_ADMIN', payload: true });
-      setShowPinModal(false);
-      setPinInput('');
-      showToast('관리자 모드로 전환되었습니다.', 'success');
+  const login = async (email, password) => {
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      showToast('이메일 또는 비밀번호가 틀렸습니다.', 'error');
     } else {
-      showToast('비밀번호가 틀렸습니다.', 'error');
+      setShowPinModal(false);
+      setEmailInput('');
+      setPasswordInput('');
+      showToast('관리자 모드로 전환되었습니다.', 'success');
+      dispatch({ type: 'TOGGLE_ADMIN', payload: true });
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await supabase.auth.signOut();
     dispatch({ type: 'TOGGLE_ADMIN', payload: false });
     showToast('학생 모드로 전환되었습니다.', 'info');
   };
@@ -35,8 +40,10 @@ export function useAdminMode() {
     isAdmin, 
     showPinModal, 
     setShowPinModal, 
-    pinInput, 
-    setPinInput, 
+    emailInput, 
+    setEmailInput,
+    passwordInput,
+    setPasswordInput,
     login, 
     logout, 
     toggle 

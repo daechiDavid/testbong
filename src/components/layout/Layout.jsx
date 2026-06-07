@@ -43,7 +43,7 @@ export default function Layout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const location = useLocation();
-  const { isAdmin, showPinModal, setShowPinModal, pinInput, setPinInput, login, toggle } = useAdminMode();
+  const { isAdmin, showPinModal, setShowPinModal, emailInput, setEmailInput, passwordInput, setPasswordInput, login, toggle } = useAdminMode();
 
   const pageTitle = PAGE_TITLES[location.pathname] || '대시보드';
 
@@ -133,28 +133,40 @@ export default function Layout({ children }) {
           </NavLink>
         ))}
       </nav>
-    {/* PIN Modal */}
+    {/* Auth Modal */}
     {showPinModal && (
       <div className="modal-overlay" onClick={() => setShowPinModal(false)}>
-        <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: '300px'}}>
+        <div className="modal-content" onClick={e => e.stopPropagation()} style={{maxWidth: '350px'}}>
           <div className="modal-header">
-            <h3>🔒 관리자 인증</h3>
+            <h3>🔒 선생님 로그인</h3>
             <button className="close-btn" onClick={() => setShowPinModal(false)}>×</button>
           </div>
-          <div className="modal-body">
-            <input 
-              type="password" 
-              className="form-input" 
-              placeholder="4자리 PIN"
-              maxLength="4"
-              value={pinInput}
-              onChange={e => setPinInput(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && login(pinInput)}
-              autoFocus
-            />
+          <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-light)' }}>이메일</label>
+              <input 
+                type="email" 
+                className="form-input" 
+                placeholder="teacher@school.com"
+                value={emailInput}
+                onChange={e => setEmailInput(e.target.value)}
+                autoFocus
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem', color: 'var(--text-light)' }}>비밀번호</label>
+              <input 
+                type="password" 
+                className="form-input" 
+                placeholder="비밀번호"
+                value={passwordInput}
+                onChange={e => setPasswordInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && login(emailInput, passwordInput)}
+              />
+            </div>
           </div>
           <div className="modal-footer">
-            <button className="btn btn-primary" style={{width:'100%'}} onClick={() => login(pinInput)}>확인</button>
+            <button className="btn btn-primary" style={{width:'100%'}} onClick={() => login(emailInput, passwordInput)}>로그인</button>
           </div>
         </div>
       </div>
