@@ -1,0 +1,140 @@
+.links-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.links-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.links-form {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--primary-color);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.link-card-wrapper {
+  position: relative;
+  height: 100%;
+}
+
+.link-card {
+  display: flex;
+  gap: 1.25rem;
+  align-items: center;
+  padding: 1.25rem;
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%;
+  border: 1px solid var(--border-light);
+}
+
+.link-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--primary-color);
+}
+
+.link-icon {
+  font-size: 2.5rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.link-content {
+  flex: 1;
+}
+
+.link-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.35rem 0;
+}
+
+.link-desc {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.link-actions {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: var(--radius-md);
+  padding: 0.25rem;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-color);
+}
+
+.link-card-wrapper:hover .link-actions {
+  opacity: 1;
+}
+
+.link-action-btn {
+  padding: 0.35rem;
+  font-size: 1.125rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.link-action-btn:hover {
+  background: var(--bg-primary);
+}

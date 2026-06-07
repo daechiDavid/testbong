@@ -1,0 +1,142 @@
+.weekly-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.weekly-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.weekly-date {
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: var(--bg-card);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--border-color);
+  font-size: 0.875rem;
+}
+
+.weekly-tip {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-top: -0.5rem;
+}
+
+.weekly-table-wrapper {
+  overflow-x: auto;
+}
+
+.weekly-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.weekly-table th,
+.weekly-table td {
+  border: 1px solid var(--border-color);
+  padding: 1rem;
+  text-align: center;
+  vertical-align: top;
+}
+
+.weekly-table th {
+  background: var(--bg-primary);
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 1rem;
+}
+
+.period-col {
+  width: 60px;
+  background: var(--bg-primary);
+}
+
+.period-cell {
+  font-weight: 700;
+  color: var(--text-secondary);
+  vertical-align: middle !important;
+  background: var(--bg-primary);
+  font-size: 1.125rem;
+}
+
+.plan-cell {
+  width: calc((100% - 60px) / 5);
+  transition: all 0.2s;
+  position: relative;
+  height: 80px;
+}
+
+.plan-cell.editable:hover {
+  background: var(--bg-sidebar-hover);
+  cursor: pointer;
+}
+
+.plan-cell.is-editing {
+  background: var(--bg-primary);
+  padding: 0.75rem;
+}
+
+.plan-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+  justify-content: center;
+}
+
+.plan-subject {
+  font-weight: 700;
+  color: var(--primary-color);
+  font-size: 0.875rem;
+  background: rgba(99, 102, 241, 0.1);
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  align-self: center;
+}
+
+.plan-content {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  line-height: 1.4;
+  word-break: keep-all;
+}
+
+.plan-empty {
+  color: var(--border-color);
+  font-size: 1rem;
+}
+
+.plan-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.plan-subject-input {
+  font-size: 0.8125rem;
+  padding: 0.5rem;
+  font-weight: 600;
+}
+
+.plan-content-input {
+  font-size: 0.8125rem;
+  padding: 0.5rem;
+}
+
+.plan-edit-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.plan-edit-actions button {
+  flex: 1;
+  padding: 0.35rem;
+  font-size: 0.75rem;
+}
