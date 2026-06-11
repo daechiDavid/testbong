@@ -15,8 +15,31 @@
 .stat-unit { font-size:0.875rem; font-weight:600; color:var(--text-secondary); margin-left:2px; }
 .stat-change { font-size:0.75rem; font-weight:600; margin-top:2px; }
 .stat-change.up { color:var(--accent); }
-.dashboard-layout { display:flex; flex-direction:column; gap:1.5rem; }
-.dashboard-row { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; }
+.dashboard-layout {
+  min-height: 500px;
+}
+
+.dashboard-widget {
+  display: flex;
+  flex-direction: column;
+  height: 100% !important;
+  overflow: hidden;
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.widget-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+
+.react-grid-item.react-grid-placeholder {
+  background: var(--primary-color) !important;
+  opacity: 0.2 !important;
+  border-radius: var(--radius-lg);
+}
 .card { background:var(--bg-card); backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); border-radius:var(--radius-xl); padding:1.5rem; box-shadow:var(--shadow-md); border:1px solid var(--glass-border); transition: transform var(--transition-base), box-shadow var(--transition-base); }
 .card:hover { transform:translateY(-2px); box-shadow:var(--shadow-lg); }
 .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:1rem; }
@@ -50,7 +73,11 @@
 .dday-date { font-size:0.75rem; color:var(--text-secondary); }
 .dday-badge { padding:0.25rem 0.75rem; border-radius:999px; font-size:0.75rem; font-weight:700; background:var(--primary-50); color:var(--primary); white-space:nowrap; }
 .dday-badge.urgent { background:#FEF2F2; color:var(--danger); animation:pulse 2s infinite; }
-.notice-list { display:flex; flex-direction:column; gap:0.5rem; }
+.notice-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
 .notice-item { display:flex; align-items:flex-start; gap:0.75rem; padding:0.75rem; border-radius:var(--radius-sm); cursor:pointer; transition:background var(--transition-fast); }
 .notice-item:hover { background:var(--gray-50); }
 .notice-type { padding:2px 8px; border-radius:4px; font-size:0.6875rem; font-weight:600; flex-shrink:0; margin-top:2px; }
@@ -64,4 +91,47 @@
 .empty-state .empty-icon { font-size:3rem; margin-bottom:0.75rem; opacity:0.5; }
 
 @media (max-width:1024px) { .dashboard-row { grid-template-columns:1fr; } }
-@media (max-width:768px) { .stat-card { padding:0.75rem; } .stat-icon { width:40px; height:40px; font-size:1.1rem; } .stat-value { font-size:1.25rem; } .assignment-name { min-width:80px; } }
+.pretty-lunch-box {
+  background: linear-gradient(135deg, #FFF8E1 0%, #FFF3E0 100%);
+  padding: 1.25rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid #FFE0B2;
+  box-shadow: 0 4px 12px rgba(255, 152, 0, 0.08);
+}
+.lunch-menu-text {
+  white-space: pre-line;
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  font-weight: 700;
+  color: #5D4037;
+}
+.lunch-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+}
+.lunch-calories {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: #E65100;
+}
+.cal-icon { font-size: 1rem; }
+.delete-btn:hover { background: #FEE2E2; }
+
+/* Ranking List */
+.ranking-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.ranking-item { display: flex; align-items: center; padding: 0.75rem; background: var(--gray-50); border-radius: var(--radius-md); border-left: 3px solid var(--primary-color); }
+.ranking-item:nth-child(1) { border-left-color: #FBBF24; background: #FEF3C7; }
+.ranking-item:nth-child(2) { border-left-color: #9CA3AF; background: #F3F4F6; }
+.ranking-item:nth-child(3) { border-left-color: #B45309; background: #FEF3C7; }
+.ranking-rank { width: 30px; font-weight: 800; font-size: 1.125rem; text-align: center; margin-right: 0.5rem; }
+.ranking-name { flex: 1; font-weight: 700; font-size: 0.9375rem; }
+.ranking-score { font-weight: 800; color: var(--primary-color); font-size: 0.9375rem; }
+
+@media (max-width: 768px) { .stat-card { padding:0.75rem; } .stat-icon { width:40px; height:40px; font-size:1.1rem; } .stat-value { font-size:1.25rem; } .assignment-name { min-width:80px; } }

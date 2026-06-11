@@ -1,18 +1,65 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
+import { getWeekStart, toISODate } from '../context/AppContext';
 import './WeeklyPlanPage.css';
 
 export default function WeeklyPlanPage() {
-  const { state, dispatch, showToast } = useApp();
+  const { state, dispatch, showToast, saveWeeklyPlan } = useApp();
   const { weeklyPlans, isAdmin } = state;
-  const currentWeek = weeklyPlans[0];
 
-  const [editing, setEditing] = useState(null); // { day, period }
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [editing, setEditing] = useState(null);
   const [editSubject, setEditSubject] = useState('');
   const [editContent, setEditContent] = useState('');
 
   const days = ['월', '화', '수', '목', '금'];
   const periods = [1, 2, 3, 4, 5, 6];
+
+  // 현재 주차 계산
+  const weekStart = useMemo(() => getWeekStart(currentDate), [currentDate]);
+  const weekKey = toISODate(weekStart);
+
+  // 각 요일의 날짜 계산
+  const dayDates = useMemo(() => {
+    return days.map((d, i) => {
+      const date = new Date(weekStart);
+      date.setDate(date.getDate() + i);
+      return {
+        day: d,
+        date: date,
+        dateStr: `${date.getMonth() + 1}/${date.getDate()}`,
+        isoDate: toISODate(date)
+      };
+    });
+  }, [weekStart]);
+
+  const weekEndDate = new Date(weekStart);
+  weekEndDate.setDate(weekEndDate.getDate() + 4);
+
+  const currentWeekPlans = weeklyPlans[weekKey] || {};
+
+  // 오늘 날짜
+  const todayStr = toISODate(new Date());
+  const isCurrentWeek = dayDates.some(dd => dd.isoDate === todayStr);
+
+  const goToPrevWeek = () => {
+    const d = new Date(currentDate);
+    d.setDate(d.getDate() - 7);
+    setCurrentDate(d);
+    setEditing(null);
+  };
+
+  const goToNextWeek = () => {
+    const d = new Date(currentDate);
+    d.setDate(d.getDate() + 7);
+    setCurrentDate(d);
+    setEditing(null);
+  };
+
+  const goToToday = () => {
+    setCurrentDate(new Date());
+    setEditing(null);
+  };
 
   const handleEdit = (day, period, subject, content) => {
     if (!isAdmin) return;
@@ -22,10 +69,7 @@ export default function WeeklyPlanPage() {
   };
 
   const handleSave = () => {
-    dispatch({
-      type: 'SET_WEEKLY_PLAN',
-      payload: { weekId: currentWeek.id, day: editing.day, period: editing.period, subject: editSubject, content: editContent }
-    });
+    saveWeeklyPlan(weekKey, editing.day, editing.period, editSubject, editContent);
     setEditing(null);
     showToast('주간 일정이 저장되었습니다.', 'success');
   };
@@ -34,7 +78,24 @@ export default function WeeklyPlanPage() {
     <div className="weekly-page">
       <div className="weekly-header">
         <h2 className="section-title">📅 주간 교육일정</h2>
-        <span className="weekly-date">{currentWeek?.weekStart} ~ {currentWeek?.weekEnd}</span>
+        <div className="weekly-nav">
+          <button className="week-nav-btn" onClick={goToPrevWeek}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+            이전 주
+          </button>
+          {!isCurrentWeek && (
+            <button className="week-nav-btn today-btn" onClick={goToToday}>
+              오늘
+            </button>
+          )}
+          <span className="weekly-date">
+            {weekStart.getMonth() + 1}/{weekStart.getDate()} ~ {weekEndDate.getMonth() + 1}/{weekEndDate.getDate()}
+          </span>
+          <button className="week-nav-btn" onClick={goToNextWeek}>
+            다음 주
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+          </button>
+        </div>
       </div>
 
       {isAdmin && <p className="weekly-tip">💡 빈 칸을 클릭하면 내용을 수정할 수 있습니다.</p>}
@@ -44,21 +105,29 @@ export default function WeeklyPlanPage() {
           <thead>
             <tr>
               <th className="period-col">교시</th>
-              {days.map(d => <th key={d}>{d}요일</th>)}
+              {dayDates.map(dd => (
+                <th key={dd.day} className={dd.isoDate === todayStr ? 'today-col' : ''}>
+                  <div className="day-header">
+                    <span className="day-name">{dd.day}요일</span>
+                    <span className="day-date">{dd.dateStr}</span>
+                  </div>
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {periods.map(p => (
               <tr key={p}>
                 <td className="period-cell">{p}</td>
-                {days.map(d => {
-                  const plan = currentWeek?.plans?.[d]?.[p] || {};
-                  const isEditing = editing?.day === d && editing?.period === p;
+                {dayDates.map(dd => {
+                  const plan = currentWeekPlans[dd.day]?.[p] || {};
+                  const isEditing = editing?.day === dd.day && editing?.period === p;
+                  const isToday = dd.isoDate === todayStr;
                   return (
                     <td 
-                      key={d} 
-                      className={`plan-cell ${isAdmin ? 'editable' : ''} ${isEditing ? 'is-editing' : ''}`} 
-                      onClick={() => !isEditing && handleEdit(d, p, plan.subject, plan.content)}
+                      key={dd.day} 
+                      className={`plan-cell ${isAdmin ? 'editable' : ''} ${isEditing ? 'is-editing' : ''} ${isToday ? 'today-cell' : ''}`} 
+                      onClick={() => !isEditing && handleEdit(dd.day, p, plan.subject, plan.content)}
                     >
                       {isEditing ? (
                         <div className="plan-edit-form" onClick={e => e.stopPropagation()}>

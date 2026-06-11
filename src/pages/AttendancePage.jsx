@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { getAvatarColor, getInitials } from '../utils/helpers';
 import './AttendancePage.css';
 
 const STATUS_MAP = {
@@ -11,9 +10,24 @@ const STATUS_MAP = {
 };
 
 export default function AttendancePage() {
-  const { state, updateAttendance, showToast, isAdmin } = useApp();
-  const { students, attendance } = state;
+  const { state, updateAttendance, loadAttendanceByDate, loadMonthlyAttendance, showToast } = useApp();
+  const { students, attendance, selectedAttendanceDate, monthlyAttendance, isAdmin } = state;
   const [activeSelector, setActiveSelector] = useState(null);
+  const [viewMode, setViewMode] = useState('daily'); // daily | monthly
+  const [monthYear, setMonthYear] = useState({ year: new Date().getFullYear(), month: new Date().getMonth() });
+
+  // 날짜 변경 시 데이터 로드
+  const handleDateChange = (e) => {
+    const date = e.target.value;
+    loadAttendanceByDate(date);
+  };
+
+  // 월별 보기 시 데이터 로드
+  useEffect(() => {
+    if (viewMode === 'monthly') {
+      loadMonthlyAttendance(monthYear.year, monthYear.month);
+    }
+  }, [viewMode, monthYear]);
 
   const counts = {
     present: Object.values(attendance).filter(a => a.status === 'present').length,
@@ -23,81 +37,182 @@ export default function AttendancePage() {
   };
 
   const handleStatus = (studentId, status) => {
-    updateAttendance(studentId, status);
+    if (!isAdmin) {
+      showToast('관리자 모드에서만 수정할 수 있습니다.', 'error');
+      return;
+    }
+    updateAttendance(studentId, status, '', selectedAttendanceDate);
     const s = students.find(st => st.id === studentId);
     showToast(`${s.name} → ${STATUS_MAP[status].label}`, 'success');
     setActiveSelector(null);
   };
 
+  // 월별 날짜 목록 생성
+  const getDaysInMonth = (year, month) => {
+    const days = [];
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    for (let d = 1; d <= lastDay; d++) {
+      const date = new Date(year, month, d);
+      const dow = date.getDay();
+      if (dow !== 0 && dow !== 6) { // 주말 제외
+        days.push(`${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`);
+      }
+    }
+    return days;
+  };
+
+  const monthDays = getDaysInMonth(monthYear.year, monthYear.month);
+  const monthLabel = `${monthYear.year}년 ${monthYear.month + 1}월`;
+
   return (
     <div className="attendance-page">
-      <div className="attendance-controls">
-        <div className="date-display-box">
-          <span className="date-display-icon">📅</span>
-          <span className="date-display-text">오늘의 출석 체크</span>
-        </div>
-        <div className="attendance-summary-bar">
-          {Object.entries(STATUS_MAP).map(([key, val]) => (
-            <div key={key} className={`attendance-count ${val.color}`}>
-              <span>{val.icon}</span>
-              <span>{val.label}</span>
-              <span className="count-num">{counts[key]}</span>
+      {/* View Mode Toggle */}
+      <div className="attendance-view-toggle">
+        <button 
+          className={`view-tab ${viewMode === 'daily' ? 'active' : ''}`} 
+          onClick={() => setViewMode('daily')}
+        >
+          📋 일별 출석
+        </button>
+        <button 
+          className={`view-tab ${viewMode === 'monthly' ? 'active' : ''}`} 
+          onClick={() => setViewMode('monthly')}
+        >
+          📊 월별 현황
+        </button>
+      </div>
+
+      {viewMode === 'daily' ? (
+        <>
+          <div className="attendance-controls">
+            <div className="date-display-box">
+              <span className="date-display-icon">📅</span>
+              <input 
+                type="date" 
+                className="attendance-date-input"
+                value={selectedAttendanceDate}
+                onChange={handleDateChange}
+              />
             </div>
-          ))}
-        </div>
-      </div>
-
-      {isAdmin && <p className="attendance-tip">💡 학생 카드를 클릭하면 출석 상태를 변경할 수 있습니다.</p>}
-
-      <div className="attendance-grid">
-        {students.map(s => {
-          const att = attendance[s.id] || { status: 'present' };
-          const info = STATUS_MAP[att.status];
-          return (
-            <div
-              key={s.id}
-              className={`attendance-cell ${att.status}`}
-              onClick={() => { if (isAdmin) setActiveSelector(activeSelector === s.id ? null : s.id); }}
-            >
-              <div className="student-num">{s.number}번</div>
-              <div className="student-name">{s.name}</div>
-              <div className="status-icon">{info.icon}</div>
-              {att.note && <div className="att-note">{att.note}</div>}
-
-              {activeSelector === s.id && (
-                <div className="attendance-status-selector show" onClick={e => e.stopPropagation()}>
-                  {Object.entries(STATUS_MAP).map(([key, val]) => (
-                    <button key={key} className={`status-option ${att.status === key ? 'active' : ''}`} onClick={() => handleStatus(s.id, key)}>
-                      {val.icon} {val.label}
-                    </button>
-                  ))}
+            <div className="attendance-summary-bar">
+              {Object.entries(STATUS_MAP).map(([key, val]) => (
+                <div key={key} className={`attendance-count ${val.color}`}>
+                  <span>{val.icon}</span>
+                  <span>{val.label}</span>
+                  <span className="count-num">{counts[key]}</span>
                 </div>
-              )}
+              ))}
             </div>
-          );
-        })}
-      </div>
+          </div>
 
-      {/* Attendance Rate Chart (Simple Bar) */}
-      <div className="card" style={{marginTop:'1.5rem'}}>
-        <div className="card-header">
-          <h3 className="card-title"><span className="emoji">📊</span> 출석 현황 요약</h3>
-        </div>
-        <div className="att-chart">
-          {Object.entries(STATUS_MAP).map(([key, val]) => {
-            const pct = Math.round((counts[key] / students.length) * 100);
-            return (
-              <div key={key} className="att-chart-row">
-                <span className="att-chart-label">{val.icon} {val.label}</span>
-                <div className="att-chart-bar-bg">
-                  <div className={`att-chart-bar-fill ${key}`} style={{width:`${pct}%`}} />
+          {isAdmin && <p className="attendance-tip">💡 학생 카드를 클릭하면 출석 상태를 변경할 수 있습니다.</p>}
+
+          <div className="attendance-grid">
+            {students.map(s => {
+              const att = attendance[s.id] || { status: 'present' };
+              const info = STATUS_MAP[att.status];
+              return (
+                <div
+                  key={s.id}
+                  className={`attendance-cell ${att.status}`}
+                  onClick={() => { if (isAdmin) setActiveSelector(activeSelector === s.id ? null : s.id); }}
+                >
+                  <div className="student-num">{s.number}번</div>
+                  <div className="student-name">{s.name}</div>
+                  <div className="status-icon">{info.icon}</div>
+                  {att.note && <div className="att-note">{att.note}</div>}
+
+                  {activeSelector === s.id && (
+                    <div className="attendance-status-selector show" onClick={e => e.stopPropagation()}>
+                      {Object.entries(STATUS_MAP).map(([key, val]) => (
+                        <button key={key} className={`status-option ${att.status === key ? 'active' : ''}`} onClick={() => handleStatus(s.id, key)}>
+                          {val.icon} {val.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <span className="att-chart-value">{counts[key]}명 ({pct}%)</span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        /* Monthly View */
+        <div className="monthly-attendance">
+          <div className="monthly-nav">
+            <button className="month-nav-btn" onClick={() => {
+              if (monthYear.month === 0) setMonthYear({ year: monthYear.year - 1, month: 11 });
+              else setMonthYear({ ...monthYear, month: monthYear.month - 1 });
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
+            </button>
+            <span className="month-label">{monthLabel}</span>
+            <button className="month-nav-btn" onClick={() => {
+              if (monthYear.month === 11) setMonthYear({ year: monthYear.year + 1, month: 0 });
+              else setMonthYear({ ...monthYear, month: monthYear.month + 1 });
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
+            </button>
+          </div>
+
+          <div className="monthly-table-wrapper">
+            <table className="monthly-table">
+              <thead>
+                <tr>
+                  <th className="sticky-col">번호</th>
+                  <th className="sticky-col-name">이름</th>
+                  {monthDays.map(d => {
+                    const date = new Date(d);
+                    const dayNum = date.getDate();
+                    const dayNames = ['일','월','화','수','목','금','토'];
+                    const dayName = dayNames[date.getDay()];
+                    return (
+                      <th key={d} className="date-col">
+                        <div className="date-header">
+                          <span>{dayNum}</span>
+                          <span className="date-dow">{dayName}</span>
+                        </div>
+                      </th>
+                    );
+                  })}
+                </tr>
+              </thead>
+              <tbody>
+                {students.map(s => (
+                  <tr key={s.id}>
+                    <td className="sticky-col">{s.number}</td>
+                    <td className="sticky-col-name">{s.name}</td>
+                    {monthDays.map(d => {
+                      const record = monthlyAttendance[d]?.[s.id];
+                      const status = record?.status || null;
+                      const statusInfo = status ? STATUS_MAP[status] : null;
+                      return (
+                        <td key={d} className={`monthly-cell ${status || 'no-data'}`} title={record?.note || ''}>
+                          {statusInfo ? (
+                            <span className={`monthly-status ${status}`}>
+                              {status === 'present' ? '○' : status === 'absent' ? '✕' : status === 'late' ? '△' : '▽'}
+                            </span>
+                          ) : (
+                            <span className="monthly-status no-data">-</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="monthly-legend">
+            <span className="legend-item"><span className="legend-icon present">○</span> 출석</span>
+            <span className="legend-item"><span className="legend-icon absent">✕</span> 결석</span>
+            <span className="legend-item"><span className="legend-icon late">△</span> 지각</span>
+            <span className="legend-item"><span className="legend-icon early-leave">▽</span> 조퇴</span>
+            <span className="legend-item"><span className="legend-icon no-data">-</span> 기록 없음</span>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

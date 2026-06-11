@@ -1,103 +1,100 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { CALENDAR_EVENTS, NEWSLETTERS } from '../data/mockData';
-import { getCalendarDays, formatDate, isSameDay } from '../utils/helpers';
 import './CalendarPage.css';
 
 export default function CalendarPage() {
   const { state, dispatch, showToast } = useApp();
   const { announcements, isAdmin, settings } = state;
-  const today = new Date();
-  const [calYear, setCalYear] = useState(today.getFullYear());
-  const [calMonth, setCalMonth] = useState(today.getMonth());
   const [newNotice, setNewNotice] = useState({ title: '', content: '', type: 'general' });
   const [showForm, setShowForm] = useState(false);
+  const [editNoticeId, setEditNoticeId] = useState(null);
 
-  const calDays = getCalendarDays(calYear, calMonth);
-  const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
-  const monthLabel = `${calYear}년 ${calMonth + 1}월`;
+  const calendars = [settings?.calendarId1, settings?.calendarId2, settings?.calendarId3].filter(Boolean);
 
-  const prevMonth = () => { if (calMonth === 0) { setCalYear(calYear - 1); setCalMonth(11); } else setCalMonth(calMonth - 1); };
-  const nextMonth = () => { if (calMonth === 11) { setCalYear(calYear + 1); setCalMonth(0); } else setCalMonth(calMonth + 1); };
+  const getCalendarSrc = (input) => {
+    if (!input) return '';
+    // 만약 사용자가 <iframe src="..."> 전체를 복사해서 넣은 경우 src 추출
+    const srcMatch = input.match(/src="([^"]+)"/);
+    let extracted = srcMatch ? srcMatch[1] : input.trim();
 
-  const getEventsForDate = (date) => {
-    const iso = formatDate(date, 'iso');
-    return CALENDAR_EVENTS.filter(e => e.date === iso);
+    // 만약 이미 http 통째로 URL이라면 그대로 사용 (옵션 유지)
+    if (extracted.startsWith('http') && extracted.includes('calendar.google.com')) {
+      return extracted;
+    }
+    
+    // 그렇지 않고 ID만 넣었다면 템플릿 사용
+    return `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(extracted)}&ctz=Asia%2FSeoul&showPrint=0&showCalendars=0&showTz=0`;
   };
 
   const handleAddNotice = () => {
     if (!newNotice.title.trim()) return;
-    dispatch({
-      type: 'ADD_ANNOUNCEMENT',
-      payload: { id: Date.now(), ...newNotice, date: formatDate(new Date(), 'iso') }
-    });
+    const today = new Date();
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    
+    if (editNoticeId) {
+      dispatch({
+        type: 'UPDATE_ANNOUNCEMENT',
+        payload: { id: editNoticeId, ...newNotice, date: dateStr }
+      });
+      showToast('공지사항이 수정되었습니다', 'success');
+    } else {
+      dispatch({
+        type: 'ADD_ANNOUNCEMENT',
+        payload: { id: Date.now(), ...newNotice, date: dateStr }
+      });
+      showToast('공지사항이 등록되었습니다', 'success');
+    }
+    
     setNewNotice({ title: '', content: '', type: 'general' });
     setShowForm(false);
-    showToast('공지사항이 등록되었습니다', 'success');
+    setEditNoticeId(null);
   };
 
-  const handleCollect = (id) => {
-    dispatch({ type: 'COLLECT_NEWSLETTER', payload: id });
-    showToast('회수 1건 처리되었습니다', 'success');
+  const handleEditNotice = (n) => {
+    setNewNotice({ title: n.title, content: n.content, type: n.type });
+    setEditNoticeId(n.id);
+    setShowForm(true);
+  };
+
+  const handleDeleteNotice = (id) => {
+    if (confirm('이 공지사항을 삭제하시겠습니까?')) {
+      dispatch({ type: 'DELETE_ANNOUNCEMENT', payload: id });
+      showToast('공지사항이 삭제되었습니다', 'success');
+    }
   };
 
   return (
     <div className="calendar-page">
-      {/* Google Calendar Embed */}
-      {settings?.calendarId ? (
-        <div className="card google-calendar-embed" style={{marginBottom: '1.5rem', overflow: 'hidden'}}>
-          <iframe 
-            src={`https://calendar.google.com/calendar/embed?src=${encodeURIComponent(settings.calendarId)}&ctz=Asia%2FSeoul&showPrint=0&showCalendars=0&showTz=0`} 
-            style={{border: 0, width: '100%', height: '600px'}} 
-            frameBorder="0" 
-            scrolling="no"
-            title="Google Calendar"
-          ></iframe>
-        </div>
-      ) : (
-        <div className="card google-calendar-embed" style={{marginBottom: '1.5rem', padding: '3rem', textAlign: 'center'}}>
-          <h3>📅 구글 캘린더가 연동되지 않았습니다.</h3>
-          {isAdmin ? (
-            <p style={{color: 'var(--text-secondary)', marginTop: '0.5rem'}}>우측 상단의 ⚙️ 설정 메뉴에서 구글 캘린더 ID를 입력해주세요.</p>
+      <div className="calendar-two-col">
+        {/* Google Calendar Embed */}
+        <div className="calendar-left" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {calendars.length > 0 ? (
+            calendars.map((calId, idx) => (
+              <div key={idx} className="card google-calendar-embed" style={{overflow: 'hidden', flex: 1, minHeight: calendars.length > 1 ? '400px' : '600px'}}>
+                <iframe 
+                  src={getCalendarSrc(calId)} 
+                  style={{border: 0, width: '100%', height: '100%'}} 
+                  frameBorder="0" 
+                  scrolling="no"
+                  title={`Google Calendar ${idx + 1}`}
+                ></iframe>
+              </div>
+            ))
           ) : (
-            <p style={{color: 'var(--text-secondary)', marginTop: '0.5rem'}}>관리자가 캘린더를 연동하면 이 곳에 표시됩니다.</p>
+            <div className="card google-calendar-embed" style={{padding: '3rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px'}}>
+              <h3>📅 구글 캘린더가 연동되지 않았습니다.</h3>
+              {isAdmin ? (
+                <p style={{color: 'var(--text-secondary)', marginTop: '0.5rem'}}>우측 상단의 ⚙️ 설정 메뉴에서 구글 캘린더 ID를 입력해주세요.</p>
+              ) : (
+                <p style={{color: 'var(--text-secondary)', marginTop: '0.5rem'}}>관리자가 캘린더를 연동하면 이 곳에 표시됩니다.</p>
+              )}
+            </div>
           )}
         </div>
-      )}
 
-      <div className="calendar-page-grid">
-        {/* Calendar */}
-        <div className="full-calendar card">
-          <div className="cal-nav">
-            <button className="cal-nav-btn" onClick={prevMonth}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
-            <span className="cal-month-year">{monthLabel}</span>
-            <button className="cal-nav-btn" onClick={nextMonth}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 18l6-6-6-6"/></svg>
-            </button>
-          </div>
-          <div className="cal-grid">
-            {weekdays.map((d, i) => <div key={d} className={`cal-weekday ${i === 0 ? 'sunday' : i === 6 ? 'saturday' : ''}`}>{d}</div>)}
-            {calDays.map((d, i) => {
-              const events = getEventsForDate(d.date);
-              const isToday = isSameDay(d.date, today);
-              return (
-                <div key={i} className={`cal-day ${!d.currentMonth ? 'other-month' : ''} ${isToday ? 'today' : ''} ${events.length > 0 ? 'has-event' : ''}`}>
-                  <span className={`cal-day-num ${isToday ? 'today-num' : ''}`}>{d.day}</span>
-                  {events.map((ev, j) => (
-                    <span key={j} className={`cal-event ${ev.type}`}>{ev.title}</span>
-                  ))}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Sidebar: Notices + Newsletter + Supplies */}
-        <div className="calendar-sidebar">
-          {/* Notice Board */}
-          <div className="card">
+        {/* Notice Board */}
+        <div className="calendar-right">
+          <div className="card notice-card-container">
             <div className="card-header">
               <h3 className="card-title"><span>📢</span> 공지사항</h3>
               {isAdmin && <button className="btn btn-sm btn-primary" onClick={() => setShowForm(!showForm)}>+ 새 공지</button>}
@@ -112,49 +109,34 @@ export default function CalendarPage() {
                     <option value="important">중요</option>
                     <option value="newsletter">통신문</option>
                   </select>
-                  <button className="btn btn-primary" onClick={handleAddNotice}>등록</button>
+                  <button className="btn btn-primary" onClick={handleAddNotice}>{editNoticeId ? '수정' : '등록'}</button>
+                  {editNoticeId && <button className="btn btn-secondary" onClick={() => {setShowForm(false); setEditNoticeId(null); setNewNotice({title:'', content:'', type:'general'})}}>취소</button>}
                 </div>
               </div>
             )}
             <div className="notices-list">
-              {announcements.slice(0, 5).map(n => (
+              {announcements.length > 0 ? announcements.map(n => (
                 <div key={n.id} className="notice-card">
                   <div className="notice-card-header">
-                    <span className={`notice-type ${n.type}`}>{n.type === 'important' ? '중요' : n.type === 'newsletter' ? '통신문' : '일반'}</span>
-                    <span className="notice-card-date">{n.date}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span className={`notice-type ${n.type}`}>{n.type === 'important' ? '중요' : n.type === 'newsletter' ? '통신문' : '일반'}</span>
+                      <span className="notice-card-date">{n.date}</span>
+                    </div>
+                    {isAdmin && (
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        <button className="icon-btn" onClick={() => handleEditNotice(n)} style={{ fontSize: '0.75rem', padding: '2px 4px' }}>✏️</button>
+                        <button className="icon-btn" onClick={() => handleDeleteNotice(n.id)} style={{ fontSize: '0.75rem', padding: '2px 4px' }}>🗑️</button>
+                      </div>
+                    )}
                   </div>
                   <div className="notice-card-title">{n.title}</div>
                   <div className="notice-card-content">{n.content}</div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Newsletter Manager */}
-          <div className="card">
-            <div className="card-header">
-              <h3 className="card-title"><span>📄</span> 가정통신문 회수</h3>
-            </div>
-            <div className="newsletter-list">
-              {NEWSLETTERS.map(n => {
-                const stateN = state.newsletters.find(sn => sn.id === n.id) || n;
-                const pct = Math.round((stateN.collected / stateN.distributed) * 100);
-                return (
-                  <div key={n.id} className="newsletter-item">
-                    <span className="newsletter-icon">📋</span>
-                    <div className="newsletter-info">
-                      <div className="newsletter-name">{n.name}</div>
-                      <div className="newsletter-status">배부: {stateN.distributed}장 · 회수: {stateN.collected}장</div>
-                    </div>
-                    <div className="newsletter-progress">
-                      <div className="newsletter-ratio" style={{color: pct >= 90 ? 'var(--accent)' : pct >= 70 ? 'var(--secondary)' : 'var(--danger)'}}>{pct}%</div>
-                      {isAdmin && (
-                        <button className="btn btn-sm btn-outline" onClick={() => handleCollect(n.id)} style={{marginTop:'0.25rem',fontSize:'0.6875rem',padding:'2px 8px',minHeight:'24px'}}>+1 회수</button>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
+              )) : (
+                <div className="empty-state" style={{padding: '2rem', textAlign: 'center'}}>
+                  <p style={{color: 'var(--text-secondary)'}}>등록된 공지사항이 없습니다.</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

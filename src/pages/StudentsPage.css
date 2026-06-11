@@ -38,6 +38,76 @@
 .point-add.minus { background:#FEF2F2; color:var(--danger-dark); }
 .point-add.minus:hover { background:var(--danger); color:white; }
 
+/* --- Evaluation Tab Split Layout --- */
+.evaluation-split-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.eval-grid-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.eval-student-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  background: white;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.eval-student-pill.submitted {
+  background: var(--gray-50);
+  border-color: var(--primary-color);
+}
+
+.eval-student-pill.unsubmitted {
+  background: #FFF0F0;
+  border-color: #FECACA;
+  opacity: 0.8;
+}
+
+.eval-student-pill .eval-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.eval-student-pill .eval-grade-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.eval-student-pill .grade-btn {
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-light);
+  background: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--text-secondary);
+}
+
+.eval-student-pill .grade-btn:hover {
+  background: var(--gray-100);
+}
+
+.eval-student-pill .grade-btn.active.top { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+.eval-student-pill .grade-btn.active.mid { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+.eval-student-pill .grade-btn.active.bot { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+
+.eval-grade-display {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
 /* Table */
 .table-container { overflow-x:auto; border-radius:var(--radius-md); border:1px solid var(--border-color); background:var(--bg-card); }
 table { width:100%; border-collapse:collapse; }
@@ -50,9 +120,9 @@ tr:hover td { background:var(--gray-50); }
 .seating-container { padding:1rem 0; }
 .seating-header h3 { font-size:1rem; font-weight:700; margin-bottom:1rem; }
 .teacher-desk { text-align:center; padding:0.75rem; background:linear-gradient(135deg,var(--primary),var(--primary-dark)); color:white; border-radius:var(--radius-md); font-weight:700; font-size:0.875rem; margin:0 auto 1.5rem; max-width:200px; }
-.seating-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:0.75rem; max-width:700px; margin:0 auto; }
-.seat { aspect-ratio:1; border:2px dashed var(--border-color); border-radius:var(--radius-md); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:0.75rem; font-weight:600; color:var(--text-secondary); transition:all var(--transition-fast); cursor:pointer; background:var(--bg-card); min-height:70px; }
-.seat.empty-aisle { border:none; background:transparent; cursor:default; }
+.seating-grid-dynamic { display:flex; flex-wrap:wrap; gap:0.75rem; max-width:650px; margin:0 auto; justify-content:center; }
+.seat { width:calc(16.666% - 1.5rem); min-width:65px; border:2px dashed var(--border-color); border-radius:var(--radius-md); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; font-size:0.75rem; font-weight:600; color:var(--text-secondary); transition:all var(--transition-fast); background:var(--bg-card); min-height:70px; aspect-ratio:1; }
+.seat:nth-child(2n):not(:nth-child(6n)) { margin-right:2.5rem; }
 .seat.occupied { border:2px solid var(--primary-200); background:var(--primary-50); color:var(--primary); }
 .seat.occupied:hover { border-color:var(--primary); transform:scale(1.05); box-shadow:var(--shadow-md); }
 .seat-name { font-weight:700; font-size:0.75rem; }
@@ -69,6 +139,13 @@ tr:hover td { background:var(--gray-50); }
 .points-rank.bronze { background:#FED7AA; color:#9A3412; }
 .points-student-name { flex:1; font-weight:600; font-size:0.8125rem; }
 .points-score { font-weight:800; font-size:0.9375rem; color:var(--secondary); }
+.points-actions { display:flex; gap:0.25rem; }
+
+/* DnD Group Card */
+.group-card-dnd { transition: all 0.2s ease; }
+.group-card-dnd.drag-over { border-color: var(--primary); background: var(--primary-50) !important; transform: scale(1.02); }
+.team-student-pill { transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.team-student-pill:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: var(--primary-300); }
 .points-actions { display:flex; gap:0.25rem; }
 
 /* Modal */
@@ -89,9 +166,94 @@ tr:hover td { background:var(--gray-50); }
 .detail-stat { text-align:center; padding:0.75rem; background:var(--gray-50); border-radius:var(--radius-md); }
 .detail-stat-value { font-size:0.9375rem; font-weight:800; color:var(--primary); }
 .detail-stat-label { font-size:0.75rem; color:var(--text-secondary); margin-top:2px; }
-.counseling-list { max-height:200px; overflow-y:auto; }
+.counseling-list { max-height:300px; overflow-y:auto; }
 .counseling-item { padding:0.75rem; border-left:3px solid var(--primary-200); margin-bottom:0.75rem; background:var(--gray-50); border-radius:0 var(--radius-sm) var(--radius-sm) 0; }
 .counseling-date { font-size:0.75rem; color:var(--text-muted); font-weight:600; }
 .counseling-content { font-size:0.8125rem; margin-top:4px; }
 
-@media (max-width:768px) { .students-grid { grid-template-columns:1fr; } .seating-grid { grid-template-columns:repeat(5,1fr); gap:0.5rem; } .seat { min-height:55px; } }
+/* Student Edit Section */
+.student-edit-section {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: var(--gray-50);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+}
+
+.edit-fields-grid {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.edit-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.edit-field label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.edit-field .form-input {
+  min-height: 34px;
+  font-size: 0.8125rem;
+}
+
+/* Record Input */
+.record-input-section {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--gray-50);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+}
+
+.record-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.record-input-row .form-input {
+  font-size: 0.8125rem;
+}
+
+.records-list-section {
+  margin-top: 1rem;
+}
+
+.record-type-badge {
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.record-type-badge.observation {
+  background: #EEF2FF;
+  color: #4338CA;
+}
+
+.record-type-badge.counseling {
+  background: #FEF3C7;
+  color: #92400E;
+}
+
+/* Tabs */
+.students-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--border-light); padding-bottom: 0.5rem; }
+.tab-btn { background: transparent; border: none; font-size: 1rem; font-weight: 700; color: var(--text-secondary); padding: 0.5rem 1rem; cursor: pointer; border-radius: var(--radius-md); transition: all var(--transition-fast); }
+.tab-btn:hover { background: var(--gray-100); color: var(--text-primary); }
+.tab-btn.active { background: var(--primary-50); color: var(--primary-dark); }
+
+/* Evaluation Tab */
+.evaluation-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0.75rem; }
+.eval-student-card { transition: transform 0.2s; }
+.eval-student-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+
+@media (max-width:768px) { .students-grid { grid-template-columns:1fr; } .seating-grid { grid-template-columns:repeat(5,1fr); gap:0.5rem; } .seat { min-height:55px; } .edit-fields-grid { flex-direction: column; } .evaluation-grid { grid-template-columns: 1fr; } }
+

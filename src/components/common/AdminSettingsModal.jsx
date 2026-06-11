@@ -6,22 +6,20 @@ export default function AdminSettingsModal({ onClose }) {
   const { state, dispatch, showToast } = useApp();
   const { settings } = state;
 
-  const [pin, setPin] = useState(settings.adminPin);
-  const [goal, setGoal] = useState(settings.thermometerGoal);
-  const [calendarId, setCalendarId] = useState(settings.calendarId);
+  const [calendarId1, setCalendarId1] = useState(settings.calendarId1 || '');
+  const [calendarId2, setCalendarId2] = useState(settings.calendarId2 || '');
+  const [calendarId3, setCalendarId3] = useState(settings.calendarId3 || '');
+  const [geminiApiKey, setGeminiApiKey] = useState(settings.geminiApiKey || '');
 
   const handleSave = () => {
-    if (pin.length !== 4) {
-      showToast('PIN은 4자리 숫자여야 합니다.', 'error');
-      return;
-    }
-    
     dispatch({ 
       type: 'UPDATE_SETTINGS', 
       payload: { 
-        adminPin: pin, 
-        thermometerGoal: parseInt(goal) || 1500, 
-        calendarId 
+        ...settings,
+        calendarId1, 
+        calendarId2, 
+        calendarId3, 
+        geminiApiKey 
       } 
     });
     showToast('설정이 저장되었습니다.', 'success');
@@ -37,34 +35,44 @@ export default function AdminSettingsModal({ onClose }) {
         </div>
         <div className="settings-modal-body">
           <div className="settings-form-group">
-            <label>관리자 PIN (4자리 숫자)</label>
+            <label>🤖 제미나이(Gemini) API 키</label>
             <input 
               type="password" 
               className="settings-form-input" 
-              maxLength="4"
-              value={pin} 
-              onChange={e => setPin(e.target.value.replace(/[^0-9]/g, ''))} 
+              placeholder="AI 행동발달 종합의견을 위한 API 키 입력"
+              value={geminiApiKey} 
+              onChange={e => setGeminiApiKey(e.target.value)} 
             />
+            <small className="settings-help-text">구글 AI Studio에서 발급받은 API 키를 입력하세요. 브라우저에 안전하게 저장됩니다.</small>
           </div>
           <div className="settings-form-group">
-            <label>학급 온도계 목표 점수</label>
-            <input 
-              type="number" 
-              className="settings-form-input" 
-              value={goal} 
-              onChange={e => setGoal(e.target.value)} 
-            />
-          </div>
-          <div className="settings-form-group">
-            <label>구글 캘린더 ID (공개)</label>
+            <label>📅 구글 캘린더 ID 1 (필수)</label>
             <input 
               type="text" 
               className="settings-form-input" 
               placeholder="예: ...@group.calendar.google.com"
-              value={calendarId} 
-              onChange={e => setCalendarId(e.target.value)} 
+              value={calendarId1} 
+              onChange={e => setCalendarId1(e.target.value)} 
             />
-            <small className="settings-help-text">구글 캘린더 설정의 '캘린더 ID'를 복사해 넣으세요. 캘린더가 전체 공개여야 합니다.</small>
+          </div>
+          <div className="settings-form-group">
+            <label>📅 구글 캘린더 ID 2 (선택)</label>
+            <input 
+              type="text" 
+              className="settings-form-input" 
+              value={calendarId2} 
+              onChange={e => setCalendarId2(e.target.value)} 
+            />
+          </div>
+          <div className="settings-form-group">
+            <label>📅 구글 캘린더 ID 3 (선택)</label>
+            <input 
+              type="text" 
+              className="settings-form-input" 
+              value={calendarId3} 
+              onChange={e => setCalendarId3(e.target.value)} 
+            />
+            <small className="settings-help-text">일정 및 공지 페이지에 표시할 구글 캘린더 ID를 입력하세요. (최대 3개)</small>
           </div>
         </div>
         <div className="settings-modal-footer">

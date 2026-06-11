@@ -1,29 +1,68 @@
 .weekly-page {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 .weekly-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.weekly-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.week-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.week-nav-btn:hover {
+  background: var(--primary-50);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.week-nav-btn.today-btn {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.week-nav-btn.today-btn:hover {
+  background: var(--primary-dark);
 }
 
 .weekly-date {
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-card);
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-full);
-  border: 1px solid var(--border-color);
-  font-size: 0.875rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 0.25rem 0.75rem;
+  background: var(--primary-50);
+  border-radius: var(--radius-md);
 }
 
 .weekly-tip {
+  font-size: 0.8rem;
   color: var(--text-secondary);
-  font-size: 0.875rem;
-  margin-top: -0.5rem;
+  margin-bottom: 1rem;
 }
 
 .weekly-table-wrapper {
@@ -33,110 +72,119 @@
 .weekly-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 800px;
+  font-size: 0.85rem;
 }
 
-.weekly-table th,
-.weekly-table td {
-  border: 1px solid var(--border-color);
-  padding: 1rem;
+.weekly-table th, .weekly-table td {
+  border: 1px solid var(--glass-border);
+  padding: 0.5rem;
   text-align: center;
   vertical-align: top;
 }
 
 .weekly-table th {
-  background: var(--bg-primary);
+  background: var(--gray-50);
   font-weight: 700;
-  color: var(--text-primary);
-  padding: 1rem;
+  padding: 0.6rem 0.5rem;
+}
+
+.weekly-table th.today-col {
+  background: var(--primary-50);
+  color: var(--primary-dark);
+}
+
+.day-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.day-name {
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.day-date {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.today-col .day-date {
+  color: var(--primary);
 }
 
 .period-col {
-  width: 60px;
-  background: var(--bg-primary);
+  width: 50px;
+  font-weight: 700;
 }
 
 .period-cell {
-  font-weight: 700;
-  color: var(--text-secondary);
-  vertical-align: middle !important;
-  background: var(--bg-primary);
-  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--primary);
+  background: var(--gray-50);
+  width: 50px;
 }
 
 .plan-cell {
-  width: calc((100% - 60px) / 5);
-  transition: all 0.2s;
-  position: relative;
-  height: 80px;
+  min-width: 120px;
+  cursor: default;
+  transition: background 0.2s;
+  min-height: 60px;
 }
 
-.plan-cell.editable:hover {
-  background: var(--bg-sidebar-hover);
+.plan-cell.today-cell {
+  background: rgba(99, 102, 241, 0.03);
+}
+
+.plan-cell.editable {
   cursor: pointer;
 }
 
+.plan-cell.editable:hover {
+  background: var(--primary-50);
+}
+
 .plan-cell.is-editing {
-  background: var(--bg-primary);
-  padding: 0.75rem;
+  background: var(--primary-50);
+  padding: 0.5rem;
 }
 
 .plan-display {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  height: 100%;
-  justify-content: center;
+  gap: 2px;
 }
 
 .plan-subject {
   font-weight: 700;
-  color: var(--primary-color);
-  font-size: 0.875rem;
-  background: rgba(99, 102, 241, 0.1);
-  display: inline-block;
-  padding: 0.2rem 0.5rem;
-  border-radius: var(--radius-sm);
-  align-self: center;
+  color: var(--primary);
+  font-size: 0.85rem;
 }
 
 .plan-content {
-  font-size: 0.875rem;
-  color: var(--text-primary);
-  line-height: 1.4;
-  word-break: keep-all;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
 }
 
 .plan-empty {
-  color: var(--border-color);
-  font-size: 1rem;
+  color: var(--text-muted);
 }
 
 .plan-edit-form {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  text-align: left;
+  gap: 0.35rem;
 }
 
-.plan-subject-input {
-  font-size: 0.8125rem;
-  padding: 0.5rem;
-  font-weight: 600;
-}
-
-.plan-content-input {
-  font-size: 0.8125rem;
-  padding: 0.5rem;
+.plan-subject-input, .plan-content-input {
+  font-size: 0.8rem !important;
+  padding: 0.3rem 0.5rem !important;
+  min-height: 28px !important;
 }
 
 .plan-edit-actions {
   display: flex;
   gap: 0.25rem;
-}
-
-.plan-edit-actions button {
-  flex: 1;
-  padding: 0.35rem;
-  font-size: 0.75rem;
+  justify-content: flex-end;
 }
