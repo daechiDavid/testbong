@@ -203,7 +203,7 @@ export default function LearningPage() {
           const remaining = total - submittedCount;
           return (
             <div key={a.id} className="assignment-card clickable" onClick={() => setSelectedAssignment(a)}>
-              <div className="assignment-icon" style={{ background: a.type === '수행평가' ? '#EEF2FF' : '#ECFDF5' }}>
+              <div className="assignment-icon" style={{ background: a.type === '수행평가' ? '#FFF4ED' : '#ECFDF5' }}>
                 {a.type === '수행평가' ? '📋' : '📝'}
               </div>
               <div className="assignment-details">

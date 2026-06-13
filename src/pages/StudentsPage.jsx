@@ -568,7 +568,7 @@ export default function StudentsPage() {
                     <th style={{ position: 'sticky', left: 0, zIndex: 10, background: 'var(--gray-50)', minWidth: '120px' }}>학생 이름</th>
                     {assignments.map(a => (
                       <th key={a.id} style={{ minWidth: '160px', textAlign: 'center', padding: '1rem' }}>
-                        <div style={{ display: 'inline-block', padding: '0.2rem 0.5rem', background: a.type === '수행평가' ? '#EEF2FF' : '#ECFDF5', color: a.type === '수행평가' ? '#4F46E5' : '#059669', borderRadius: '4px', fontSize: '0.75rem', marginBottom: '0.4rem' }}>{a.type}</div>
+                        <div style={{ display: 'inline-block', padding: '0.2rem 0.5rem', background: a.type === '수행평가' ? '#FFF4ED' : '#ECFDF5', color: a.type === '수행평가' ? '#E8590C' : '#059669', borderRadius: '4px', fontSize: '0.75rem', marginBottom: '0.4rem' }}>{a.type}</div>
                         <div style={{ fontSize: '0.9rem', color: 'var(--text-primary)', fontWeight: 700, marginBottom: '0.25rem', whiteSpace: 'normal', wordBreak: 'keep-all' }}>{a.title}</div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{a.dueDate}</div>
                         {isAdmin && (

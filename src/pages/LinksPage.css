@@ -16,8 +16,8 @@
   flex-direction: column;
   gap: 1.25rem;
   background: var(--bg-card);
-  border: 1px solid var(--primary-color);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1);
+  border: 1px solid var(--primary);
+  box-shadow: 0 4px 12px rgba(255, 111, 15, 0.1);
 }
 
 .form-row {
@@ -69,7 +69,7 @@
 .link-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-md);
-  border-color: var(--primary-color);
+  border-color: var(--primary);
 }
 
 .link-icon {

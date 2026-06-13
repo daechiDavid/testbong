@@ -17,7 +17,7 @@ export function useAdminMode() {
       setShowPinModal(false);
       setEmailInput('');
       setPasswordInput('');
-      showToast('관리자 모드로 전환되었습니다.', 'success');
+      showToast('교사 모드로 전환되었습니다.', 'success');
       dispatch({ type: 'TOGGLE_ADMIN', payload: true });
     }
   };
@@ -36,16 +36,16 @@ export function useAdminMode() {
     }
   };
 
-  return { 
-    isAdmin, 
-    showPinModal, 
-    setShowPinModal, 
-    emailInput, 
+  return {
+    isAdmin,
+    showPinModal,
+    setShowPinModal,
+    emailInput,
     setEmailInput,
     passwordInput,
     setPasswordInput,
-    login, 
-    logout, 
-    toggle 
+    login,
+    logout,
+    toggle
   };
 }

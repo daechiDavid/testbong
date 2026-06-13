@@ -16,7 +16,7 @@
 .avatar { width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:0.8125rem; color:white; flex-shrink:0; }
 .avatar.sm { width:32px; height:32px; font-size:0.75rem; }
 .avatar.xl { width:72px; height:72px; font-size:1.25rem; }
-.avatar.c1 { background:linear-gradient(135deg,#6366F1,#818CF8); }
+.avatar.c1 { background:linear-gradient(135deg,#FF6F0F,#FF922B); }
 .avatar.c2 { background:linear-gradient(135deg,#EC4899,#F472B6); }
 .avatar.c3 { background:linear-gradient(135deg,#10B981,#34D399); }
 .avatar.c4 { background:linear-gradient(135deg,#F59E0B,#FBBF24); }
@@ -64,7 +64,7 @@
 
 .eval-student-pill.submitted {
   background: var(--gray-50);
-  border-color: var(--primary-color);
+  border-color: var(--primary);
 }
 
 .eval-student-pill.unsubmitted {
@@ -98,14 +98,14 @@
   background: var(--gray-100);
 }
 
-.eval-student-pill .grade-btn.active.top { background: var(--primary-color); color: white; border-color: var(--primary-color); }
-.eval-student-pill .grade-btn.active.mid { background: var(--primary-color); color: white; border-color: var(--primary-color); }
-.eval-student-pill .grade-btn.active.bot { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+.eval-student-pill .grade-btn.active.top { background: var(--primary); color: white; border-color: var(--primary); }
+.eval-student-pill .grade-btn.active.mid { background: var(--primary); color: white; border-color: var(--primary); }
+.eval-student-pill .grade-btn.active.bot { background: var(--primary); color: white; border-color: var(--primary); }
 
 .eval-grade-display {
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--primary-color);
+  color: var(--primary);
 }
 
 /* Table */
@@ -235,8 +235,8 @@ tr:hover td { background:var(--gray-50); }
 }
 
 .record-type-badge.observation {
-  background: #EEF2FF;
-  color: #4338CA;
+  background: #FFF4ED;
+  color: #E8590C;
 }
 
 .record-type-badge.counseling {
