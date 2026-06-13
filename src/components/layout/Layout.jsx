@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { NavLink, useLocation, useNavigate } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { formatDate } from '../../utils/helpers'
 import { useAdminMode } from '../../hooks/useAdminMode'
-import { useApp } from '../../context/AppContext'
 import AdminSettingsModal from '../common/AdminSettingsModal'
 import './Layout.css'
 
@@ -46,15 +46,13 @@ export default function Layout({ children }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
   const { isAdmin, showPinModal, setShowPinModal, emailInput, setEmailInput, passwordInput, setPasswordInput, login, toggle } = useAdminMode();
-  const { showToast } = useApp();
 
-  const pageTitle = PAGE_TITLES[location.pathname] || '대시보드';
+  const pageTitle = PAGE_TITLES[pathname] || '대시보드';
 
   // 학습 관리, 투표(학급 도구) 등만 클릭 허용하고 나머지는 읽기 전용
-  const isReadOnlyPath = !isAdmin && !STUDENT_ALLOWED_PATHS.includes(location.pathname);
+  const isReadOnlyPath = !isAdmin && !STUDENT_ALLOWED_PATHS.includes(pathname);
 
   return (
     <div className="app-layout">
@@ -80,18 +78,18 @@ export default function Layout({ children }) {
         <nav className="sidebar-nav">
           {NAV_ITEMS.map(item => {
             const isAllowed = isAdmin || STUDENT_ALLOWED_PATHS.includes(item.path);
+            const isActive = pathname === item.path;
             return (
-              <NavLink
+              <Link
                 key={item.path}
-                to={item.path}
-                end={item.path === '/'}
-                className={({ isActive }) => `nav-item ${isActive ? 'active' : ''} ${!isAllowed ? 'nav-disabled' : ''}`}
+                href={item.path}
+                className={`nav-item ${isActive ? 'active' : ''} ${!isAllowed ? 'nav-disabled' : ''}`}
                 onClick={() => setSidebarOpen(false)}
               >
                 <span className="nav-icon">{item.icon}</span>
                 <span className="nav-label">{item.label}</span>
                 {!isAllowed && <span className="nav-lock">🔒</span>}
-              </NavLink>
+              </Link>
             );
           })}
         </nav>
@@ -136,16 +134,16 @@ export default function Layout({ children }) {
       <nav className="mobile-nav">
         {NAV_ITEMS.map(item => {
           const isAllowed = isAdmin || STUDENT_ALLOWED_PATHS.includes(item.path);
+          const isActive = pathname === item.path;
           return (
-            <NavLink
+            <Link
               key={item.path}
-              to={item.path}
-              end={item.path === '/'}
-              className={({ isActive }) => `mobile-nav-item ${isActive ? 'active' : ''} ${!isAllowed ? 'nav-disabled' : ''}`}
+              href={item.path}
+              className={`mobile-nav-item ${isActive ? 'active' : ''} ${!isAllowed ? 'nav-disabled' : ''}`}
             >
               {item.icon}
               <span>{MOBILE_LABELS[item.path]}</span>
-            </NavLink>
+            </Link>
           );
         })}
       </nav>

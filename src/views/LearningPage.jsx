@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/purity */
 import { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import './LearningPage.css';
@@ -213,15 +214,6 @@ export default function LearningPage() {
                   <span>{a.subject}</span>
                   <span>마감: {a.dueDate || a.due_date}</span>
                   {remaining > 0 && <span style={{ color: 'var(--danger)' }}>미제출 {remaining}명</span>}
-                  {isAdmin && (
-                    <button style={{ background: 'transparent', border: 'none', color: '#DC2626', fontSize: '0.8rem', cursor: 'pointer', marginLeft: 'auto', fontWeight: 600, display: 'flex', alignItems: 'center', height: '100%' }} onClick={(e) => {
-                      e.stopPropagation();
-                      if (confirm('이 항목을 정말 삭제하시겠습니까?')) {
-                        dispatch({ type: 'DELETE_ASSIGNMENT', payload: a.id });
-                        showToast('삭제되었습니다.', 'success');
-                      }
-                    }}>🗑️ 삭제</button>
-                  )}
                 </div>
               </div>
               <div className="assignment-progress-bar">
@@ -230,6 +222,15 @@ export default function LearningPage() {
                 </div>
               </div>
               <div className="assignment-percentage">{pct}%</div>
+              {isAdmin && (
+                <button className="assignment-delete-btn" onClick={(e) => {
+                  e.stopPropagation();
+                  if (confirm('이 항목을 정말 삭제하시겠습니까?')) {
+                    dispatch({ type: 'DELETE_ASSIGNMENT', payload: a.id });
+                    showToast('삭제되었습니다.', 'success');
+                  }
+                }} title="삭제">🗑️</button>
+              )}
             </div>
           );
         }) : (

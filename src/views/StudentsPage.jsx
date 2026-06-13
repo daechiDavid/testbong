@@ -1,13 +1,12 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { getAvatarColor, getInitials } from '../utils/helpers';
-import { generateBehaviorSummary } from '../utils/gemini';
 import * as XLSX from 'xlsx';
 import './StudentsPage.css';
 
 export default function StudentsPage() {
   const { state, dispatch, showToast, updatePoints, resetPoints, updateStudent, bulkUpdateStudents, addStudentRecord, deleteStudentRecord } = useApp();
-  const { students, isAdmin, studentRecords, assignments, settings } = state;
+  const { students, isAdmin, studentRecords, assignments } = state;
   const [activeTab, setActiveTab] = useState('list'); // 'list', 'behavior', 'evaluation'
   const [search, setSearch] = useState('');
   const [view, setView] = useState('card');
@@ -232,11 +231,6 @@ export default function StudentsPage() {
   };
 
   const handleGenerateAI = async (student) => {
-    if (!settings.geminiApiKey) {
-      showToast('설정에서 제미나이 API 키를 먼저 등록해주세요.', 'error');
-      return;
-    }
-    
     const recs = studentRecords[student.id] || [];
     const evals = assignments.filter(a => a.submissions?.[student.id]).map(a => ({
       title: a.title,
@@ -253,9 +247,23 @@ export default function StudentsPage() {
 
     try {
       setIsGeneratingAi(true);
-      const summary = await generateBehaviorSummary(settings.geminiApiKey, studentData);
       
-      updateStudent({ id: student.id, aiSummary: summary });
+      const res = await fetch('/api/gemini', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ studentData })
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || '의견 생성 실패');
+      }
+
+      const data = await res.json();
+      
+      updateStudent({ id: student.id, aiSummary: data.summary });
       
       showToast('AI가 종합의견을 생성했습니다.', 'success');
     } catch (err) {

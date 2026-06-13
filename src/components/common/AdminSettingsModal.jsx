@@ -1,26 +1,23 @@
+"use client";
+
 import { useState } from 'react';
 import { useApp } from '../../context/AppContext';
 import './AdminSettingsModal.css';
 
 export default function AdminSettingsModal({ onClose }) {
-  const { state, dispatch, showToast } = useApp();
+  const { state, updateSettings, showToast } = useApp();
   const { settings } = state;
 
   const [calendarId1, setCalendarId1] = useState(settings.calendarId1 || '');
   const [calendarId2, setCalendarId2] = useState(settings.calendarId2 || '');
   const [calendarId3, setCalendarId3] = useState(settings.calendarId3 || '');
-  const [geminiApiKey, setGeminiApiKey] = useState(settings.geminiApiKey || '');
 
-  const handleSave = () => {
-    dispatch({ 
-      type: 'UPDATE_SETTINGS', 
-      payload: { 
-        ...settings,
-        calendarId1, 
-        calendarId2, 
-        calendarId3, 
-        geminiApiKey 
-      } 
+  const handleSave = async () => {
+    await updateSettings({ 
+      ...settings,
+      calendarId1, 
+      calendarId2, 
+      calendarId3
     });
     showToast('설정이 저장되었습니다.', 'success');
     onClose();
@@ -34,17 +31,6 @@ export default function AdminSettingsModal({ onClose }) {
           <button className="settings-close-btn" onClick={onClose}>×</button>
         </div>
         <div className="settings-modal-body">
-          <div className="settings-form-group">
-            <label>🤖 제미나이(Gemini) API 키</label>
-            <input 
-              type="password" 
-              className="settings-form-input" 
-              placeholder="AI 행동발달 종합의견을 위한 API 키 입력"
-              value={geminiApiKey} 
-              onChange={e => setGeminiApiKey(e.target.value)} 
-            />
-            <small className="settings-help-text">구글 AI Studio에서 발급받은 API 키를 입력하세요. 브라우저에 안전하게 저장됩니다.</small>
-          </div>
           <div className="settings-form-group">
             <label>📅 구글 캘린더 ID 1 (필수)</label>
             <input 
@@ -83,3 +69,4 @@ export default function AdminSettingsModal({ onClose }) {
     </div>
   );
 }
+

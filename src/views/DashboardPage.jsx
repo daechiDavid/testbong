@@ -24,7 +24,7 @@ const defaultLayouts = {
 
 export default function DashboardPage() {
   const { state, dispatch, showToast } = useApp();
-  const { students, attendance, announcements, settings, weeklyPlans, ddays = [], isAdmin } = state;
+  const { students, announcements, settings, weeklyPlans, ddays = [], isAdmin } = state;
 
   const [lunchInfo, setLunchInfo] = useState(null);
   const [isLoadingLunch, setIsLoadingLunch] = useState(true);

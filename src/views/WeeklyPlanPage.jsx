@@ -4,7 +4,7 @@ import { getWeekStart, toISODate } from '../context/AppContext';
 import './WeeklyPlanPage.css';
 
 export default function WeeklyPlanPage() {
-  const { state, dispatch, showToast, saveWeeklyPlan } = useApp();
+  const { state, showToast, saveWeeklyPlan } = useApp();
   const { weeklyPlans, isAdmin } = state;
 
   const [currentDate, setCurrentDate] = useState(new Date());

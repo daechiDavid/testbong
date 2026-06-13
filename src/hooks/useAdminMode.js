@@ -4,13 +4,13 @@ import { supabase } from '../utils/supabase';
 
 export function useAdminMode() {
   const { state, dispatch, showToast } = useApp();
-  const { isAdmin, settings } = state;
+  const { isAdmin } = state;
   const [showPinModal, setShowPinModal] = useState(false);
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
 
   const login = async (email, password) => {
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       showToast('이메일 또는 비밀번호가 틀렸습니다.', 'error');
     } else {

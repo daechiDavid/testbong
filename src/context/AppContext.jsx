@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useReducer, useCallback, useEffect, useState } from 'react';
 import { supabase } from '../utils/supabase';
 
@@ -33,7 +34,6 @@ const initialState = {
     calendarId1: '',
     calendarId2: '',
     calendarId3: '',
-    geminiApiKey: '',
     thermometerGoal: 1500,
     thermometerReward: '아이스크림 파티!'
   },
@@ -279,13 +279,6 @@ export function AppProvider({ children }) {
         if (app_configs) {
           mergedSettings = { ...mergedSettings, ...app_configs };
         }
-        try {
-          const localSettings = localStorage.getItem('dashboardSettings');
-          if (localSettings) {
-            const parsed = JSON.parse(localSettings);
-            mergedSettings.geminiApiKey = parsed.geminiApiKey || '';
-          }
-        } catch (e) {}
         dispatch({ type: 'UPDATE_SETTINGS', payload: mergedSettings });
 
         // Auth state listener
@@ -317,12 +310,8 @@ export function AppProvider({ children }) {
 
   const updateSettings = async (newSettings) => {
     dispatch({ type: 'UPDATE_SETTINGS', payload: newSettings });
-    // LocalStorage 저장
-    localStorage.setItem('dashboardSettings', JSON.stringify({ geminiApiKey: newSettings.geminiApiKey }));
-    
-    // DB 저장 (API 키 제외)
-    const { geminiApiKey, ...dbSettings } = newSettings;
-    await supabase.from('app_configs').upsert({ id: 1, ...dbSettings });
+    // DB 저장
+    await supabase.from('app_configs').upsert({ id: 1, ...newSettings });
   };
 
   const addDDay = async (dday) => {
