@@ -80,10 +80,10 @@ export default function CalendarPage() {
         {/* Google Calendar Embed */}
         <div className="calendar-left" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {calendars.length > 0 ? (
-              <div className="card google-calendar-embed" style={{overflow: 'hidden', flex: 1, minHeight: '800px'}}>
+              <div className="card google-calendar-embed" style={{overflow: 'hidden', flex: 1, height: '800px'}}>
                 <iframe 
                   src={getCombinedCalendarSrc(calendars)} 
-                  style={{border: 0, width: '100%', height: '100%'}} 
+                  style={{border: 0, width: '100%', height: '100%', minHeight: '800px'}} 
                   frameBorder="0" 
                   scrolling="no"
                   title="Google Calendar Combined"
