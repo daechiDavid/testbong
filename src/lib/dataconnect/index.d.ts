@@ -258,10 +258,6 @@ export interface UpdatePollVariables {
   votes: number[];
 }
 
-export interface UpdateStudentData {
-  student_update?: Student_Key | null;
-}
-
 export interface UpdateStudentPointsData {
   student_update?: Student_Key | null;
 }
@@ -269,12 +265,6 @@ export interface UpdateStudentPointsData {
 export interface UpdateStudentPointsVariables {
   id: UUIDString;
   points: number;
-}
-
-export interface UpdateStudentVariables {
-  id: UUIDString;
-  name?: string | null;
-  number?: number | null;
 }
 
 export interface UpsertActivityCheckData {
@@ -320,6 +310,25 @@ export interface UpsertAttendanceVariables {
   date: DateString;
   status: string;
   note?: string | null;
+}
+
+export interface UpsertStudentData {
+  student_upsert: Student_Key;
+}
+
+export interface UpsertStudentVariables {
+  id?: UUIDString | null;
+  name?: string | null;
+  number?: number | null;
+  gender?: string | null;
+  birthday?: string | null;
+  parentPhone?: string | null;
+  allergies?: string | null;
+  healthNotes?: string | null;
+  points?: number | null;
+  group?: number | null;
+  seatIndex?: number | null;
+  aiSummary?: string | null;
 }
 
 export interface UpsertWeeklyPlanData {
@@ -508,17 +517,17 @@ export const upsertActivityCheckRef: UpsertActivityCheckRef;
 export function upsertActivityCheck(vars: UpsertActivityCheckVariables): MutationPromise<UpsertActivityCheckData, UpsertActivityCheckVariables>;
 export function upsertActivityCheck(dc: DataConnect, vars: UpsertActivityCheckVariables): MutationPromise<UpsertActivityCheckData, UpsertActivityCheckVariables>;
 
-interface UpdateStudentRef {
+interface UpsertStudentRef {
   /* Allow users to create refs without passing in DataConnect */
-  (vars: UpdateStudentVariables): MutationRef<UpdateStudentData, UpdateStudentVariables>;
+  (vars?: UpsertStudentVariables): MutationRef<UpsertStudentData, UpsertStudentVariables>;
   /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: UpdateStudentVariables): MutationRef<UpdateStudentData, UpdateStudentVariables>;
+  (dc: DataConnect, vars?: UpsertStudentVariables): MutationRef<UpsertStudentData, UpsertStudentVariables>;
   operationName: string;
 }
-export const updateStudentRef: UpdateStudentRef;
+export const upsertStudentRef: UpsertStudentRef;
 
-export function updateStudent(vars: UpdateStudentVariables): MutationPromise<UpdateStudentData, UpdateStudentVariables>;
-export function updateStudent(dc: DataConnect, vars: UpdateStudentVariables): MutationPromise<UpdateStudentData, UpdateStudentVariables>;
+export function upsertStudent(vars?: UpsertStudentVariables): MutationPromise<UpsertStudentData, UpsertStudentVariables>;
+export function upsertStudent(dc: DataConnect, vars?: UpsertStudentVariables): MutationPromise<UpsertStudentData, UpsertStudentVariables>;
 
 interface GetAllAppDataRef {
   /* Allow users to create refs without passing in DataConnect */

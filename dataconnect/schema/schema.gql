@@ -5,6 +5,14 @@ type Student @table {
   number: Int
   name: String
   points: Int! @default(expr: "0")
+  gender: String
+  birthday: String
+  parentPhone: String
+  allergies: String
+  healthNotes: String
+  group: Int
+  seatIndex: Int
+  aiSummary: String
 }
 
 type Attendance @table {

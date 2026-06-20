@@ -74,6 +74,19 @@ mutation UpsertActivityCheck($id: Int!, $content: String, $type: String) @auth(l
   activityCheck_upsert(data: { id: $id, content: $content, type: $type })
 }
 
-mutation UpdateStudent($id: UUID!, $name: String, $number: Int) @auth(level: PUBLIC) {
-  student_update(id: $id, data: { name: $name, number: $number })
+mutation UpsertStudent($id: UUID, $name: String, $number: Int, $gender: String, $birthday: String, $parentPhone: String, $allergies: String, $healthNotes: String, $points: Int, $group: Int, $seatIndex: Int, $aiSummary: String) @auth(level: PUBLIC) {
+  student_upsert(data: { 
+    id: $id, 
+    name: $name, 
+    number: $number,
+    gender: $gender,
+    birthday: $birthday,
+    parentPhone: $parentPhone,
+    allergies: $allergies,
+    healthNotes: $healthNotes,
+    points: $points,
+    group: $group,
+    seatIndex: $seatIndex,
+    aiSummary: $aiSummary
+  })
 }

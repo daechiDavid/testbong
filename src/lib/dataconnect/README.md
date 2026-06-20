@@ -26,7 +26,7 @@ This README will guide you through the process of using the generated JavaScript
   - [*UpsertActivityCompletion*](#upsertactivitycompletion)
   - [*DeleteActivityCompletion*](#deleteactivitycompletion)
   - [*UpsertActivityCheck*](#upsertactivitycheck)
-  - [*UpdateStudent*](#updatestudent)
+  - [*UpsertStudent*](#upsertstudent)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `default`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -2144,118 +2144,149 @@ executeMutation(ref).then((response) => {
 });
 ```
 
-## UpdateStudent
-You can execute the `UpdateStudent` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+## UpsertStudent
+You can execute the `UpsertStudent` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
 ```typescript
-updateStudent(vars: UpdateStudentVariables): MutationPromise<UpdateStudentData, UpdateStudentVariables>;
+upsertStudent(vars?: UpsertStudentVariables): MutationPromise<UpsertStudentData, UpsertStudentVariables>;
 
-interface UpdateStudentRef {
+interface UpsertStudentRef {
   ...
   /* Allow users to create refs without passing in DataConnect */
-  (vars: UpdateStudentVariables): MutationRef<UpdateStudentData, UpdateStudentVariables>;
+  (vars?: UpsertStudentVariables): MutationRef<UpsertStudentData, UpsertStudentVariables>;
 }
-export const updateStudentRef: UpdateStudentRef;
+export const upsertStudentRef: UpsertStudentRef;
 ```
 You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
 ```typescript
-updateStudent(dc: DataConnect, vars: UpdateStudentVariables): MutationPromise<UpdateStudentData, UpdateStudentVariables>;
+upsertStudent(dc: DataConnect, vars?: UpsertStudentVariables): MutationPromise<UpsertStudentData, UpsertStudentVariables>;
 
-interface UpdateStudentRef {
+interface UpsertStudentRef {
   ...
-  (dc: DataConnect, vars: UpdateStudentVariables): MutationRef<UpdateStudentData, UpdateStudentVariables>;
+  (dc: DataConnect, vars?: UpsertStudentVariables): MutationRef<UpsertStudentData, UpsertStudentVariables>;
 }
-export const updateStudentRef: UpdateStudentRef;
+export const upsertStudentRef: UpsertStudentRef;
 ```
 
-If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the updateStudentRef:
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the upsertStudentRef:
 ```typescript
-const name = updateStudentRef.operationName;
+const name = upsertStudentRef.operationName;
 console.log(name);
 ```
 
 ### Variables
-The `UpdateStudent` mutation requires an argument of type `UpdateStudentVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+The `UpsertStudent` mutation has an optional argument of type `UpsertStudentVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 
 ```typescript
-export interface UpdateStudentVariables {
-  id: UUIDString;
+export interface UpsertStudentVariables {
+  id?: UUIDString | null;
   name?: string | null;
   number?: number | null;
+  gender?: string | null;
+  birthday?: string | null;
+  parentPhone?: string | null;
+  allergies?: string | null;
+  healthNotes?: string | null;
+  points?: number | null;
+  group?: number | null;
+  seatIndex?: number | null;
+  aiSummary?: string | null;
 }
 ```
 ### Return Type
-Recall that executing the `UpdateStudent` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+Recall that executing the `UpsertStudent` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
 
-The `data` property is an object of type `UpdateStudentData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+The `data` property is an object of type `UpsertStudentData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
 ```typescript
-export interface UpdateStudentData {
-  student_update?: Student_Key | null;
+export interface UpsertStudentData {
+  student_upsert: Student_Key;
 }
 ```
-### Using `UpdateStudent`'s action shortcut function
+### Using `UpsertStudent`'s action shortcut function
 
 ```typescript
 import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, updateStudent, UpdateStudentVariables } from '@dashboard/dataconnect';
+import { connectorConfig, upsertStudent, UpsertStudentVariables } from '@dashboard/dataconnect';
 
-// The `UpdateStudent` mutation requires an argument of type `UpdateStudentVariables`:
-const updateStudentVars: UpdateStudentVariables = {
-  id: ..., 
+// The `UpsertStudent` mutation has an optional argument of type `UpsertStudentVariables`:
+const upsertStudentVars: UpsertStudentVariables = {
+  id: ..., // optional
   name: ..., // optional
   number: ..., // optional
+  gender: ..., // optional
+  birthday: ..., // optional
+  parentPhone: ..., // optional
+  allergies: ..., // optional
+  healthNotes: ..., // optional
+  points: ..., // optional
+  group: ..., // optional
+  seatIndex: ..., // optional
+  aiSummary: ..., // optional
 };
 
-// Call the `updateStudent()` function to execute the mutation.
+// Call the `upsertStudent()` function to execute the mutation.
 // You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await updateStudent(updateStudentVars);
+const { data } = await upsertStudent(upsertStudentVars);
 // Variables can be defined inline as well.
-const { data } = await updateStudent({ id: ..., name: ..., number: ..., });
+const { data } = await upsertStudent({ id: ..., name: ..., number: ..., gender: ..., birthday: ..., parentPhone: ..., allergies: ..., healthNotes: ..., points: ..., group: ..., seatIndex: ..., aiSummary: ..., });
+// Since all variables are optional for this mutation, you can omit the `UpsertStudentVariables` argument.
+const { data } = await upsertStudent();
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
-const { data } = await updateStudent(dataConnect, updateStudentVars);
+const { data } = await upsertStudent(dataConnect, upsertStudentVars);
 
-console.log(data.student_update);
+console.log(data.student_upsert);
 
 // Or, you can use the `Promise` API.
-updateStudent(updateStudentVars).then((response) => {
+upsertStudent(upsertStudentVars).then((response) => {
   const data = response.data;
-  console.log(data.student_update);
+  console.log(data.student_upsert);
 });
 ```
 
-### Using `UpdateStudent`'s `MutationRef` function
+### Using `UpsertStudent`'s `MutationRef` function
 
 ```typescript
 import { getDataConnect, executeMutation } from 'firebase/data-connect';
-import { connectorConfig, updateStudentRef, UpdateStudentVariables } from '@dashboard/dataconnect';
+import { connectorConfig, upsertStudentRef, UpsertStudentVariables } from '@dashboard/dataconnect';
 
-// The `UpdateStudent` mutation requires an argument of type `UpdateStudentVariables`:
-const updateStudentVars: UpdateStudentVariables = {
-  id: ..., 
+// The `UpsertStudent` mutation has an optional argument of type `UpsertStudentVariables`:
+const upsertStudentVars: UpsertStudentVariables = {
+  id: ..., // optional
   name: ..., // optional
   number: ..., // optional
+  gender: ..., // optional
+  birthday: ..., // optional
+  parentPhone: ..., // optional
+  allergies: ..., // optional
+  healthNotes: ..., // optional
+  points: ..., // optional
+  group: ..., // optional
+  seatIndex: ..., // optional
+  aiSummary: ..., // optional
 };
 
-// Call the `updateStudentRef()` function to get a reference to the mutation.
-const ref = updateStudentRef(updateStudentVars);
+// Call the `upsertStudentRef()` function to get a reference to the mutation.
+const ref = upsertStudentRef(upsertStudentVars);
 // Variables can be defined inline as well.
-const ref = updateStudentRef({ id: ..., name: ..., number: ..., });
+const ref = upsertStudentRef({ id: ..., name: ..., number: ..., gender: ..., birthday: ..., parentPhone: ..., allergies: ..., healthNotes: ..., points: ..., group: ..., seatIndex: ..., aiSummary: ..., });
+// Since all variables are optional for this mutation, you can omit the `UpsertStudentVariables` argument.
+const ref = upsertStudentRef();
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
-const ref = updateStudentRef(dataConnect, updateStudentVars);
+const ref = upsertStudentRef(dataConnect, upsertStudentVars);
 
 // Call `executeMutation()` on the reference to execute the mutation.
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await executeMutation(ref);
 
-console.log(data.student_update);
+console.log(data.student_upsert);
 
 // Or, you can use the `Promise` API.
 executeMutation(ref).then((response) => {
   const data = response.data;
-  console.log(data.student_update);
+  console.log(data.student_upsert);
 });
 ```
 

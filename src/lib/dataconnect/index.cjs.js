@@ -175,16 +175,16 @@ exports.upsertActivityCheck = function upsertActivityCheck(dcOrVars, vars) {
   return executeMutation(upsertActivityCheckRef(dcOrVars, vars));
 };
 
-const updateStudentRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+const upsertStudentRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars);
   dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'UpdateStudent', inputVars);
+  return mutationRef(dcInstance, 'UpsertStudent', inputVars);
 }
-updateStudentRef.operationName = 'UpdateStudent';
-exports.updateStudentRef = updateStudentRef;
+upsertStudentRef.operationName = 'UpsertStudent';
+exports.upsertStudentRef = upsertStudentRef;
 
-exports.updateStudent = function updateStudent(dcOrVars, vars) {
-  return executeMutation(updateStudentRef(dcOrVars, vars));
+exports.upsertStudent = function upsertStudent(dcOrVars, vars) {
+  return executeMutation(upsertStudentRef(dcOrVars, vars));
 };
 
 const getAllAppDataRef = (dc) => {

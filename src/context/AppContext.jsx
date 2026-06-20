@@ -18,7 +18,7 @@ import {
   updateNewsletter,
   upsertActivityCompletion,
   upsertActivityCheck,
-  updateStudent as updateStudentMutation
+  upsertStudent as updateStudentMutation
 } from '../lib/dataconnect';
 
 const AppContext = createContext(null);
@@ -402,15 +402,15 @@ export function AppProvider({ children }) {
 
   const updateStudentFunc = async (studentData) => {
     dispatch({ type: 'UPDATE_STUDENT', payload: studentData });
-    const { id, name, number } = studentData;
-    await updateStudentMutation({ id, name, number });
+    const { id, name, number, gender, birthday, parentPhone, allergies, healthNotes, points, group, seatIndex, aiSummary } = studentData;
+    await updateStudentMutation({ id, name, number, gender, birthday, parentPhone, allergies, healthNotes, points, group, seatIndex, aiSummary });
   };
 
   const bulkUpdateStudentsFunc = async (updates) => {
     dispatch({ type: 'BULK_UPDATE_STUDENTS', payload: updates });
     for (const u of updates) {
-      const { id, name, number } = u;
-      await updateStudentMutation({ id, name, number });
+      const { id, name, number, gender, birthday, parentPhone, allergies, healthNotes, points, group, seatIndex, aiSummary } = u;
+      await updateStudentMutation({ id, name, number, gender, birthday, parentPhone, allergies, healthNotes, points, group, seatIndex, aiSummary });
     }
   };
 

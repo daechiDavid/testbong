@@ -173,6 +173,7 @@ export default function StudentsPage() {
     });
 
     dispatch({ type: 'SET_STUDENTS', payload: newStudents });
+    bulkUpdateStudents(newStudents);
     showToast(`총 ${newStudents.length}명으로 명단이 갱신되었습니다.`, 'success');
     setShowBulkModal(false);
     setBulkNames('');
@@ -224,6 +225,7 @@ export default function StudentsPage() {
         };
       });
       dispatch({ type: 'SET_STUDENTS', payload: newStudents });
+      bulkUpdateStudents(newStudents);
       showToast(`총 ${newStudents.length}명으로 명단이 갱신되었습니다.`, 'success');
     };
     reader.readAsBinaryString(file);
