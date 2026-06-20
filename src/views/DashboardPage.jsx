@@ -23,7 +23,7 @@ const defaultLayouts = {
 };
 
 export default function DashboardPage() {
-  const { state, dispatch, showToast } = useApp();
+  const { state, dispatch, showToast, updateSettings } = useApp();
   const { students, announcements, settings, weeklyPlans, ddays = [], isAdmin } = state;
 
   const [lunchInfo, setLunchInfo] = useState(null);
@@ -97,11 +97,8 @@ export default function DashboardPage() {
     dispatch({ type: 'DELETE_DDAY', payload: id });
   };
 
-  const handleUpdateThermometer = (goal, reward) => {
-    dispatch({
-      type: 'UPDATE_SETTINGS',
-      payload: { ...settings, thermometerGoal: goal, thermometerReward: reward }
-    });
+  const handleUpdateThermometer = async (goal, reward) => {
+    await updateSettings({ ...settings, thermometerGoal: goal, thermometerReward: reward });
     showToast('우리반 온도계 설정이 변경되었습니다.', 'success');
   };
 
