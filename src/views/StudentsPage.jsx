@@ -290,8 +290,9 @@ export default function StudentsPage() {
       {/* Top Tabs */}
       <div className="students-tabs">
         <button className={`tab-btn ${activeTab === 'list' ? 'active' : ''}`} onClick={() => setActiveTab('list')}>👥 학생 목록</button>
-        <button className={`tab-btn ${activeTab === 'behavior' ? 'active' : ''}`} onClick={() => setActiveTab('behavior')}>🌱 행동발달</button>
-        <button className={`tab-btn ${activeTab === 'evaluation' ? 'active' : ''}`} onClick={() => setActiveTab('evaluation')}>📝 학습평가</button>
+        {/* 행동발달/학습평가 탭은 관리자(교사)만 볼 수 있음 */}
+        {isAdmin && <button className={`tab-btn ${activeTab === 'behavior' ? 'active' : ''}`} onClick={() => setActiveTab('behavior')}>🌱 행동발달</button>}
+        {isAdmin && <button className={`tab-btn ${activeTab === 'evaluation' ? 'active' : ''}`} onClick={() => setActiveTab('evaluation')}>📝 학습평가</button>}
       </div>
 
       {/* Tab: List */}
