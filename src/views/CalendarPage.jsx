@@ -11,19 +11,30 @@ export default function CalendarPage() {
 
   const calendars = [settings?.calendarId1, settings?.calendarId2, settings?.calendarId3].filter(Boolean);
 
-  const getCalendarSrc = (input) => {
-    if (!input) return '';
-    // 만약 사용자가 <iframe src="..."> 전체를 복사해서 넣은 경우 src 추출
-    const srcMatch = input.match(/src="([^"]+)"/);
-    let extracted = srcMatch ? srcMatch[1] : input.trim();
-
-    // 만약 이미 http 통째로 URL이라면 그대로 사용 (옵션 유지)
-    if (extracted.startsWith('http') && extracted.includes('calendar.google.com')) {
-      return extracted;
-    }
+  const getCombinedCalendarSrc = (cals) => {
+    if (cals.length === 0) return '';
     
-    // 그렇지 않고 ID만 넣었다면 템플릿 사용
-    return `https://calendar.google.com/calendar/embed?src=${encodeURIComponent(extracted)}&ctz=Asia%2FSeoul&showPrint=0&showCalendars=0&showTz=0`;
+    let baseUrl = 'https://calendar.google.com/calendar/embed?ctz=Asia%2FSeoul&showPrint=0&showCalendars=0&showTz=0&mode=MONTH';
+    const colors = ['%23039BE5', '%23D50000', '%230B8043'];
+    
+    cals.forEach((input, index) => {
+      const srcMatch = input.match(/src="([^"]+)"/);
+      let extracted = srcMatch ? srcMatch[1] : input.trim();
+      
+      let calId = '';
+      if (extracted.includes('calendar.google.com') && extracted.includes('src=')) {
+         const match = extracted.match(/src=([^&]+)/);
+         if (match) calId = decodeURIComponent(match[1]);
+      } else {
+         calId = extracted;
+      }
+      
+      if (calId) {
+          baseUrl += `&src=${encodeURIComponent(calId)}&color=${colors[index % colors.length]}`;
+      }
+    });
+    
+    return baseUrl;
   };
 
   const handleAddNotice = () => {
@@ -69,19 +80,17 @@ export default function CalendarPage() {
         {/* Google Calendar Embed */}
         <div className="calendar-left" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {calendars.length > 0 ? (
-            calendars.map((calId, idx) => (
-              <div key={idx} className="card google-calendar-embed" style={{overflow: 'hidden', flex: 1, minHeight: calendars.length > 1 ? '400px' : '600px'}}>
+              <div className="card google-calendar-embed" style={{overflow: 'hidden', flex: 1, minHeight: '800px'}}>
                 <iframe 
-                  src={getCalendarSrc(calId)} 
+                  src={getCombinedCalendarSrc(calendars)} 
                   style={{border: 0, width: '100%', height: '100%'}} 
                   frameBorder="0" 
                   scrolling="no"
-                  title={`Google Calendar ${idx + 1}`}
+                  title="Google Calendar Combined"
                 ></iframe>
               </div>
-            ))
           ) : (
-            <div className="card google-calendar-embed" style={{padding: '3rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '400px'}}>
+            <div className="card google-calendar-embed" style={{padding: '3rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '800px'}}>
               <h3>📅 구글 캘린더가 연동되지 않았습니다.</h3>
               {isAdmin ? (
                 <p style={{color: 'var(--text-secondary)', marginTop: '0.5rem'}}>우측 상단의 ⚙️ 설정 메뉴에서 구글 캘린더 ID를 입력해주세요.</p>
