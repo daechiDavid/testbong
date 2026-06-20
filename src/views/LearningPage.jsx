@@ -4,7 +4,7 @@ import { useApp } from '../context/AppContext';
 import './LearningPage.css';
 
 export default function LearningPage() {
-  const { state, dispatch, showToast } = useApp();
+  const { state, dispatch, showToast, addAssignment, updateAssignmentSubmissions, deleteAssignment } = useApp();
   const { students, assignments, isAdmin } = state;
 
   const [isEditingActivity, setIsEditingActivity] = useState(false);
@@ -52,22 +52,16 @@ export default function LearningPage() {
         );
 
         if (existingAssignment) {
-          dispatch({
-            type: 'UPDATE_ASSIGNMENT_SUBMISSIONS',
-            payload: { id: existingAssignment.id, submissions: { [studentId]: { timestamp: new Date().toISOString() } } }
-          });
+          updateAssignmentSubmissions(existingAssignment.id, { [studentId]: { timestamp: new Date().toISOString() } });
         } else {
-          dispatch({
-            type: 'ADD_ASSIGNMENT',
-            payload: {
-              id: Date.now(),
-              title: activityContent,
-              subject: '활동',
-              type: state.activityCheck?.type || '수행평가',
-              dueDate: todayStr,
-              submissions: { [studentId]: { timestamp: new Date().toISOString() } },
-              total: students.length,
-            }
+          addAssignment({
+            id: Date.now(),
+            title: activityContent,
+            subject: '활동',
+            type: state.activityCheck?.type || '수행평가',
+            dueDate: todayStr,
+            submissions: { [studentId]: { timestamp: new Date().toISOString() } },
+            total: students.length,
           });
         }
       }
@@ -126,17 +120,14 @@ export default function LearningPage() {
                     a => a.title === tempActivityContent && a.dueDate === todayStr
                   );
                   if (!existingAssignment && tempActivityContent.trim() !== '') {
-                    dispatch({
-                      type: 'ADD_ASSIGNMENT',
-                      payload: {
-                        id: Date.now(),
-                        title: tempActivityContent,
-                        subject: '활동',
-                        type: tempActivityType,
-                        dueDate: todayStr,
-                        submissions: {},
-                        total: students.length,
-                      }
+                    addAssignment({
+                      id: Date.now(),
+                      title: tempActivityContent,
+                      subject: '활동',
+                      type: tempActivityType,
+                      dueDate: todayStr,
+                      submissions: {},
+                      total: students.length,
                     });
                     showToast('과제/수행평가 목록에도 추가되었습니다.', 'success');
                   }
@@ -226,7 +217,7 @@ export default function LearningPage() {
                 <button className="assignment-delete-btn" onClick={(e) => {
                   e.stopPropagation();
                   if (confirm('이 항목을 정말 삭제하시겠습니까?')) {
-                    dispatch({ type: 'DELETE_ASSIGNMENT', payload: a.id });
+                    deleteAssignment(a.id);
                     showToast('삭제되었습니다.', 'success');
                   }
                 }} title="삭제">🗑️</button>

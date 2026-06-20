@@ -53,6 +53,14 @@ export interface DeleteActivityCompletionVariables {
   id: UUIDString;
 }
 
+export interface DeleteAssignmentData {
+  assignment_delete?: Assignment_Key | null;
+}
+
+export interface DeleteAssignmentVariables {
+  id: UUIDString;
+}
+
 export interface DeleteAttendanceData {
   attendance_delete?: Attendance_Key | null;
 }
@@ -66,6 +74,14 @@ export interface DeleteDDayData {
 }
 
 export interface DeleteDDayVariables {
+  id: UUIDString;
+}
+
+export interface DeleteQuickLinkData {
+  quickLink_delete?: QuickLink_Key | null;
+}
+
+export interface DeleteQuickLinkVariables {
   id: UUIDString;
 }
 
@@ -300,6 +316,17 @@ export interface UpsertAppConfigVariables {
   thermometerReward?: string | null;
 }
 
+export interface UpsertAssignmentData {
+  assignment_upsert: Assignment_Key;
+}
+
+export interface UpsertAssignmentVariables {
+  id?: UUIDString | null;
+  dueDate: DateString;
+  title: string;
+  submissions?: unknown | null;
+}
+
 export interface UpsertAttendanceData {
   attendance_upsert: Attendance_Key;
 }
@@ -310,6 +337,17 @@ export interface UpsertAttendanceVariables {
   date: DateString;
   status: string;
   note?: string | null;
+}
+
+export interface UpsertQuickLinkData {
+  quickLink_upsert: QuickLink_Key;
+}
+
+export interface UpsertQuickLinkVariables {
+  id?: UUIDString | null;
+  title: string;
+  url: string;
+  icon?: string | null;
 }
 
 export interface UpsertStudentData {
@@ -528,6 +566,54 @@ export const upsertStudentRef: UpsertStudentRef;
 
 export function upsertStudent(vars?: UpsertStudentVariables): MutationPromise<UpsertStudentData, UpsertStudentVariables>;
 export function upsertStudent(dc: DataConnect, vars?: UpsertStudentVariables): MutationPromise<UpsertStudentData, UpsertStudentVariables>;
+
+interface UpsertQuickLinkRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpsertQuickLinkVariables): MutationRef<UpsertQuickLinkData, UpsertQuickLinkVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpsertQuickLinkVariables): MutationRef<UpsertQuickLinkData, UpsertQuickLinkVariables>;
+  operationName: string;
+}
+export const upsertQuickLinkRef: UpsertQuickLinkRef;
+
+export function upsertQuickLink(vars: UpsertQuickLinkVariables): MutationPromise<UpsertQuickLinkData, UpsertQuickLinkVariables>;
+export function upsertQuickLink(dc: DataConnect, vars: UpsertQuickLinkVariables): MutationPromise<UpsertQuickLinkData, UpsertQuickLinkVariables>;
+
+interface DeleteQuickLinkRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteQuickLinkVariables): MutationRef<DeleteQuickLinkData, DeleteQuickLinkVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteQuickLinkVariables): MutationRef<DeleteQuickLinkData, DeleteQuickLinkVariables>;
+  operationName: string;
+}
+export const deleteQuickLinkRef: DeleteQuickLinkRef;
+
+export function deleteQuickLink(vars: DeleteQuickLinkVariables): MutationPromise<DeleteQuickLinkData, DeleteQuickLinkVariables>;
+export function deleteQuickLink(dc: DataConnect, vars: DeleteQuickLinkVariables): MutationPromise<DeleteQuickLinkData, DeleteQuickLinkVariables>;
+
+interface UpsertAssignmentRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpsertAssignmentVariables): MutationRef<UpsertAssignmentData, UpsertAssignmentVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpsertAssignmentVariables): MutationRef<UpsertAssignmentData, UpsertAssignmentVariables>;
+  operationName: string;
+}
+export const upsertAssignmentRef: UpsertAssignmentRef;
+
+export function upsertAssignment(vars: UpsertAssignmentVariables): MutationPromise<UpsertAssignmentData, UpsertAssignmentVariables>;
+export function upsertAssignment(dc: DataConnect, vars: UpsertAssignmentVariables): MutationPromise<UpsertAssignmentData, UpsertAssignmentVariables>;
+
+interface DeleteAssignmentRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteAssignmentVariables): MutationRef<DeleteAssignmentData, DeleteAssignmentVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteAssignmentVariables): MutationRef<DeleteAssignmentData, DeleteAssignmentVariables>;
+  operationName: string;
+}
+export const deleteAssignmentRef: DeleteAssignmentRef;
+
+export function deleteAssignment(vars: DeleteAssignmentVariables): MutationPromise<DeleteAssignmentData, DeleteAssignmentVariables>;
+export function deleteAssignment(dc: DataConnect, vars: DeleteAssignmentVariables): MutationPromise<DeleteAssignmentData, DeleteAssignmentVariables>;
 
 interface GetAllAppDataRef {
   /* Allow users to create refs without passing in DataConnect */

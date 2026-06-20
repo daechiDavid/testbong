@@ -171,6 +171,50 @@ export function upsertStudent(dcOrVars, vars) {
   return executeMutation(upsertStudentRef(dcOrVars, vars));
 }
 
+export const upsertQuickLinkRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpsertQuickLink', inputVars);
+}
+upsertQuickLinkRef.operationName = 'UpsertQuickLink';
+
+export function upsertQuickLink(dcOrVars, vars) {
+  return executeMutation(upsertQuickLinkRef(dcOrVars, vars));
+}
+
+export const deleteQuickLinkRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteQuickLink', inputVars);
+}
+deleteQuickLinkRef.operationName = 'DeleteQuickLink';
+
+export function deleteQuickLink(dcOrVars, vars) {
+  return executeMutation(deleteQuickLinkRef(dcOrVars, vars));
+}
+
+export const upsertAssignmentRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpsertAssignment', inputVars);
+}
+upsertAssignmentRef.operationName = 'UpsertAssignment';
+
+export function upsertAssignment(dcOrVars, vars) {
+  return executeMutation(upsertAssignmentRef(dcOrVars, vars));
+}
+
+export const deleteAssignmentRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteAssignment', inputVars);
+}
+deleteAssignmentRef.operationName = 'DeleteAssignment';
+
+export function deleteAssignment(dcOrVars, vars) {
+  return executeMutation(deleteAssignmentRef(dcOrVars, vars));
+}
+
 export const getAllAppDataRef = (dc) => {
   const { dc: dcInstance} = validateArgs(connectorConfig, dc, undefined);
   dcInstance._useGeneratedSdk();

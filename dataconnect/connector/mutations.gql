@@ -90,3 +90,29 @@ mutation UpsertStudent($id: UUID, $name: String, $number: Int, $gender: String, 
     aiSummary: $aiSummary
   })
 }
+
+mutation UpsertQuickLink($id: UUID, $title: String!, $url: String!, $icon: String) @auth(level: PUBLIC) {
+  quickLink_upsert(data: {
+    id: $id,
+    title: $title,
+    url: $url,
+    icon: $icon
+  })
+}
+
+mutation DeleteQuickLink($id: UUID!) @auth(level: PUBLIC) {
+  quickLink_delete(id: $id)
+}
+
+mutation UpsertAssignment($id: UUID, $dueDate: Date!, $title: String!, $submissions: Any) @auth(level: PUBLIC) {
+  assignment_upsert(data: {
+    id: $id,
+    dueDate: $dueDate,
+    title: $title,
+    submissions: $submissions
+  })
+}
+
+mutation DeleteAssignment($id: UUID!) @auth(level: PUBLIC) {
+  assignment_delete(id: $id)
+}

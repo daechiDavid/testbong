@@ -18,7 +18,11 @@ import {
   updateNewsletter,
   upsertActivityCompletion,
   upsertActivityCheck,
-  upsertStudent as updateStudentMutation
+  upsertStudent as updateStudentMutation,
+  upsertQuickLink,
+  deleteQuickLink,
+  upsertAssignment,
+  deleteAssignment
 } from '../lib/dataconnect';
 
 const AppContext = createContext(null);
@@ -445,6 +449,51 @@ export function AppProvider({ children }) {
     await upsertActivityCheck({ id: 1, content, type });
   };
 
+  const addLinkFunc = async (linkData) => {
+    dispatch({ type: 'ADD_LINK', payload: linkData });
+    try {
+      await upsertQuickLink(linkData);
+    } catch(e) { console.error(e); }
+  };
+
+  const updateLinkFunc = async (linkData) => {
+    dispatch({ type: 'UPDATE_LINK', payload: linkData });
+    try {
+      await upsertQuickLink(linkData);
+    } catch(e) { console.error(e); }
+  };
+
+  const deleteLinkFunc = async (id) => {
+    dispatch({ type: 'DELETE_LINK', payload: id });
+    try {
+      await deleteQuickLink({ id });
+    } catch(e) { console.error(e); }
+  };
+
+  const addAssignmentFunc = async (assignmentData) => {
+    dispatch({ type: 'ADD_ASSIGNMENT', payload: assignmentData });
+    try {
+      await upsertAssignment(assignmentData);
+    } catch(e) { console.error(e); }
+  };
+
+  const updateAssignmentSubmissionsFunc = async (id, submissions) => {
+    dispatch({ type: 'UPDATE_ASSIGNMENT_SUBMISSIONS', payload: { id, submissions } });
+    const assignment = state.assignments.find(a => a.id === id);
+    if (assignment) {
+      try {
+        await upsertAssignment({ ...assignment, submissions: { ...assignment.submissions, ...submissions } });
+      } catch(e) { console.error(e); }
+    }
+  };
+
+  const deleteAssignmentFunc = async (id) => {
+    dispatch({ type: 'DELETE_ASSIGNMENT', payload: id });
+    try {
+      await deleteAssignment({ id });
+    } catch(e) { console.error(e); }
+  };
+
   return (
     <AppContext.Provider value={{
       state, dispatch, showToast, 
@@ -453,6 +502,8 @@ export function AppProvider({ children }) {
       updateStudent: updateStudentFunc, bulkUpdateStudents: bulkUpdateStudentsFunc, addStudentRecord: addStudentRecordFunc, deleteStudentRecord: deleteStudentRecordFunc,
       saveWeeklyPlan, updateSettings, addDDay, deleteDDay: deleteDDayFunc,
       votePoll: votePollFunc, collectNewsletter: collectNewsletterFunc, markActivityCompleted: markActivityCompletedFunc, cancelActivityCompletion: cancelActivityCompletionFunc, updateActivityContent: updateActivityContentFunc,
+      addLink: addLinkFunc, updateLink: updateLinkFunc, deleteLink: deleteLinkFunc,
+      addAssignment: addAssignmentFunc, updateAssignmentSubmissions: updateAssignmentSubmissionsFunc, deleteAssignment: deleteAssignmentFunc,
       isDbLoading, getWeekStart, toISODate
     }}>
       {children}

@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import './LinksPage.css';
 
 export default function LinksPage() {
-  const { state, dispatch, showToast } = useApp();
+  const { state, dispatch, showToast, addLink, updateLink, deleteLink } = useApp();
   const { quickLinks, isAdmin } = state;
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -17,7 +17,7 @@ export default function LinksPage() {
 
   const handleDelete = (id) => {
     if (confirm('정말 삭제하시겠습니까?')) {
-      dispatch({ type: 'DELETE_LINK', payload: id });
+      deleteLink(id);
       showToast('삭제되었습니다.', 'success');
     }
   };
@@ -30,10 +30,10 @@ export default function LinksPage() {
     const url = formData.url.startsWith('http') ? formData.url : `https://${formData.url}`;
     
     if (editingId) {
-      dispatch({ type: 'UPDATE_LINK', payload: { ...formData, url, id: editingId } });
+      updateLink({ ...formData, url, id: editingId });
       showToast('수정되었습니다.', 'success');
     } else {
-      dispatch({ type: 'ADD_LINK', payload: { ...formData, url, id: Date.now() } });
+      addLink({ ...formData, url, id: Date.now() });
       showToast('추가되었습니다.', 'success');
     }
     setShowForm(false);
