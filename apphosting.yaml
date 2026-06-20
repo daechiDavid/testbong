@@ -9,13 +9,33 @@ runConfig:
 
 # Environment variables and secrets.
 env:
-  - variable: NEXT_PUBLIC_SUPABASE_URL
-    value: https://ueibtdpzixmirngpapus.supabase.co
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: AIzaSyAeWB7hEwe_mkZPqbl24S4mBJ2alCwB0DU
     availability:
       - BUILD
       - RUNTIME
-  - variable: NEXT_PUBLIC_SUPABASE_ANON_KEY
-    value: sb_publishable_u5LLSp81hExmQ-IsHnQOUQ_Lg9DDqwg
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: dashboard-boongssam.firebaseapp.com
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: dashboard-boongssam
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: dashboard-boongssam.firebasestorage.app
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "1009654249580"
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: 1:1009654249580:web:3c2fa686882f44317ec049
     availability:
       - BUILD
       - RUNTIME
