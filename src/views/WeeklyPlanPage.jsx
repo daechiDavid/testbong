@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 import { getWeekStart, toISODate } from '../context/AppContext';
 import './WeeklyPlanPage.css';
@@ -68,11 +68,11 @@ export default function WeeklyPlanPage() {
     setEditContent(content || '');
   };
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     saveWeeklyPlan(weekKey, editing.day, editing.period, editSubject, editContent);
     setEditing(null);
     showToast('주간 일정이 저장되었습니다.', 'success');
-  };
+  }, [saveWeeklyPlan, weekKey, editing, editSubject, editContent, showToast]);
 
   return (
     <div className="weekly-page">

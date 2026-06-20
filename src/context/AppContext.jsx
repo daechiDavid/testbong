@@ -12,13 +12,11 @@ import {
   deleteDDay,
   updateStudentPoints,
   upsertAttendance,
-  deleteAttendance,
   insertStudentRecord,
   deleteStudentRecord,
   updatePoll,
   updateNewsletter,
   upsertActivityCompletion,
-  deleteActivityCompletion,
   upsertActivityCheck,
   updateStudent as updateStudentMutation
 } from '../lib/dataconnect';
