@@ -13,6 +13,16 @@
 .calendar-left .google-calendar-embed {
   border-radius: var(--radius-lg);
   overflow: hidden;
+  height: 800px !important;
+  min-height: 800px !important;
+}
+
+/* iframe이 부모 카드의 높이를 꽉 채우도록 강제 */
+.calendar-left .google-calendar-embed iframe {
+  width: 100% !important;
+  height: 800px !important;
+  min-height: 800px !important;
+  border: 0;
 }
 
 .calendar-right .notice-card-container {
