@@ -162,7 +162,7 @@ export default function StudentsPage() {
       
       return {
         ...existing,
-        id: existing ? existing.id : Date.now() + i, // 새 학생이면 새로운 ID 부여
+        id: existing ? existing.id : crypto.randomUUID(),
         number: i + 1,
         name: parts[0] || `학생${i+1}`,
         gender: gender,
@@ -214,7 +214,7 @@ export default function StudentsPage() {
         }
         return {
           ...existing,
-          id: existing ? existing.id : Date.now() + i,
+          id: existing ? existing.id : crypto.randomUUID(),
           number: i + 1,
           name: row['이름'] || `학생${i+1}`,
           gender: gender,
