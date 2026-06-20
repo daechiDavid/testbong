@@ -47,6 +47,16 @@ export default function AttendancePage() {
     setActiveSelector(null);
   };
 
+  const handleSaveAllToday = async () => {
+    if (!isAdmin) return;
+    const promises = students.map(s => {
+      const att = attendance[s.id] || { status: 'present', note: '' };
+      return updateAttendance(s.id, att.status, att.note || '', selectedAttendanceDate);
+    });
+    await Promise.all(promises);
+    showToast('오늘의 출석 현황이 모두 저장되었습니다.', 'success');
+  };
+
   // 월별 날짜 목록 생성
   const getDaysInMonth = (year, month) => {
     const days = [];
@@ -94,6 +104,11 @@ export default function AttendancePage() {
                 onChange={handleDateChange}
               />
             </div>
+            {isAdmin && (
+              <button className="btn btn-primary" onClick={handleSaveAllToday}>
+                오늘의 출석 입력 완료
+              </button>
+            )}
             <div className="attendance-summary-bar">
               {Object.entries(STATUS_MAP).map(([key, val]) => (
                 <div key={key} className={`attendance-count ${val.color}`}>
@@ -115,6 +130,7 @@ export default function AttendancePage() {
                 <div
                   key={s.id}
                   className={`attendance-cell ${att.status}`}
+                  style={{ zIndex: activeSelector === s.id ? 100 : 1 }}
                   onClick={() => { if (isAdmin) setActiveSelector(activeSelector === s.id ? null : s.id); }}
                 >
                   <div className="student-num">{s.number}번</div>

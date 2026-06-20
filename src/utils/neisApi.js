@@ -45,21 +45,11 @@ export async function fetchTodayLunch(date = getTodayString()) {
         calories: mealInfo.CAL_INFO
       };
     } else {
-      // API 데이터가 없는 경우(미등록, 주말 등) 테스트 및 디자인 확인용 예시 데이터 반환
-      return {
-        date: date,
-        type: '중식',
-        menu: '차수수밥\n쇠고기미역국\n매콤돈육강정\n배추김치\n우리밀초코케이크\n친환경방울토마토',
-        calories: '650.5 Kcal'
-      };
+      // API 데이터가 없는 경우(주말 등) null 반환하여 화면에 '급식 정보 없음' 표시
+      return null;
     }
   } catch (error) {
     console.error('급식 정보를 가져오는 중 오류 발생:', error);
-    return {
-      date: date,
-      type: '중식',
-      menu: '차수수밥\n쇠고기미역국\n매콤돈육강정\n배추김치\n우리밀초코케이크\n친환경방울토마토',
-      calories: '650.5 Kcal'
-    };
+    return null;
   }
 }

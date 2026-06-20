@@ -7,7 +7,7 @@ import AdminSettingsModal from '../common/AdminSettingsModal'
 import './Layout.css'
 
 // 학생 모드에서 접근 가능한 경로 (내용 조회는 가능, 쓰기/수정은 isAdmin으로 각 페이지에서 통제)
-const STUDENT_ALLOWED_PATHS = ['/', '/weekly', '/attendance', '/learning', '/calendar', '/tools', '/links', '/students'];
+const STUDENT_ALLOWED_PATHS = ['/', '/weekly', '/learning', '/calendar', '/tools', '/links', '/students'];
 
 const NAV_ITEMS = [
   { path: '/', label: '대시보드', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" /></svg> },
@@ -77,6 +77,7 @@ export default function Layout({ children }) {
         </div>
         <nav className="sidebar-nav">
           {NAV_ITEMS.map(item => {
+            if (item.path === '/attendance' && !isAdmin) return null;
             const isAllowed = isAdmin || STUDENT_ALLOWED_PATHS.includes(item.path);
             const isActive = pathname === item.path;
             return (
@@ -133,6 +134,7 @@ export default function Layout({ children }) {
       {/* Mobile Bottom Nav */}
       <nav className="mobile-nav">
         {NAV_ITEMS.map(item => {
+          if (item.path === '/attendance' && !isAdmin) return null;
           const isAllowed = isAdmin || STUDENT_ALLOWED_PATHS.includes(item.path);
           const isActive = pathname === item.path;
           return (
