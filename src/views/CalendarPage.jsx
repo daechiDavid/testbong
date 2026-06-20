@@ -81,10 +81,12 @@ export default function CalendarPage() {
         <div className="calendar-left" style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {calendars.length > 0 ? (
               <div className="card google-calendar-embed">
+                {/* 구글 캘린더는 iframe의 width/height HTML 속성을 읽어서 내부 크기를 결정함 */}
                 <iframe 
                   src={getCombinedCalendarSrc(calendars)} 
+                  width="100%"
+                  height="750"
                   frameBorder="0" 
-                  scrolling="no"
                   title="Google Calendar Combined"
                 ></iframe>
               </div>
