@@ -1,0 +1,11 @@
+specVersion: "v1alpha"
+serviceId: "dashboard-edu"
+location: "asia-northeast3"
+schema:
+  source: "./schema"
+  datasource:
+    postgresql:
+      database: "sqldb"
+      cloudSql:
+        instanceId: "dashboard-edu-sql"
+connectorDirs: ["./connector"]

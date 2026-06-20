@@ -1,0 +1,98 @@
+# dataconnect/schema/schema.gql
+
+type Student @table {
+  id: UUID! @default(expr: "uuidV4()")
+  number: Int
+  name: String
+  points: Int! @default(expr: "0")
+}
+
+type Attendance @table {
+  id: UUID! @default(expr: "uuidV4()")
+  student: Student!
+  date: Date!
+  status: String!
+  note: String
+}
+
+type Announcement @table {
+  id: UUID! @default(expr: "uuidV4()")
+  date: Date!
+  title: String!
+  content: String
+}
+
+type Assignment @table {
+  id: UUID! @default(expr: "uuidV4()")
+  dueDate: Date!
+  title: String!
+  submissions: Any # JSON object for submissions
+}
+
+type WeeklyPlan @table {
+  id: UUID! @default(expr: "uuidV4()")
+  weekKey: String!
+  day: String!
+  period: Int!
+  subject: String
+  content: String
+}
+
+type AppConfig @table {
+  id: Int!
+  calendarId1: String
+  calendarId2: String
+  calendarId3: String
+  thermometerGoal: Int
+  thermometerReward: String
+}
+
+type DDay @table {
+  id: UUID! @default(expr: "uuidV4()")
+  name: String!
+  date: Date!
+}
+
+type QuickLink @table {
+  id: UUID! @default(expr: "uuidV4()")
+  title: String!
+  url: String!
+  icon: String
+}
+
+type Poll @table {
+  id: UUID! @default(expr: "uuidV4()")
+  question: String!
+  options: [String!]
+  votes: [Int!]
+}
+
+type Newsletter @table {
+  id: UUID! @default(expr: "uuidV4()")
+  date: Date!
+  title: String!
+  content: String
+  collected: Boolean! @default(expr: "false")
+}
+
+type ActivityCheck @table {
+  id: Int!
+  content: String
+  type: String
+}
+
+type ActivityCompletion @table {
+  id: UUID! @default(expr: "uuidV4()")
+  student: Student!
+  timestamp: Timestamp!
+}
+
+type StudentRecord @table {
+  id: UUID! @default(expr: "uuidV4()")
+  student: Student!
+  type: String!
+  content: String
+  category: String
+  date: Date!
+  createdAt: Timestamp! @default(expr: "request.time")
+}

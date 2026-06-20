@@ -1,0 +1,21 @@
+# Settings for Backend (on Cloud Run).
+# See https://firebase.google.com/docs/app-hosting/configure#cloud-run
+runConfig:
+  minInstances: 0
+  # maxInstances: 100
+  # concurrency: 80
+  # cpu: 1
+  # memoryMiB: 512
+
+# Environment variables and secrets.
+env:
+  - variable: NEXT_PUBLIC_SUPABASE_URL
+    value: https://ueibtdpzixmirngpapus.supabase.co
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_SUPABASE_ANON_KEY
+    value: sb_publishable_u5LLSp81hExmQ-IsHnQOUQ_Lg9DDqwg
+    availability:
+      - BUILD
+      - RUNTIME

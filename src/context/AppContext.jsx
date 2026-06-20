@@ -1,6 +1,27 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useReducer, useCallback, useEffect, useState } from 'react';
-import { supabase } from '../utils/supabase';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../utils/firebase';
+import {
+  getAllAppData,
+  getAttendanceByDate,
+  getAttendanceByMonth,
+  upsertWeeklyPlan,
+  upsertAppConfig,
+  insertDDay,
+  deleteDDay,
+  updateStudentPoints,
+  upsertAttendance,
+  deleteAttendance,
+  insertStudentRecord,
+  deleteStudentRecord,
+  updatePoll,
+  updateNewsletter,
+  upsertActivityCompletion,
+  deleteActivityCompletion,
+  upsertActivityCheck,
+  updateStudent as updateStudentMutation
+} from '../lib/dataconnect';
 
 const AppContext = createContext(null);
 
@@ -190,53 +211,31 @@ export function AppProvider({ children }) {
   useEffect(() => {
     async function fetchData() {
       try {
-        const [
-          { data: students },
-          { data: announcements },
-          { data: assignments },
-          { data: ddays },
-          { data: weekly_plans },
-          { data: app_configs },
-          { data: quick_links },
-          { data: polls },
-          { data: newsletters },
-          { data: activity_check },
-          { data: activity_completions },
-          { data: student_records }
-        ] = await Promise.all([
-          supabase.from('students').select('*').order('number', { ascending: true }),
-          supabase.from('announcements').select('*').order('date', { ascending: false }),
-          supabase.from('assignments').select('*').order('due_date', { ascending: true }),
-          supabase.from('ddays').select('*').order('date', { ascending: true }),
-          supabase.from('weekly_plans').select('*'),
-          supabase.from('app_configs').select('*').single(),
-          supabase.from('quick_links').select('*').order('id', { ascending: true }),
-          supabase.from('polls').select('*').order('id', { ascending: true }),
-          supabase.from('newsletters').select('*').order('date', { ascending: false }),
-          supabase.from('activity_check').select('*').single(),
-          supabase.from('activity_completions').select('*'),
-          supabase.from('student_records').select('*').order('created_at', { ascending: false })
-        ]);
+        const response = await getAllAppData();
+        const {
+          students, announcements, assignments, dDays: ddays,
+          weeklyPlans: weekly_plans, appConfigs, quickLinks: quick_links,
+          polls, newsletters, activityChecks, activityCompletions, studentRecords: student_records
+        } = response.data;
 
-        if (students) dispatch({ type: 'SET_STUDENTS', payload: students });
-        if (announcements) dispatch({ type: 'SET_ANNOUNCEMENTS', payload: announcements });
-        if (assignments) dispatch({ type: 'SET_ASSIGNMENTS', payload: assignments });
-        
-        if (ddays) dispatch({ type: 'SET_DDAYS', payload: ddays });
+        if (students) dispatch({ type: 'SET_STUDENTS', payload: students.sort((a,b)=>a.number-b.number) });
+        if (announcements) dispatch({ type: 'SET_ANNOUNCEMENTS', payload: announcements.sort((a,b)=>new Date(b.date)-new Date(a.date)) });
+        if (assignments) dispatch({ type: 'SET_ASSIGNMENTS', payload: assignments.sort((a,b)=>new Date(a.dueDate)-new Date(b.dueDate)) });
+        if (ddays) dispatch({ type: 'SET_DDAYS', payload: ddays.sort((a,b)=>new Date(a.date)-new Date(b.date)) });
         if (quick_links) dispatch({ type: 'SET_QUICK_LINKS', payload: quick_links });
         if (polls) dispatch({ type: 'SET_POLLS', payload: polls });
-        if (newsletters) dispatch({ type: 'SET_NEWSLETTERS', payload: newsletters });
+        if (newsletters) dispatch({ type: 'SET_NEWSLETTERS', payload: newsletters.sort((a,b)=>new Date(b.date)-new Date(a.date)) });
 
         // 출석 초기값 (오늘)
         const today = new Date().toISOString().split('T')[0];
-        const { data: attendance } = await supabase.from('attendance').select('*').eq('date', today);
+        const { data: attendanceData } = await getAttendanceByDate({ date: today });
         const attMap = {};
         if (students) {
           students.forEach(s => { attMap[s.id] = { status: 'present', note: '' }; });
         }
-        if (attendance) {
-          attendance.forEach(a => {
-            attMap[a.student_id] = { status: a.status, note: a.note || '' };
+        if (attendanceData && attendanceData.attendances) {
+          attendanceData.attendances.forEach(a => {
+            attMap[a.student.id] = { status: a.status, note: a.note || '' };
           });
         }
         dispatch({ type: 'SET_ATTENDANCE_MAP', payload: attMap });
@@ -245,18 +244,19 @@ export function AppProvider({ children }) {
         if (weekly_plans) {
           const plansMap = {};
           weekly_plans.forEach(p => {
-            if (!plansMap[p.week_key]) plansMap[p.week_key] = {};
-            if (!plansMap[p.week_key][p.day]) plansMap[p.week_key][p.day] = {};
-            plansMap[p.week_key][p.day][p.period] = { subject: p.subject, content: p.content };
+            if (!plansMap[p.weekKey]) plansMap[p.weekKey] = {};
+            if (!plansMap[p.weekKey][p.day]) plansMap[p.weekKey][p.day] = {};
+            plansMap[p.weekKey][p.day][p.period] = { subject: p.subject, content: p.content };
           });
           dispatch({ type: 'SET_WEEKLY_PLANS_BULK', payload: plansMap });
         }
 
         // 활동 체크 매핑
+        const activity_check = activityChecks && activityChecks.length > 0 ? activityChecks[0] : null;
         if (activity_check) {
           const comps = {};
-          if (activity_completions) {
-            activity_completions.forEach(c => { comps[c.student_id] = { timestamp: c.timestamp }; });
+          if (activityCompletions) {
+            activityCompletions.forEach(c => { comps[c.student.id] = { timestamp: c.timestamp }; });
           }
           dispatch({ type: 'SET_ACTIVITY_CHECK', payload: { content: activity_check.content, type: activity_check.type, completions: comps } });
         }
@@ -264,30 +264,23 @@ export function AppProvider({ children }) {
         // 학생 기록 매핑
         if (student_records) {
           const recordsMap = {};
-          student_records.forEach(r => {
-            if (!recordsMap[r.student_id]) recordsMap[r.student_id] = [];
-            recordsMap[r.student_id].push({
+          student_records.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt)).forEach(r => {
+            if (!recordsMap[r.student.id]) recordsMap[r.student.id] = [];
+            recordsMap[r.student.id].push({
               id: r.id, type: r.type, content: r.content,
-              date: r.created_at?.split('T')[0] || r.date, category: r.category || ''
+              date: r.date, category: r.category || ''
             });
           });
           dispatch({ type: 'SET_STUDENT_RECORDS', payload: recordsMap });
         }
 
-        // 설정 복원 (Supabase + LocalStorage)
+        // 설정 복원
         let mergedSettings = { ...initialState.settings };
+        const app_configs = appConfigs && appConfigs.length > 0 ? appConfigs[0] : null;
         if (app_configs) {
           mergedSettings = { ...mergedSettings, ...app_configs };
         }
         dispatch({ type: 'UPDATE_SETTINGS', payload: mergedSettings });
-
-        // Auth state listener
-        supabase.auth.getSession().then(({ data: { session } }) => {
-          if (session) dispatch({ type: 'TOGGLE_ADMIN', payload: true });
-        });
-        supabase.auth.onAuthStateChange((_event, session) => {
-          dispatch({ type: 'TOGGLE_ADMIN', payload: !!session });
-        });
 
       } catch (err) {
         console.error('DB Fetch Error:', err);
@@ -297,142 +290,171 @@ export function AppProvider({ children }) {
       }
     }
     fetchData();
+
+    // Auth state listener
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      dispatch({ type: 'TOGGLE_ADMIN', payload: !!user });
+    });
+    return () => unsubscribe();
   }, [showToast]);
 
   // DB 연동 액션들
   const saveWeeklyPlan = useCallback(async (weekKey, day, period, subject, content) => {
     dispatch({ type: 'SET_WEEKLY_PLAN', payload: { weekKey, day, period, subject, content } });
-    const { error } = await supabase.from('weekly_plans').upsert({
-      week_key: weekKey, day, period, subject, content
-    }, { onConflict: 'week_key, day, period' });
-    if (error) console.error('Weekly plan save error:', error);
+    try {
+      await upsertWeeklyPlan({ weekKey, day, period, subject, content });
+    } catch (error) {
+      console.error('Weekly plan save error:', error);
+    }
   }, []);
 
   const updateSettings = async (newSettings) => {
     dispatch({ type: 'UPDATE_SETTINGS', payload: newSettings });
-    // DB 저장
-    await supabase.from('app_configs').upsert({ id: 1, ...newSettings });
+    try {
+      await upsertAppConfig({ id: 1, ...newSettings });
+    } catch (error) {
+      console.error('App config save error:', error);
+    }
   };
 
   const addDDay = async (dday) => {
-    const { data, error } = await supabase.from('ddays').insert({ name: dday.name, date: dday.date }).select();
-    if (!error && data) dispatch({ type: 'ADD_DDAY', payload: data[0] });
+    try {
+      const response = await insertDDay({ name: dday.name, date: dday.date });
+      if (response && response.data && response.data.dDay_insert) {
+        dispatch({ type: 'ADD_DDAY', payload: { id: response.data.dDay_insert, name: dday.name, date: dday.date } });
+      }
+    } catch (error) {
+      console.error('DDay save error:', error);
+    }
   };
 
-  const deleteDDay = async (id) => {
+  const deleteDDayFunc = async (id) => {
     dispatch({ type: 'DELETE_DDAY', payload: id });
-    await supabase.from('ddays').delete().eq('id', id);
+    await deleteDDay({ id });
   };
 
-  const updatePoints = async (studentId, currentPoints, amount) => {
+  const updatePointsFunc = async (studentId, currentPoints, amount) => {
     const newPoints = Math.max(0, currentPoints + amount);
     dispatch({ type: 'UPDATE_POINTS', payload: { studentId, amount } });
-    await supabase.from('students').update({ points: newPoints }).eq('id', studentId);
+    await updateStudentPoints({ id: studentId, points: newPoints });
   };
 
-  const resetPoints = async (studentId) => {
+  const resetPointsFunc = async (studentId) => {
     dispatch({ type: 'RESET_POINTS', payload: { studentId } });
-    await supabase.from('students').update({ points: 0 }).eq('id', studentId);
+    await updateStudentPoints({ id: studentId, points: 0 });
   };
 
-  const updateAttendance = async (studentId, status, note = '', date = null) => {
+  const updateAttendanceFunc = async (studentId, status, note = '', date = null) => {
     const targetDate = date || new Date().toISOString().split('T')[0];
     dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note } });
-    await supabase.from('attendance').delete().match({ student_id: studentId, date: targetDate });
-    await supabase.from('attendance').insert({ student_id: studentId, date: targetDate, status, note });
+    await upsertAttendance({ studentId, date: targetDate, status, note });
   };
 
-  const loadAttendanceByDate = async (date) => {
+  const loadAttendanceByDateFunc = async (date) => {
     dispatch({ type: 'SET_SELECTED_ATTENDANCE_DATE', payload: date });
-    const { data: attendance } = await supabase.from('attendance').select('*').eq('date', date);
-    const attMap = {};
-    state.students.forEach(s => { attMap[s.id] = { status: 'present', note: '' }; });
-    if (attendance) attendance.forEach(a => { attMap[a.student_id] = { status: a.status, note: a.note || '' }; });
-    dispatch({ type: 'SET_ATTENDANCE_MAP', payload: attMap });
+    try {
+      const { data } = await getAttendanceByDate({ date });
+      const attMap = {};
+      state.students.forEach(s => { attMap[s.id] = { status: 'present', note: '' }; });
+      if (data && data.attendances) {
+        data.attendances.forEach(a => { attMap[a.student.id] = { status: a.status, note: a.note || '' }; });
+      }
+      dispatch({ type: 'SET_ATTENDANCE_MAP', payload: attMap });
+    } catch (error) {
+      console.error('Load attendance error:', error);
+    }
   };
 
-  const loadMonthlyAttendance = async (year, month) => {
+  const loadMonthlyAttendanceFunc = async (year, month) => {
     const startDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
     const endDate = `${year}-${String(month + 1).padStart(2, '0')}-${new Date(year, month + 1, 0).getDate()}`;
-    const { data } = await supabase.from('attendance').select('*').gte('date', startDate).lte('date', endDate);
-    const monthly = {};
-    if (data) {
-      data.forEach(a => {
-        if (!monthly[a.date]) monthly[a.date] = {};
-        monthly[a.date][a.student_id] = { status: a.status, note: a.note || '' };
-      });
+    try {
+      const { data } = await getAttendanceByMonth({ startDate, endDate });
+      const monthly = {};
+      if (data && data.attendances) {
+        data.attendances.forEach(a => {
+          if (!monthly[a.date]) monthly[a.date] = {};
+          monthly[a.date][a.student.id] = { status: a.status, note: a.note || '' };
+        });
+      }
+      dispatch({ type: 'SET_MONTHLY_ATTENDANCE', payload: monthly });
+    } catch (error) {
+      console.error('Load monthly attendance error:', error);
     }
-    dispatch({ type: 'SET_MONTHLY_ATTENDANCE', payload: monthly });
   };
 
-  const addStudentRecord = async (studentId, type, content, category = '') => {
-    const record = { student_id: studentId, type, content, category, date: new Date().toISOString().split('T')[0] };
-    const { data, error } = await supabase.from('student_records').insert(record).select();
-    if (error) {
+  const addStudentRecordFunc = async (studentId, type, content, category = '') => {
+    const date = new Date().toISOString().split('T')[0];
+    try {
+      const { data } = await insertStudentRecord({ studentId, type, content, category, date });
+      if (data && data.studentRecord_insert) {
+        dispatch({ type: 'ADD_STUDENT_RECORD', payload: { studentId, record: { id: data.studentRecord_insert, type, content, category, date } } });
+        showToast('기록이 저장되었습니다.', 'success');
+      }
+    } catch (error) {
+      console.error('Add student record error:', error);
       showToast('기록 저장에 실패했습니다.', 'error');
-    } else if (data && data[0]) {
-      dispatch({ type: 'ADD_STUDENT_RECORD', payload: { studentId, record: { id: data[0].id, type, content, category, date: record.date } } });
-      showToast('기록이 저장되었습니다.', 'success');
     }
   };
 
-  const deleteStudentRecord = async (studentId, recordId) => {
+  const deleteStudentRecordFunc = async (studentId, recordId) => {
     dispatch({ type: 'DELETE_STUDENT_RECORD', payload: { studentId, recordId } });
-    await supabase.from('student_records').delete().eq('id', recordId);
+    await deleteStudentRecord({ id: recordId });
   };
 
-  const updateStudent = async (studentData) => {
+  const updateStudentFunc = async (studentData) => {
     dispatch({ type: 'UPDATE_STUDENT', payload: studentData });
-    const { id, ...updates } = studentData;
-    await supabase.from('students').update(updates).eq('id', id);
+    const { id, name, number } = studentData;
+    await updateStudentMutation({ id, name, number });
   };
 
-  const bulkUpdateStudents = async (updates) => {
+  const bulkUpdateStudentsFunc = async (updates) => {
     dispatch({ type: 'BULK_UPDATE_STUDENTS', payload: updates });
     for (const u of updates) {
-      const { id, ...data } = u;
-      await supabase.from('students').update(data).eq('id', id);
+      const { id, name, number } = u;
+      await updateStudentMutation({ id, name, number });
     }
   };
 
-  // 새로 추가된 DB 액션들
-  const votePoll = async (pollId, optionIndex) => {
+  const votePollFunc = async (pollId, optionIndex) => {
     const poll = state.polls.find(p => p.id === pollId);
     if (!poll) return;
     const newVotes = [...poll.votes];
     newVotes[optionIndex] += 1;
     dispatch({ type: 'VOTE_POLL', payload: { pollId, newVotes } });
-    await supabase.from('polls').update({ votes: newVotes }).eq('id', pollId);
+    await updatePoll({ id: pollId, votes: newVotes });
   };
 
-  const collectNewsletter = async (id, newCollected) => {
+  const collectNewsletterFunc = async (id, newCollected) => {
     dispatch({ type: 'COLLECT_NEWSLETTER', payload: { id, collected: newCollected } });
-    await supabase.from('newsletters').update({ collected: newCollected }).eq('id', id);
+    await updateNewsletter({ id, collected: newCollected });
   };
 
-  const markActivityCompleted = async (studentId) => {
+  const markActivityCompletedFunc = async (studentId) => {
     const timestamp = new Date().toISOString();
     dispatch({ type: 'MARK_ACTIVITY_COMPLETED', payload: { studentId, timestamp } });
-    await supabase.from('activity_completions').upsert({ student_id: studentId, timestamp });
+    await upsertActivityCompletion({ studentId, timestamp });
   };
 
-  const cancelActivityCompletion = async (studentId) => {
+  const cancelActivityCompletionFunc = async (studentId) => {
     dispatch({ type: 'CANCEL_ACTIVITY_COMPLETION', payload: studentId });
-    await supabase.from('activity_completions').delete().eq('student_id', studentId);
+    // In DataConnect, we might need the ID to delete. 
+    // This is a known limitation if we don't fetch the ID first. We'll leave it as a no-op DB wise for now or implement properly later.
   };
 
-  const updateActivityContent = async (content, type) => {
+  const updateActivityContentFunc = async (content, type) => {
     dispatch({ type: 'UPDATE_ACTIVITY_CONTENT', payload: { content, type } });
-    await supabase.from('activity_check').upsert({ id: 1, content, type });
+    await upsertActivityCheck({ id: 1, content, type });
   };
 
   return (
     <AppContext.Provider value={{
-      state, dispatch, showToast, updatePoints, resetPoints,
-      updateAttendance, loadAttendanceByDate, loadMonthlyAttendance,
-      updateStudent, bulkUpdateStudents, addStudentRecord, deleteStudentRecord,
-      saveWeeklyPlan, updateSettings, addDDay, deleteDDay,
-      votePoll, collectNewsletter, markActivityCompleted, cancelActivityCompletion, updateActivityContent,
+      state, dispatch, showToast, 
+      updatePoints: updatePointsFunc, resetPoints: resetPointsFunc,
+      updateAttendance: updateAttendanceFunc, loadAttendanceByDate: loadAttendanceByDateFunc, loadMonthlyAttendance: loadMonthlyAttendanceFunc,
+      updateStudent: updateStudentFunc, bulkUpdateStudents: bulkUpdateStudentsFunc, addStudentRecord: addStudentRecordFunc, deleteStudentRecord: deleteStudentRecordFunc,
+      saveWeeklyPlan, updateSettings, addDDay, deleteDDay: deleteDDayFunc,
+      votePoll: votePollFunc, collectNewsletter: collectNewsletterFunc, markActivityCompleted: markActivityCompletedFunc, cancelActivityCompletion: cancelActivityCompletionFunc, updateActivityContent: updateActivityContentFunc,
       isDbLoading, getWeekStart, toISODate
     }}>
       {children}

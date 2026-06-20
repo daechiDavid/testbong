@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { supabase } from '../utils/supabase';
+import { auth } from '../utils/firebase';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 export function useAdminMode() {
   const { state, dispatch, showToast } = useApp();
@@ -10,22 +11,27 @@ export function useAdminMode() {
   const [passwordInput, setPasswordInput] = useState('');
 
   const login = async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      showToast('이메일 또는 비밀번호가 틀렸습니다.', 'error');
-    } else {
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
       setShowPinModal(false);
       setEmailInput('');
       setPasswordInput('');
       showToast('교사 모드로 전환되었습니다.', 'success');
       dispatch({ type: 'TOGGLE_ADMIN', payload: true });
+    } catch (error) {
+      console.error('Login error:', error);
+      showToast('이메일 또는 비밀번호가 틀렸습니다.', 'error');
     }
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
-    dispatch({ type: 'TOGGLE_ADMIN', payload: false });
-    showToast('학생 모드로 전환되었습니다.', 'info');
+    try {
+      await signOut(auth);
+      dispatch({ type: 'TOGGLE_ADMIN', payload: false });
+      showToast('학생 모드로 전환되었습니다.', 'info');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
 
   const toggle = () => {

@@ -1,0 +1,101 @@
+# dataconnect/connector/queries.gql
+
+query GetAllAppData @auth(level: PUBLIC) {
+  students {
+    id
+    number
+    name
+    points
+  }
+  announcements {
+    id
+    date
+    title
+    content
+  }
+  assignments {
+    id
+    dueDate
+    title
+    submissions
+  }
+  dDays {
+    id
+    name
+    date
+  }
+  weeklyPlans {
+    id
+    weekKey
+    day
+    period
+    subject
+    content
+  }
+  appConfigs {
+    id
+    calendarId1
+    calendarId2
+    calendarId3
+    thermometerGoal
+    thermometerReward
+  }
+  quickLinks {
+    id
+    title
+    url
+    icon
+  }
+  polls {
+    id
+    question
+    options
+    votes
+  }
+  newsletters {
+    id
+    date
+    title
+    content
+    collected
+  }
+  activityChecks {
+    id
+    content
+    type
+  }
+  activityCompletions {
+    id
+    student { id }
+    timestamp
+  }
+  studentRecords {
+    id
+    student { id }
+    type
+    content
+    category
+    date
+    createdAt
+  }
+}
+
+query GetAttendanceByDate($date: Date!) @auth(level: PUBLIC) {
+  attendances(where: { date: { eq: $date } }) {
+    id
+    student { id }
+    date
+    status
+    note
+  }
+}
+
+query GetAttendanceByMonth($startDate: Date!, $endDate: Date!) @auth(level: PUBLIC) {
+  attendances(where: { date: { ge: $startDate, le: $endDate } }) {
+    id
+    student { id }
+    date
+    status
+    note
+  }
+}

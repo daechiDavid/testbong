@@ -1,0 +1,79 @@
+# dataconnect/connector/mutations.gql
+
+mutation UpsertWeeklyPlan($id: UUID, $weekKey: String!, $day: String!, $period: Int!, $subject: String, $content: String) @auth(level: PUBLIC) {
+  weeklyPlan_upsert(
+    data: {
+      id: $id,
+      weekKey: $weekKey,
+      day: $day,
+      period: $period,
+      subject: $subject,
+      content: $content
+    }
+  )
+}
+
+mutation UpsertAppConfig($id: Int!, $calendarId1: String, $calendarId2: String, $calendarId3: String, $thermometerGoal: Int, $thermometerReward: String) @auth(level: PUBLIC) {
+  appConfig_upsert(
+    data: {
+      id: $id,
+      calendarId1: $calendarId1,
+      calendarId2: $calendarId2,
+      calendarId3: $calendarId3,
+      thermometerGoal: $thermometerGoal,
+      thermometerReward: $thermometerReward
+    }
+  )
+}
+
+mutation InsertDDay($name: String!, $date: Date!) @auth(level: PUBLIC) {
+  dDay_insert(data: { name: $name, date: $date })
+}
+
+mutation DeleteDDay($id: UUID!) @auth(level: PUBLIC) {
+  dDay_delete(id: $id)
+}
+
+mutation UpdateStudentPoints($id: UUID!, $points: Int!) @auth(level: PUBLIC) {
+  student_update(id: $id, data: { points: $points })
+}
+
+mutation UpsertAttendance($id: UUID, $studentId: UUID!, $date: Date!, $status: String!, $note: String) @auth(level: PUBLIC) {
+  attendance_upsert(data: { id: $id, studentId: $studentId, date: $date, status: $status, note: $note })
+}
+
+mutation DeleteAttendance($id: UUID!) @auth(level: PUBLIC) {
+  attendance_delete(id: $id)
+}
+
+mutation InsertStudentRecord($studentId: UUID!, $type: String!, $content: String, $category: String, $date: Date!) @auth(level: PUBLIC) {
+  studentRecord_insert(data: { studentId: $studentId, type: $type, content: $content, category: $category, date: $date })
+}
+
+mutation DeleteStudentRecord($id: UUID!) @auth(level: PUBLIC) {
+  studentRecord_delete(id: $id)
+}
+
+mutation UpdatePoll($id: UUID!, $votes: [Int!]!) @auth(level: PUBLIC) {
+  poll_update(id: $id, data: { votes: $votes })
+}
+
+mutation UpdateNewsletter($id: UUID!, $collected: Boolean!) @auth(level: PUBLIC) {
+  newsletter_update(id: $id, data: { collected: $collected })
+}
+
+mutation UpsertActivityCompletion($id: UUID, $studentId: UUID!, $timestamp: Timestamp!) @auth(level: PUBLIC) {
+  activityCompletion_upsert(data: { id: $id, studentId: $studentId, timestamp: $timestamp })
+}
+
+mutation DeleteActivityCompletion($id: UUID!) @auth(level: PUBLIC) {
+  activityCompletion_delete(id: $id)
+}
+
+mutation UpsertActivityCheck($id: Int!, $content: String, $type: String) @auth(level: PUBLIC) {
+  activityCheck_upsert(data: { id: $id, content: $content, type: $type })
+}
+
+mutation UpdateStudent($id: UUID!, $name: String, $number: Int) @auth(level: PUBLIC) {
+  student_update(id: $id, data: { name: $name, number: $number })
+}
