@@ -13,16 +13,19 @@
 .calendar-left .google-calendar-embed {
   border-radius: var(--radius-lg);
   overflow: hidden;
-  height: 800px !important;
-  min-height: 800px !important;
+  /* .card 기본 패딩을 제거하고 iframe이 카드 전체를 채우도록 설정 */
+  padding: 0 !important;
+  height: 80vh !important;
+  min-height: 700px !important;
 }
 
 /* iframe이 부모 카드의 높이를 꽉 채우도록 강제 */
 .calendar-left .google-calendar-embed iframe {
+  display: block !important;
   width: 100% !important;
-  height: 800px !important;
-  min-height: 800px !important;
-  border: 0;
+  height: 80vh !important;
+  min-height: 700px !important;
+  border: 0 !important;
 }
 
 .calendar-right .notice-card-container {
