@@ -6,7 +6,8 @@ export async function generateBehaviorSummary(apiKey, studentData) {
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  // 사용자가 요청한 최신 gemini-3.5-flash 모델을 설정하여 인스턴스를 생성합니다.
+  const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
 
   const prompt = `
 당신은 초등학교 교사입니다. 다음 학생의 기록을 바탕으로 생활기록부용 행동발달 종합의견을 작성해주세요.
