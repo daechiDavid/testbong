@@ -2,6 +2,8 @@ import { useState, useMemo, useCallback } from 'react';
 import { useApp } from '../context/AppContext';
 import { getWeekStart, toISODate } from '../context/AppContext';
 import './WeeklyPlanPage.css';
+const DAYS = ['월', '화', '수', '목', '금'];
+const PERIODS = [1, 2, 3, 4, 5, 6];
 
 export default function WeeklyPlanPage() {
   const { state, showToast, saveWeeklyPlan } = useApp();
@@ -12,16 +14,13 @@ export default function WeeklyPlanPage() {
   const [editSubject, setEditSubject] = useState('');
   const [editContent, setEditContent] = useState('');
 
-  const days = ['월', '화', '수', '목', '금'];
-  const periods = [1, 2, 3, 4, 5, 6];
-
   // 현재 주차 계산
   const weekStart = useMemo(() => getWeekStart(currentDate), [currentDate]);
   const weekKey = toISODate(weekStart);
 
   // 각 요일의 날짜 계산
   const dayDates = useMemo(() => {
-    return days.map((d, i) => {
+    return DAYS.map((d, i) => {
       const date = new Date(weekStart);
       date.setDate(date.getDate() + i);
       return {
@@ -116,7 +115,7 @@ export default function WeeklyPlanPage() {
             </tr>
           </thead>
           <tbody>
-            {periods.map(p => (
+            {PERIODS.map(p => (
               <tr key={p}>
                 <td className="period-cell">{p}</td>
                 {dayDates.map(dd => {

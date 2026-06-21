@@ -55,15 +55,14 @@ const defaultLayouts = {
 };
 
 export default function DashboardPage() {
-  // AppContext에서 DB 연동 함수들을 가져옴 (addDDay, deleteDDay는 DB에 저장/삭제)
-  const { state, showToast, updateSettings, addDDay, deleteDDay } = useApp();
+  // AppContext에서 DB 연동 함수들을 가져옴
+  const { state, dispatch, showToast, updateSettings, addDDay, deleteDDay } = useApp();
   const { students, announcements, settings, weeklyPlans, ddays = [], isAdmin } = state;
 
   const [lunchInfo, setLunchInfo] = useState(null);
   const [isLoadingLunch, setIsLoadingLunch] = useState(true);
   const [showDdayForm, setShowDdayForm] = useState(false);
   const [newDday, setNewDday] = useState({ name: '', date: '', emoji: '🎉' });
-  const [layouts, setLayouts] = useState(defaultLayouts);
 
   useEffect(() => {
     async function loadLunch() {
@@ -97,9 +96,10 @@ export default function DashboardPage() {
       });
       showToast('공지사항이 수정되었습니다', 'success');
     } else {
+      const newId = crypto.randomUUID();
       dispatch({
         type: 'ADD_ANNOUNCEMENT',
-        payload: { id: Date.now(), ...newNotice, date: dateStr }
+        payload: { id: newId, ...newNotice, date: dateStr }
       });
       showToast('공지사항이 등록되었습니다', 'success');
     }
@@ -181,7 +181,7 @@ export default function DashboardPage() {
   const goalPoints = settings?.thermometerGoal || 1500;
   const thermometerReward = settings?.thermometerReward || '';
 
-  const handleLayoutChange = (layout, allLayouts) => {
+  const handleLayoutChange = () => {
     // 임시로 레이아웃 변경 저장 및 겹침 버그 유발 방지를 위해 기능 차단
     return;
   };
@@ -205,7 +205,7 @@ export default function DashboardPage() {
       {/* 대시보드 위젯 그리드 레이아웃: 블럭 이동 및 크기 조절 가능 */}
       <ResponsiveGridLayout
         className="dashboard-layout"
-        layouts={layouts}
+        layouts={defaultLayouts}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
         rowHeight={220}

@@ -27,7 +27,7 @@ export default function AttendancePage() {
     if (viewMode === 'monthly') {
       loadMonthlyAttendance(monthYear.year, monthYear.month);
     }
-  }, [viewMode, monthYear]);
+  }, [viewMode, monthYear, loadMonthlyAttendance]);
 
   const counts = {
     present: Object.values(attendance).filter(a => a.status === 'present').length,
