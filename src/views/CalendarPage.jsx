@@ -85,7 +85,7 @@ export default function CalendarPage() {
                 <iframe 
                   src={getCombinedCalendarSrc(calendars)} 
                   width="100%"
-                  height="750"
+                  height="600"
                   frameBorder="0" 
                   title="Google Calendar Combined"
                 ></iframe>

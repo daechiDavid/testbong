@@ -287,12 +287,21 @@ export default function StudentsPage() {
 
   return (
     <div className="students-page">
-      {/* Top Tabs */}
+      {/* 상단 탭: 행동발달/학습평가는 관리자 전용 (학생에게는 잠금 표시) */}
       <div className="students-tabs">
         <button className={`tab-btn ${activeTab === 'list' ? 'active' : ''}`} onClick={() => setActiveTab('list')}>👥 학생 목록</button>
-        {/* 행동발달/학습평가 탭은 관리자(교사)만 볼 수 있음 */}
-        {isAdmin && <button className={`tab-btn ${activeTab === 'behavior' ? 'active' : ''}`} onClick={() => setActiveTab('behavior')}>🌱 행동발달</button>}
-        {isAdmin && <button className={`tab-btn ${activeTab === 'evaluation' ? 'active' : ''}`} onClick={() => setActiveTab('evaluation')}>📝 학습평가</button>}
+        <button 
+          className={`tab-btn ${activeTab === 'behavior' ? 'active' : ''} ${!isAdmin ? 'tab-locked' : ''}`} 
+          onClick={() => isAdmin ? setActiveTab('behavior') : showToast('관리자 전용 기능입니다.', 'error')}
+        >
+          🌱 행동발달 {!isAdmin && <span className="lock-icon">🔒</span>}
+        </button>
+        <button 
+          className={`tab-btn ${activeTab === 'evaluation' ? 'active' : ''} ${!isAdmin ? 'tab-locked' : ''}`} 
+          onClick={() => isAdmin ? setActiveTab('evaluation') : showToast('관리자 전용 기능입니다.', 'error')}
+        >
+          📝 학습평가 {!isAdmin && <span className="lock-icon">🔒</span>}
+        </button>
       </div>
 
       {/* Tab: List */}

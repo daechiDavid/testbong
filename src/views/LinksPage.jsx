@@ -3,7 +3,7 @@ import { useApp } from '../context/AppContext';
 import './LinksPage.css';
 
 export default function LinksPage() {
-  const { state, dispatch, showToast, addLink, updateLink, deleteLink } = useApp();
+  const { state, showToast, addLink, updateLink, deleteLink } = useApp();
   const { quickLinks, isAdmin } = state;
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);

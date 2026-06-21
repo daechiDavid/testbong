@@ -23,7 +23,8 @@ const defaultLayouts = {
 };
 
 export default function DashboardPage() {
-  const { state, dispatch, showToast, updateSettings } = useApp();
+  // AppContext에서 DB 연동 함수들을 가져옴 (addDDay, deleteDDay는 DB에 저장/삭제)
+  const { state, showToast, updateSettings, addDDay, deleteDDay } = useApp();
   const { students, announcements, settings, weeklyPlans, ddays = [], isAdmin } = state;
 
   const [lunchInfo, setLunchInfo] = useState(null);
@@ -82,19 +83,21 @@ export default function DashboardPage() {
   // D-Day sorted
   const ddaySorted = [...ddays].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  const handleAddDday = () => {
+  // D-Day 추가: DB에도 저장 (addDDay 함수 사용)
+  const handleAddDday = async () => {
     if (!newDday.name || !newDday.date) {
       showToast('이름과 날짜를 입력해주세요.', 'error');
       return;
     }
-    dispatch({ type: 'ADD_DDAY', payload: { ...newDday, id: Date.now() } });
+    await addDDay({ name: newDday.name, date: newDday.date, emoji: newDday.emoji });
     setNewDday({ name: '', date: '', emoji: '🎉' });
     setShowDdayForm(false);
     showToast('D-Day가 추가되었습니다.', 'success');
   };
 
-  const handleDeleteDday = (id) => {
-    dispatch({ type: 'DELETE_DDAY', payload: id });
+  // D-Day 삭제: DB에서도 삭제 (deleteDDay 함수 사용)
+  const handleDeleteDday = async (id) => {
+    await deleteDDay(id);
   };
 
   const handleUpdateThermometer = async (goal, reward) => {
@@ -130,6 +133,7 @@ export default function DashboardPage() {
       )}
 
       {/* Main Layout */}
+      {/* 대시보드 위젯 그리드 레이아웃: 블럭 이동만 가능, 크기 조절은 비활성화 */}
       <ResponsiveGridLayout
         className="dashboard-layout"
         layouts={layouts}
@@ -138,7 +142,7 @@ export default function DashboardPage() {
         rowHeight={150}
         onLayoutChange={handleLayoutChange}
         isDraggable={isAdmin}
-        isResizable={isAdmin}
+        isResizable={false}
         draggableHandle=".card-header"
       >
         {/* Schedule */}
