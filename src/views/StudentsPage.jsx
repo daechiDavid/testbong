@@ -265,7 +265,8 @@ export default function StudentsPage() {
 
       const data = await res.json();
       
-      updateStudent({ id: student.id, aiSummary: data.summary });
+      // 기존 학생의 모든 정보(이름, 번호, 포인트 등)를 복사한 후, 생성된 AI 종합의견만 덮어씌워 업데이트를 요청합니다.
+      updateStudent({ ...student, aiSummary: data.summary });
       
       showToast('AI가 종합의견을 생성했습니다.', 'success');
     } catch (err) {
