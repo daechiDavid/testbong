@@ -342,7 +342,7 @@ export default function StudentsPage() {
           {filtered.map(s => (
             <div key={s.id} className="student-card" onClick={() => handleSelectStudent(s)}>
               <div className="student-card-header">
-                <div className={`avatar ${getAvatarColor(s.id)}`}>{getInitials(s.name)}</div>
+                <div className={`avatar ${getAvatarColor(s.gender)}`}>{getInitials(s.name)}</div>
                 <div>
                   <div className="student-number">{s.number}번</div>
                   <div className="student-name-main">{s.name}</div>
@@ -376,7 +376,7 @@ export default function StudentsPage() {
               {filtered.map(s => (
                 <tr key={s.id} onClick={() => handleSelectStudent(s)} style={{cursor:'pointer'}}>
                   <td>{s.number}</td>
-                  <td><div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}><div className={`avatar sm ${getAvatarColor(s.id)}`}>{getInitials(s.name)}</div>{s.name}</div></td>
+                  <td><div style={{display:'flex',alignItems:'center',gap:'0.5rem'}}><div className={`avatar sm ${getAvatarColor(s.gender)}`}>{getInitials(s.name)}</div>{s.name}</div></td>
                   <td>{s.gender === 'M' ? '남' : '여'}</td>
                   <td>{s.birthday?.slice(5) || '-'}</td>
                   <td>{s.allergies || '-'}</td>
@@ -436,7 +436,7 @@ export default function StudentsPage() {
               {sorted.map((s, i) => (
                 <div key={s.id} className="points-row glass-card" style={{ background: 'var(--bg-card)', backdropFilter: 'blur(12px)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-md)', padding: '0.75rem 1rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '1rem', boxShadow: 'var(--shadow-sm)' }}>
                   <div className={`points-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}`}>{i+1}</div>
-                  <div className={`avatar sm ${getAvatarColor(s.id)}`}>{getInitials(s.name)}</div>
+                  <div className={`avatar sm ${getAvatarColor(s.gender)}`}>{getInitials(s.name)}</div>
                   <div className="points-student-name" style={{ flex: 1, fontWeight: 600 }}>
                     {s.name} <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginLeft: '0.5rem', fontWeight: 500 }}>{s.group}팀</span>
                   </div>
@@ -482,7 +482,7 @@ export default function StudentsPage() {
                           onDragEnd={handleDragEndTeam}
                           style={{ padding: '0.4rem 0.75rem', background: 'var(--gray-50)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-xl)', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: isAdmin ? 'grab' : 'default', transition: 'all 0.2s' }}
                         >
-                          <div className={`avatar sm ${getAvatarColor(s.id)}`} style={{ width: '20px', height: '20px', fontSize: '0.6rem' }}>{getInitials(s.name)}</div>
+                          <div className={`avatar sm ${getAvatarColor(s.gender)}`} style={{ width: '20px', height: '20px', fontSize: '0.6rem' }}>{getInitials(s.name)}</div>
                           {s.name}
                         </div>
                       ))}
@@ -509,7 +509,7 @@ export default function StudentsPage() {
                   
                   {/* Left: Student Info */}
                   <div style={{ width: '160px', flexShrink: 0, textAlign: 'center', borderRight: '1px solid var(--border-light)', paddingRight: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <div className={`avatar xl ${getAvatarColor(s.id)}`} style={{ margin: '0 auto 0.75rem auto' }}>{getInitials(s.name)}</div>
+                    <div className={`avatar xl ${getAvatarColor(s.gender)}`} style={{ margin: '0 auto 0.75rem auto' }}>{getInitials(s.name)}</div>
                     <h3 style={{ margin: '0 0 0.5rem 0' }}>{s.number}. {s.name}</h3>
                     {isAdmin && (
                       <button className="btn-ai-generate" onClick={() => handleGenerateAI(s)} disabled={generatingAiId === s.id}>
@@ -652,7 +652,7 @@ export default function StudentsPage() {
             </div>
             <div className="modal-body" style={{maxHeight:'70vh', overflowY:'auto'}}>
               <div className="student-detail-header">
-                <div className={`avatar xl ${getAvatarColor(selectedStudent.id)}`}>{getInitials(selectedStudent.name)}</div>
+                <div className={`avatar xl ${getAvatarColor(selectedStudent.gender)}`}>{getInitials(selectedStudent.name)}</div>
                 <div className="student-detail-info">
                   <div className="student-name-edit-wrapper">
                     {isEditingName ? (

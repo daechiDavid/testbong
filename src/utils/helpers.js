@@ -43,25 +43,9 @@ export function isTodayBirthday(birthday) {
   return today.getMonth() === bd.getMonth() && today.getDate() === bd.getDate();
 }
 
-export function getAvatarColor(id) {
-  const colors = ['c1','c2','c3','c4','c5','c6','c7','c8'];
-  
-  // 1. id가 숫자형(Index)일 경우 기존 방식대로 인덱스 연산을 수행합니다.
-  if (typeof id === 'number') {
-    return colors[(id - 1) % colors.length];
-  }
-  
-  // 2. id가 UUID 등의 문자열(String)일 경우, 각 문자의 아스키 코드 합을 구하여 고유한 색상 인덱스를 추출합니다.
-  if (typeof id === 'string') {
-    let sum = 0;
-    for (let i = 0; i < id.length; i++) {
-      sum += id.charCodeAt(i);
-    }
-    return colors[sum % colors.length];
-  }
-  
-  // 3. 예외적인 경우(id가 없을 때 등)에는 기본적으로 첫 번째 색상을 적용합니다.
-  return colors[0];
+export function getAvatarColor(gender) {
+  // 학생의 성별(gender) 값이 'M'(남학생)이면 파란색 계열 'male', 그 외에는 분홍색 계열 'female' 클래스를 반환합니다.
+  return gender === 'M' ? 'male' : 'female';
 }
 
 export function getInitials(name) {

@@ -24,6 +24,10 @@
 .avatar.c6 { background:linear-gradient(135deg,#8B5CF6,#A78BFA); }
 .avatar.c7 { background:linear-gradient(135deg,#EF4444,#F87171); }
 .avatar.c8 { background:linear-gradient(135deg,#14B8A6,#2DD4BF); }
+/* 남학생용 세련된 스카이블루 그라데이션 */
+.avatar.male { background: linear-gradient(135deg, #4DABF7, #3B82F6); }
+/* 여학생용 세련된 코랄 로즈 그라데이션 */
+.avatar.female { background: linear-gradient(135deg, #FFA8A8, #EE5D5D); }
 .student-number { font-size:0.75rem; color:var(--text-muted); font-weight:600; }
 .student-name-main { font-size:0.9375rem; font-weight:700; }
 .student-card-body { display:flex; flex-direction:column; gap:0.5rem; }
