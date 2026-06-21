@@ -105,7 +105,7 @@ export default function AttendancePage() {
               />
             </div>
             {isAdmin && (
-              <button className="btn btn-primary" onClick={handleSaveAllToday}>
+              <button className="save-attendance-btn" onClick={handleSaveAllToday}>
                 오늘의 출석 입력 완료
               </button>
             )}

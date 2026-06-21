@@ -19,6 +19,38 @@ const defaultLayouts = {
     { i: 'dday', x: 6, y: 2, w: 6, h: 2 },
     { i: 'ranking', x: 0, y: 4, w: 6, h: 2 },
     { i: 'notice', x: 6, y: 4, w: 6, h: 2 }
+  ],
+  md: [
+    { i: 'schedule', x: 0, y: 0, w: 5, h: 2 },
+    { i: 'thermometer', x: 5, y: 0, w: 5, h: 2 },
+    { i: 'lunch', x: 0, y: 2, w: 5, h: 2 },
+    { i: 'dday', x: 5, y: 2, w: 5, h: 2 },
+    { i: 'ranking', x: 0, y: 4, w: 5, h: 2 },
+    { i: 'notice', x: 5, y: 4, w: 5, h: 2 }
+  ],
+  sm: [
+    { i: 'schedule', x: 0, y: 0, w: 6, h: 2 },
+    { i: 'thermometer', x: 0, y: 2, w: 6, h: 2 },
+    { i: 'lunch', x: 0, y: 4, w: 6, h: 2 },
+    { i: 'dday', x: 0, y: 6, w: 6, h: 2 },
+    { i: 'ranking', x: 0, y: 8, w: 6, h: 2 },
+    { i: 'notice', x: 0, y: 10, w: 6, h: 2 }
+  ],
+  xs: [
+    { i: 'schedule', x: 0, y: 0, w: 4, h: 2 },
+    { i: 'thermometer', x: 0, y: 2, w: 4, h: 2 },
+    { i: 'lunch', x: 0, y: 4, w: 4, h: 2 },
+    { i: 'dday', x: 0, y: 6, w: 4, h: 2 },
+    { i: 'ranking', x: 0, y: 8, w: 4, h: 2 },
+    { i: 'notice', x: 0, y: 10, w: 4, h: 2 }
+  ],
+  xxs: [
+    { i: 'schedule', x: 0, y: 0, w: 2, h: 2 },
+    { i: 'thermometer', x: 0, y: 2, w: 2, h: 2 },
+    { i: 'lunch', x: 0, y: 4, w: 2, h: 2 },
+    { i: 'dday', x: 0, y: 6, w: 2, h: 2 },
+    { i: 'ranking', x: 0, y: 8, w: 2, h: 2 },
+    { i: 'notice', x: 0, y: 10, w: 2, h: 2 }
   ]
 };
 
@@ -31,12 +63,7 @@ export default function DashboardPage() {
   const [isLoadingLunch, setIsLoadingLunch] = useState(true);
   const [showDdayForm, setShowDdayForm] = useState(false);
   const [newDday, setNewDday] = useState({ name: '', date: '', emoji: '🎉' });
-  const [layouts, setLayouts] = useState(() => {
-    try {
-      const saved = localStorage.getItem('dashboardLayouts');
-      return saved ? JSON.parse(saved) : defaultLayouts;
-    } catch { return defaultLayouts; }
-  });
+  const [layouts, setLayouts] = useState(defaultLayouts);
 
   useEffect(() => {
     async function loadLunch() {
@@ -48,9 +75,52 @@ export default function DashboardPage() {
     loadLunch();
   }, []);
 
+  // 공지사항 관리 상태 (CalendarPage에서 이동)
+  const [newNotice, setNewNotice] = useState({ title: '', content: '', type: 'general' });
+  const [showNoticeForm, setShowNoticeForm] = useState(false);
+  const [editNoticeId, setEditNoticeId] = useState(null);
+
+  // 날짜, 시간 계산
   const today = new Date();
   const dayName = getDayName(today);
   const currentPeriod = getCurrentPeriod();
+
+  // 공지사항 핸들러
+  const handleAddNotice = () => {
+    if (!newNotice.title.trim()) return;
+    const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    
+    if (editNoticeId) {
+      dispatch({
+        type: 'UPDATE_ANNOUNCEMENT',
+        payload: { id: editNoticeId, ...newNotice, date: dateStr }
+      });
+      showToast('공지사항이 수정되었습니다', 'success');
+    } else {
+      dispatch({
+        type: 'ADD_ANNOUNCEMENT',
+        payload: { id: Date.now(), ...newNotice, date: dateStr }
+      });
+      showToast('공지사항이 등록되었습니다', 'success');
+    }
+    
+    setNewNotice({ title: '', content: '', type: 'general' });
+    setShowNoticeForm(false);
+    setEditNoticeId(null);
+  };
+
+  const handleEditNotice = (n) => {
+    setNewNotice({ title: n.title, content: n.content, type: n.type });
+    setEditNoticeId(n.id);
+    setShowNoticeForm(true);
+  };
+
+  const handleDeleteNotice = (id) => {
+    if (confirm('이 공지사항을 삭제하시겠습니까?')) {
+      dispatch({ type: 'DELETE_ANNOUNCEMENT', payload: id });
+      showToast('공지사항이 삭제되었습니다', 'success');
+    }
+  };
 
   // 주간일정에서 오늘의 시간표 읽기
   const weekStart = getWeekStart(today);
@@ -112,9 +182,8 @@ export default function DashboardPage() {
   const thermometerReward = settings?.thermometerReward || '';
 
   const handleLayoutChange = (layout, allLayouts) => {
-    if (!isAdmin) return;
-    setLayouts(allLayouts);
-    localStorage.setItem('dashboardLayouts', JSON.stringify(allLayouts));
+    // 임시로 레이아웃 변경 저장 및 겹침 버그 유발 방지를 위해 기능 차단
+    return;
   };
 
   return (
@@ -133,13 +202,13 @@ export default function DashboardPage() {
       )}
 
       {/* Main Layout */}
-      {/* 대시보드 위젯 그리드 레이아웃: 블럭 이동만 가능, 크기 조절은 비활성화 */}
+      {/* 대시보드 위젯 그리드 레이아웃: 블럭 이동 및 크기 조절 가능 */}
       <ResponsiveGridLayout
         className="dashboard-layout"
         layouts={layouts}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-        rowHeight={150}
+        rowHeight={220}
         onLayoutChange={handleLayoutChange}
         isDraggable={isAdmin}
         isResizable={false}
@@ -275,24 +344,51 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Notice */}
-        <div key="notice" className="card dashboard-widget">
+        {/* Notice (CalendarPage에서 이식됨) */}
+        <div key="notice" className="card dashboard-widget notice-card-container">
           <div className="card-header" style={{ cursor: isAdmin ? 'move' : 'default' }}>
-            <h3 className="card-title"><span className="emoji">📢</span> 최근 공지</h3>
+            <h3 className="card-title"><span className="emoji">📢</span> 공지사항</h3>
+            {isAdmin && <button className="btn btn-sm btn-primary" onClick={() => setShowNoticeForm(!showNoticeForm)}>+ 새 공지</button>}
           </div>
           <div className="widget-content notice-list">
-            {announcements.slice(0, 4).map(n => (
-              <div key={n.id} className="notice-item">
-                <span className={`notice-type ${n.type}`}>{n.type === 'important' ? '중요' : n.type === 'newsletter' ? '통신문' : '일반'}</span>
-                <div className="notice-content">
-                  <div className="notice-title">{n.title}</div>
-                  <div className="notice-meta">{n.date}</div>
+            {isAdmin && showNoticeForm && (
+              <div className="notice-form" style={{ padding: '1rem', background: 'var(--gray-50)', borderRadius: 'var(--radius-md)', marginBottom: '1rem' }}>
+                <input className="form-input" placeholder="제목" value={newNotice.title} onChange={e => setNewNotice({...newNotice, title: e.target.value})} style={{marginBottom:'0.5rem'}} />
+                <textarea className="form-input" placeholder="내용" value={newNotice.content} onChange={e => setNewNotice({...newNotice, content: e.target.value})} rows="3" style={{marginBottom:'0.5rem',resize:'vertical'}} />
+                <div style={{display:'flex',gap:'0.5rem'}}>
+                  <select className="form-input" value={newNotice.type} onChange={e => setNewNotice({...newNotice, type: e.target.value})} style={{flex:1}}>
+                    <option value="general">일반</option>
+                    <option value="important">중요</option>
+                    <option value="newsletter">통신문</option>
+                  </select>
+                  <button className="btn btn-primary" onClick={handleAddNotice}>{editNoticeId ? '수정' : '등록'}</button>
+                  {editNoticeId && <button className="btn btn-secondary" onClick={() => {setShowNoticeForm(false); setEditNoticeId(null); setNewNotice({title:'', content:'', type:'general'})}}>취소</button>}
                 </div>
               </div>
-            ))}
-            {announcements.length === 0 && (
-              <div className="empty-state"><p>등록된 공지사항이 없습니다.</p></div>
             )}
+            
+            <div className="notices-list">
+              {announcements.length > 0 ? announcements.map(n => (
+                <div key={n.id} className="notice-item" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '1rem', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', marginBottom: '0.75rem', background: 'white' }}>
+                  <div style={{ display: 'flex', width: '100%', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <span className={`notice-type ${n.type}`}>{n.type === 'important' ? '중요' : n.type === 'newsletter' ? '통신문' : '일반'}</span>
+                      <span className="notice-meta">{n.date}</span>
+                    </div>
+                    {isAdmin && (
+                      <div style={{ display: 'flex', gap: '4px' }}>
+                        <button className="icon-btn" onClick={() => handleEditNotice(n)} style={{ fontSize: '0.75rem', padding: '2px 4px' }}>✏️</button>
+                        <button className="icon-btn delete-btn" onClick={() => handleDeleteNotice(n.id)} style={{ fontSize: '0.75rem', padding: '2px 4px' }}>🗑️</button>
+                      </div>
+                    )}
+                  </div>
+                  <div className="notice-title" style={{ fontSize: '1.1rem', fontWeight: '700', marginBottom: '0.5rem' }}>{n.title}</div>
+                  <div className="notice-content" style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.5', whiteSpace: 'pre-wrap' }}>{n.content}</div>
+                </div>
+              )) : (
+                <div className="empty-state"><p>등록된 공지사항이 없습니다.</p></div>
+              )}
+            </div>
           </div>
         </div>
 

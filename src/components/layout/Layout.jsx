@@ -120,7 +120,15 @@ export default function Layout({ children }) {
                   ⚙️
                 </button>
               )}
-              <button className={`admin-btn admin-toggle-btn ${isAdmin ? 'active' : ''}`} onClick={toggle} aria-label="관리자 모드">
+              <button 
+                className={`admin-btn admin-toggle-btn ${isAdmin ? 'active' : ''}`} 
+                onClick={(e) => { 
+                  e.preventDefault(); 
+                  e.stopPropagation(); 
+                  toggle(); 
+                }} 
+                aria-label="관리자 모드"
+              >
                 {isAdmin ? '🔓 선생님' : '🔒 학생'}
               </button>
             </div>

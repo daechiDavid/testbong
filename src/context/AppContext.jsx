@@ -280,7 +280,12 @@ export function AppProvider({ children }) {
         let mergedSettings = { ...initialState.settings };
         const app_configs = appConfigs && appConfigs.length > 0 ? appConfigs[0] : null;
         if (app_configs) {
-          mergedSettings = { ...mergedSettings, ...app_configs };
+          // DB에서 가져온 값이 null이 아닐 때만 기존 설정을 덮어씀 (초기화 방지)
+          Object.keys(app_configs).forEach(key => {
+            if (app_configs[key] !== null && app_configs[key] !== undefined) {
+              mergedSettings[key] = app_configs[key];
+            }
+          });
         }
         dispatch({ type: 'UPDATE_SETTINGS', payload: mergedSettings });
 

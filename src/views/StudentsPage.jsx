@@ -16,7 +16,7 @@ export default function StudentsPage() {
   const [editNameValue, setEditNameValue] = useState('');
   const [showBulkModal, setShowBulkModal] = useState(false);
   const [bulkNames, setBulkNames] = useState('');
-  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
+  const [generatingAiId, setGeneratingAiId] = useState(null);
   const [draggedSeat, setDraggedSeat] = useState(null);
   const [draggedGroupStudent, setDraggedGroupStudent] = useState(null);
 
@@ -248,7 +248,7 @@ export default function StudentsPage() {
     };
 
     try {
-      setIsGeneratingAi(true);
+      setGeneratingAiId(student.id);
       
       const res = await fetch('/api/gemini', {
         method: 'POST',
@@ -271,7 +271,7 @@ export default function StudentsPage() {
     } catch (err) {
       showToast('AI 생성 중 오류가 발생했습니다: ' + err.message, 'error');
     } finally {
-      setIsGeneratingAi(false);
+      setGeneratingAiId(null);
     }
   };
 
@@ -315,12 +315,12 @@ export default function StudentsPage() {
             <div style={{display:'flex', gap:'0.5rem', alignItems:'center'}}>
               {isAdmin && (
                 <div style={{display:'flex', gap:'0.5rem', alignItems:'center'}}>
-                  <button className="btn btn-secondary btn-sm" onClick={handleDownloadTemplate}>양식 다운로드</button>
-                  <label className="btn btn-secondary btn-sm" style={{cursor:'pointer', margin:0}}>
-                    엑셀 업로드
+                  <button className="btn-admin-action btn-admin-outline" onClick={handleDownloadTemplate}>📥 양식 다운로드</button>
+                  <label className="btn-admin-action btn-admin-excel" style={{cursor:'pointer', margin:0}}>
+                    📤 엑셀 업로드
                     <input type="file" accept=".xlsx, .xls" style={{display:'none'}} onChange={handleExcelUpload} />
                   </label>
-                  <button className="btn btn-primary btn-sm" onClick={() => {
+                  <button className="btn-admin-action btn-admin-primary" onClick={() => {
                     const existingNames = students.map(s => `${s.name}\t${s.gender||''}\t${s.birthday||''}`).join('\n');
                     setBulkNames(existingNames);
                     setShowBulkModal(true);
@@ -504,31 +504,31 @@ export default function StudentsPage() {
             {students.map(s => {
               const recs = studentRecords[s.id] || [];
               return (
-                <div key={s.id} className="card" style={{ display: 'flex', gap: '1.5rem', padding: '1.5rem', alignItems: 'stretch' }}>
+                <div key={s.id} className="behavior-student-card">
                   
                   {/* Left: Student Info */}
                   <div style={{ width: '160px', flexShrink: 0, textAlign: 'center', borderRight: '1px solid var(--border-light)', paddingRight: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <div className={`avatar xl ${getAvatarColor(s.id)}`} style={{ margin: '0 auto 0.75rem auto' }}>{getInitials(s.name)}</div>
                     <h3 style={{ margin: '0 0 0.5rem 0' }}>{s.number}. {s.name}</h3>
                     {isAdmin && (
-                      <button className="btn btn-sm btn-primary" onClick={() => handleGenerateAI(s)} disabled={isGeneratingAi} style={{ marginTop: '0.5rem', width: '100%', background: 'var(--primary-dark)' }}>
-                        {isGeneratingAi ? '생성 중...' : '✨ AI 생성'}
+                      <button className="btn-ai-generate" onClick={() => handleGenerateAI(s)} disabled={generatingAiId === s.id}>
+                        {generatingAiId === s.id ? '⏳ 생성 중...' : '✨ AI 생성'}
                       </button>
                     )}
                     {isAdmin && (
-                      <button className="btn btn-sm btn-secondary" onClick={() => handleSelectStudent(s)} style={{ marginTop: '0.5rem', width: '100%' }}>
-                        기록 추가
+                      <button className="btn btn-sm btn-secondary" onClick={() => handleSelectStudent(s)} style={{ marginTop: '0.5rem', width: '100%', fontWeight: 700 }}>
+                        ➕ 기록 추가
                       </button>
                     )}
                   </div>
 
                   {/* Middle: Cumulative Records */}
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <h4 style={{ marginBottom: '0.5rem', color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between' }}>
-                      <span>누적 기록</span>
+                    <h4 style={{ marginBottom: '0.5rem', color: 'var(--text-secondary)', display: 'flex', justifyContent: 'space-between', fontWeight: 700 }}>
+                      <span>📝 누적 기록</span>
                       <span className="badge">{recs.length}건</span>
                     </h4>
-                    <div style={{ flex: 1, background: 'var(--gray-50)', padding: '1rem', borderRadius: 'var(--radius-md)', maxHeight: '200px', overflowY: 'auto' }}>
+                    <div className="behavior-record-box">
                       {recs.length > 0 ? (
                         <ul style={{ paddingLeft: '1.25rem', margin: 0, fontSize: '0.875rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                           {recs.map((r, i) => (
@@ -552,14 +552,14 @@ export default function StudentsPage() {
 
                   {/* Right: AI Summary */}
                   <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                    <h4 style={{ marginBottom: '0.5rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                      ✨ 종합의견
+                    <h4 style={{ marginBottom: '0.5rem', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 800 }}>
+                      ✨ 종합의견 (AI)
                     </h4>
-                    <div style={{ flex: 1, background: 'var(--primary-50)', border: '1px solid var(--primary-100)', padding: '1rem', borderRadius: 'var(--radius-md)', fontSize: '0.875rem', lineHeight: '1.6', overflowY: 'auto', maxHeight: '200px' }}>
+                    <div className="behavior-ai-box">
                       {s.aiSummary ? (
-                        <div style={{ whiteSpace: 'pre-wrap', color: 'var(--text-primary)' }}>{s.aiSummary}</div>
+                        <div style={{ whiteSpace: 'pre-wrap' }}>{s.aiSummary}</div>
                       ) : (
-                        <div className="empty-state" style={{ minHeight: '100px', padding: 0, opacity: 0.7 }}>
+                        <div className="empty-state" style={{ minHeight: '100px', padding: 0, opacity: 0.6, fontSize: '0.85rem' }}>
                           AI 생성 버튼을 눌러 종합의견을 작성해보세요.
                         </div>
                       )}

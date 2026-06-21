@@ -1,6 +1,5 @@
 .attendance-page {
-  max-width: 1500px;
-  margin: 0 auto;
+  width: 100%;
 }
 
 .attendance-view-toggle {
@@ -38,6 +37,30 @@
   gap: 1rem;
   align-items: center;
   margin-bottom: 1rem;
+}
+
+.save-attendance-btn {
+  background: linear-gradient(135deg, #FF6F0F, #FF922B);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(255, 111, 15, 0.3);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.save-attendance-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 111, 15, 0.4);
+}
+.save-attendance-btn:active {
+  transform: translateY(0);
 }
 
 .date-display-box {

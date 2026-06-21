@@ -1,30 +1,27 @@
 .calendar-page {
-  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
 }
 
 .calendar-two-col {
-  display: grid;
-  grid-template-columns: 1fr 380px;
+  display: flex;
+  flex-direction: column;
   gap: 1.5rem;
-  align-items: start;
 }
 
-.calendar-left .google-calendar-embed {
+.calendar-page .google-calendar-embed {
   border-radius: var(--radius-lg);
   overflow: hidden;
-  /* .card 기본 패딩을 제거하고 iframe이 카드 전체를 채우도록 설정 */
   padding: 0 !important;
-  height: 70vh !important;
-  min-height: 600px !important;
+  height: 90vh !important;
+  min-height: 900px !important;
 }
 
-/* iframe이 부모 카드의 높이를 꽉 채우도록 강제 */
-.calendar-left .google-calendar-embed iframe {
+.calendar-page .google-calendar-embed iframe {
   display: block !important;
   width: 100% !important;
-  height: 70vh !important;
-  min-height: 600px !important;
+  height: 90vh !important;
+  min-height: 900px !important;
   border: 0 !important;
 }
 
