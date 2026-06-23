@@ -81,6 +81,20 @@ function reducer(state, action) {
     case 'SET_ATTENDANCE_MAP': return { ...state, attendance: action.payload };
     case 'SET_SELECTED_ATTENDANCE_DATE': return { ...state, selectedAttendanceDate: action.payload };
     case 'SET_MONTHLY_ATTENDANCE': return { ...state, monthlyAttendance: action.payload };
+    case 'UPDATE_MONTHLY_ATTENDANCE': {
+      const { date, studentId, status } = action.payload;
+      const dateRecords = state.monthlyAttendance[date] || {};
+      return {
+        ...state,
+        monthlyAttendance: {
+          ...state.monthlyAttendance,
+          [date]: {
+            ...dateRecords,
+            [studentId]: { status, note: dateRecords[studentId]?.note || '' }
+          }
+        }
+      };
+    }
     case 'SET_ATTENDANCE':
       return {
         ...state,
@@ -358,6 +372,7 @@ export function AppProvider({ children }) {
   const updateAttendanceFunc = async (studentId, status, note = '', date = null) => {
     const targetDate = date || new Date().toISOString().split('T')[0];
     dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note } });
+    dispatch({ type: 'UPDATE_MONTHLY_ATTENDANCE', payload: { date: targetDate, studentId, status } });
     await upsertAttendance({ studentId, date: targetDate, status, note });
   };
 
