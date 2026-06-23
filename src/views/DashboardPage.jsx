@@ -56,13 +56,24 @@ const defaultLayouts = {
 
 export default function DashboardPage() {
   // AppContext에서 DB 연동 함수들을 가져옴
-  const { state, dispatch, showToast, updateSettings, addDDay, deleteDDay } = useApp();
+  const { state, dispatch, showToast, updateSettings, addDDay, deleteDDay, addAnnouncement, updateAnnouncement, deleteAnnouncement } = useApp();
   const { students, announcements, settings, weeklyPlans, ddays = [], isAdmin } = state;
 
   const [layouts, setLayouts] = useState(() => {
     try {
       const saved = localStorage.getItem('dashboard_layouts');
-      return saved ? JSON.parse(saved) : defaultLayouts;
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // 저장된 레이아웃 중 static 속성이 오염되어 드래그가 고정되는 현상을 수정합니다.
+        Object.keys(parsed).forEach(breakpoint => {
+          parsed[breakpoint] = parsed[breakpoint].map(item => ({
+            ...item,
+            static: false // 강제로 static(고정) 속성을 비활성화하여 이동 가능하도록 함
+          }));
+        });
+        return parsed;
+      }
+      return defaultLayouts;
     } catch {
       // 로컬 스토리지 파싱 실패 시 기본 레이아웃 사용
       return defaultLayouts;
@@ -95,22 +106,16 @@ export default function DashboardPage() {
   const currentPeriod = getCurrentPeriod();
 
   // 공지사항 핸들러
-  const handleAddNotice = () => {
+  const handleAddNotice = async () => {
     if (!newNotice.title.trim()) return;
     const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
 
     if (editNoticeId) {
-      dispatch({
-        type: 'UPDATE_ANNOUNCEMENT',
-        payload: { id: editNoticeId, ...newNotice, date: dateStr }
-      });
+      await updateAnnouncement({ id: editNoticeId, ...newNotice, date: dateStr });
       showToast('공지사항이 수정되었습니다', 'success');
     } else {
       const newId = crypto.randomUUID();
-      dispatch({
-        type: 'ADD_ANNOUNCEMENT',
-        payload: { id: newId, ...newNotice, date: dateStr }
-      });
+      await addAnnouncement({ id: newId, ...newNotice, date: dateStr });
       showToast('공지사항이 등록되었습니다', 'success');
     }
 
@@ -125,9 +130,9 @@ export default function DashboardPage() {
     setShowNoticeForm(true);
   };
 
-  const handleDeleteNotice = (id) => {
+  const handleDeleteNotice = async (id) => {
     if (confirm('이 공지사항을 삭제하시겠습니까?')) {
-      dispatch({ type: 'DELETE_ANNOUNCEMENT', payload: id });
+      await deleteAnnouncement(id);
       showToast('공지사항이 삭제되었습니다', 'success');
     }
   };
@@ -257,7 +262,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Thermometer */}
-        <div key="thermometer" className="dashboard-widget">
+        <div key="thermometer" className="card dashboard-widget">
           <Thermometer
             current={totalPoints}
             goal={goalPoints}

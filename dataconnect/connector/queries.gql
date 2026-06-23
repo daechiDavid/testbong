@@ -12,6 +12,7 @@ query GetAllAppData @auth(level: PUBLIC) {
     date
     title
     content
+    type
   }
   assignments {
     id
@@ -45,6 +46,7 @@ query GetAllAppData @auth(level: PUBLIC) {
     title
     url
     icon
+    desc
   }
   polls {
     id

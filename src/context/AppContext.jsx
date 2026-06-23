@@ -22,7 +22,11 @@ import {
   upsertQuickLink,
   deleteQuickLink,
   upsertAssignment,
-  deleteAssignment
+  deleteAssignment,
+  upsertAnnouncement,
+  deleteAnnouncement,
+  upsertPoll,
+  deletePoll
 } from '../lib/dataconnect';
 
 const AppContext = createContext(null);
@@ -509,6 +513,58 @@ export function AppProvider({ children }) {
     } catch(e) { console.error(e); }
   };
 
+  const addAnnouncementFunc = async (announcementData) => {
+    try {
+      await upsertAnnouncement({
+        id: announcementData.id,
+        date: announcementData.date,
+        title: announcementData.title,
+        content: announcementData.content,
+        type: announcementData.type
+      });
+      dispatch({ type: 'ADD_ANNOUNCEMENT', payload: announcementData });
+    } catch(e) { console.error('Add announcement error:', e); }
+  };
+
+  const updateAnnouncementFunc = async (announcementData) => {
+    try {
+      await upsertAnnouncement({
+        id: announcementData.id,
+        date: announcementData.date,
+        title: announcementData.title,
+        content: announcementData.content,
+        type: announcementData.type
+      });
+      dispatch({ type: 'UPDATE_ANNOUNCEMENT', payload: announcementData });
+    } catch(e) { console.error('Update announcement error:', e); }
+  };
+
+  const deleteAnnouncementFunc = async (id) => {
+    try {
+      await deleteAnnouncement({ id });
+      dispatch({ type: 'DELETE_ANNOUNCEMENT', payload: id });
+    } catch(e) { console.error('Delete announcement error:', e); }
+  };
+
+  const addPollFunc = async (pollData) => {
+    try {
+      await upsertPoll({
+        id: pollData.id,
+        question: pollData.question,
+        options: pollData.options,
+        votes: pollData.votes
+      });
+      dispatch({ type: 'ADD_POLL', payload: pollData });
+    } catch(e) { console.error('Add poll error:', e); }
+  };
+
+  const deletePollFunc = async (id) => {
+    try {
+      await deletePoll({ id });
+      dispatch({ type: 'DELETE_POLL', payload: id });
+    } catch(e) { console.error('Delete poll error:', e); }
+  };
+
   return (
     <AppContext.Provider value={{
       state, dispatch, showToast, 
@@ -519,6 +575,8 @@ export function AppProvider({ children }) {
       votePoll: votePollFunc, collectNewsletter: collectNewsletterFunc, markActivityCompleted: markActivityCompletedFunc, cancelActivityCompletion: cancelActivityCompletionFunc, updateActivityContent: updateActivityContentFunc,
       addLink: addLinkFunc, updateLink: updateLinkFunc, deleteLink: deleteLinkFunc,
       addAssignment: addAssignmentFunc, updateAssignmentSubmissions: updateAssignmentSubmissionsFunc, deleteAssignment: deleteAssignmentFunc,
+      addAnnouncement: addAnnouncementFunc, updateAnnouncement: updateAnnouncementFunc, deleteAnnouncement: deleteAnnouncementFunc,
+      addPoll: addPollFunc, deletePoll: deletePollFunc,
       isDbLoading, getWeekStart, toISODate
     }}>
       {children}

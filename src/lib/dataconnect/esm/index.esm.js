@@ -1,11 +1,10 @@
-import { queryRef, executeQuery, mutationRef, executeMutation, validateArgs } from 'firebase/data-connect';
+import { queryRef, executeQuery, validateArgsWithOptions, mutationRef, executeMutation, validateArgs } from 'firebase/data-connect';
 
 export const connectorConfig = {
   connector: 'default',
   service: 'dashboard-edu',
   location: 'asia-northeast3'
 };
-
 export const upsertWeeklyPlanRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();
@@ -14,7 +13,8 @@ export const upsertWeeklyPlanRef = (dcOrVars, vars) => {
 upsertWeeklyPlanRef.operationName = 'UpsertWeeklyPlan';
 
 export function upsertWeeklyPlan(dcOrVars, vars) {
-  return executeMutation(upsertWeeklyPlanRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(upsertWeeklyPlanRef(dcInstance, inputVars));
 }
 
 export const upsertAppConfigRef = (dcOrVars, vars) => {
@@ -25,7 +25,8 @@ export const upsertAppConfigRef = (dcOrVars, vars) => {
 upsertAppConfigRef.operationName = 'UpsertAppConfig';
 
 export function upsertAppConfig(dcOrVars, vars) {
-  return executeMutation(upsertAppConfigRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(upsertAppConfigRef(dcInstance, inputVars));
 }
 
 export const insertDDayRef = (dcOrVars, vars) => {
@@ -36,7 +37,8 @@ export const insertDDayRef = (dcOrVars, vars) => {
 insertDDayRef.operationName = 'InsertDDay';
 
 export function insertDDay(dcOrVars, vars) {
-  return executeMutation(insertDDayRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(insertDDayRef(dcInstance, inputVars));
 }
 
 export const deleteDDayRef = (dcOrVars, vars) => {
@@ -47,7 +49,8 @@ export const deleteDDayRef = (dcOrVars, vars) => {
 deleteDDayRef.operationName = 'DeleteDDay';
 
 export function deleteDDay(dcOrVars, vars) {
-  return executeMutation(deleteDDayRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteDDayRef(dcInstance, inputVars));
 }
 
 export const updateStudentPointsRef = (dcOrVars, vars) => {
@@ -58,7 +61,8 @@ export const updateStudentPointsRef = (dcOrVars, vars) => {
 updateStudentPointsRef.operationName = 'UpdateStudentPoints';
 
 export function updateStudentPoints(dcOrVars, vars) {
-  return executeMutation(updateStudentPointsRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(updateStudentPointsRef(dcInstance, inputVars));
 }
 
 export const upsertAttendanceRef = (dcOrVars, vars) => {
@@ -69,7 +73,8 @@ export const upsertAttendanceRef = (dcOrVars, vars) => {
 upsertAttendanceRef.operationName = 'UpsertAttendance';
 
 export function upsertAttendance(dcOrVars, vars) {
-  return executeMutation(upsertAttendanceRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(upsertAttendanceRef(dcInstance, inputVars));
 }
 
 export const deleteAttendanceRef = (dcOrVars, vars) => {
@@ -80,7 +85,8 @@ export const deleteAttendanceRef = (dcOrVars, vars) => {
 deleteAttendanceRef.operationName = 'DeleteAttendance';
 
 export function deleteAttendance(dcOrVars, vars) {
-  return executeMutation(deleteAttendanceRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteAttendanceRef(dcInstance, inputVars));
 }
 
 export const insertStudentRecordRef = (dcOrVars, vars) => {
@@ -91,7 +97,8 @@ export const insertStudentRecordRef = (dcOrVars, vars) => {
 insertStudentRecordRef.operationName = 'InsertStudentRecord';
 
 export function insertStudentRecord(dcOrVars, vars) {
-  return executeMutation(insertStudentRecordRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(insertStudentRecordRef(dcInstance, inputVars));
 }
 
 export const deleteStudentRecordRef = (dcOrVars, vars) => {
@@ -102,7 +109,8 @@ export const deleteStudentRecordRef = (dcOrVars, vars) => {
 deleteStudentRecordRef.operationName = 'DeleteStudentRecord';
 
 export function deleteStudentRecord(dcOrVars, vars) {
-  return executeMutation(deleteStudentRecordRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteStudentRecordRef(dcInstance, inputVars));
 }
 
 export const updatePollRef = (dcOrVars, vars) => {
@@ -113,7 +121,8 @@ export const updatePollRef = (dcOrVars, vars) => {
 updatePollRef.operationName = 'UpdatePoll';
 
 export function updatePoll(dcOrVars, vars) {
-  return executeMutation(updatePollRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(updatePollRef(dcInstance, inputVars));
 }
 
 export const updateNewsletterRef = (dcOrVars, vars) => {
@@ -124,7 +133,8 @@ export const updateNewsletterRef = (dcOrVars, vars) => {
 updateNewsletterRef.operationName = 'UpdateNewsletter';
 
 export function updateNewsletter(dcOrVars, vars) {
-  return executeMutation(updateNewsletterRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(updateNewsletterRef(dcInstance, inputVars));
 }
 
 export const upsertActivityCompletionRef = (dcOrVars, vars) => {
@@ -135,7 +145,8 @@ export const upsertActivityCompletionRef = (dcOrVars, vars) => {
 upsertActivityCompletionRef.operationName = 'UpsertActivityCompletion';
 
 export function upsertActivityCompletion(dcOrVars, vars) {
-  return executeMutation(upsertActivityCompletionRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(upsertActivityCompletionRef(dcInstance, inputVars));
 }
 
 export const deleteActivityCompletionRef = (dcOrVars, vars) => {
@@ -146,7 +157,8 @@ export const deleteActivityCompletionRef = (dcOrVars, vars) => {
 deleteActivityCompletionRef.operationName = 'DeleteActivityCompletion';
 
 export function deleteActivityCompletion(dcOrVars, vars) {
-  return executeMutation(deleteActivityCompletionRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteActivityCompletionRef(dcInstance, inputVars));
 }
 
 export const upsertActivityCheckRef = (dcOrVars, vars) => {
@@ -157,7 +169,8 @@ export const upsertActivityCheckRef = (dcOrVars, vars) => {
 upsertActivityCheckRef.operationName = 'UpsertActivityCheck';
 
 export function upsertActivityCheck(dcOrVars, vars) {
-  return executeMutation(upsertActivityCheckRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(upsertActivityCheckRef(dcInstance, inputVars));
 }
 
 export const upsertStudentRef = (dcOrVars, vars) => {
@@ -168,7 +181,8 @@ export const upsertStudentRef = (dcOrVars, vars) => {
 upsertStudentRef.operationName = 'UpsertStudent';
 
 export function upsertStudent(dcOrVars, vars) {
-  return executeMutation(upsertStudentRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars);
+  return executeMutation(upsertStudentRef(dcInstance, inputVars));
 }
 
 export const upsertQuickLinkRef = (dcOrVars, vars) => {
@@ -179,7 +193,8 @@ export const upsertQuickLinkRef = (dcOrVars, vars) => {
 upsertQuickLinkRef.operationName = 'UpsertQuickLink';
 
 export function upsertQuickLink(dcOrVars, vars) {
-  return executeMutation(upsertQuickLinkRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(upsertQuickLinkRef(dcInstance, inputVars));
 }
 
 export const deleteQuickLinkRef = (dcOrVars, vars) => {
@@ -190,7 +205,32 @@ export const deleteQuickLinkRef = (dcOrVars, vars) => {
 deleteQuickLinkRef.operationName = 'DeleteQuickLink';
 
 export function deleteQuickLink(dcOrVars, vars) {
-  return executeMutation(deleteQuickLinkRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteQuickLinkRef(dcInstance, inputVars));
+}
+
+export const upsertAnnouncementRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpsertAnnouncement', inputVars);
+}
+upsertAnnouncementRef.operationName = 'UpsertAnnouncement';
+
+export function upsertAnnouncement(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(upsertAnnouncementRef(dcInstance, inputVars));
+}
+
+export const deleteAnnouncementRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeleteAnnouncement', inputVars);
+}
+deleteAnnouncementRef.operationName = 'DeleteAnnouncement';
+
+export function deleteAnnouncement(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteAnnouncementRef(dcInstance, inputVars));
 }
 
 export const upsertAssignmentRef = (dcOrVars, vars) => {
@@ -201,7 +241,8 @@ export const upsertAssignmentRef = (dcOrVars, vars) => {
 upsertAssignmentRef.operationName = 'UpsertAssignment';
 
 export function upsertAssignment(dcOrVars, vars) {
-  return executeMutation(upsertAssignmentRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(upsertAssignmentRef(dcInstance, inputVars));
 }
 
 export const deleteAssignmentRef = (dcOrVars, vars) => {
@@ -212,7 +253,32 @@ export const deleteAssignmentRef = (dcOrVars, vars) => {
 deleteAssignmentRef.operationName = 'DeleteAssignment';
 
 export function deleteAssignment(dcOrVars, vars) {
-  return executeMutation(deleteAssignmentRef(dcOrVars, vars));
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deleteAssignmentRef(dcInstance, inputVars));
+}
+
+export const upsertPollRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'UpsertPoll', inputVars);
+}
+upsertPollRef.operationName = 'UpsertPoll';
+
+export function upsertPoll(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(upsertPollRef(dcInstance, inputVars));
+}
+
+export const deletePollRef = (dcOrVars, vars) => {
+  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
+  dcInstance._useGeneratedSdk();
+  return mutationRef(dcInstance, 'DeletePoll', inputVars);
+}
+deletePollRef.operationName = 'DeletePoll';
+
+export function deletePoll(dcOrVars, vars) {
+  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
+  return executeMutation(deletePollRef(dcInstance, inputVars));
 }
 
 export const getAllAppDataRef = (dc) => {
@@ -222,8 +288,10 @@ export const getAllAppDataRef = (dc) => {
 }
 getAllAppDataRef.operationName = 'GetAllAppData';
 
-export function getAllAppData(dc) {
-  return executeQuery(getAllAppDataRef(dc));
+export function getAllAppData(dcOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrOptions, options, undefined,false, false);
+  return executeQuery(getAllAppDataRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 
 export const getAttendanceByDateRef = (dcOrVars, vars) => {
@@ -233,8 +301,10 @@ export const getAttendanceByDateRef = (dcOrVars, vars) => {
 }
 getAttendanceByDateRef.operationName = 'GetAttendanceByDate';
 
-export function getAttendanceByDate(dcOrVars, vars) {
-  return executeQuery(getAttendanceByDateRef(dcOrVars, vars));
+export function getAttendanceByDate(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getAttendanceByDateRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 
 export const getAttendanceByMonthRef = (dcOrVars, vars) => {
@@ -244,7 +314,9 @@ export const getAttendanceByMonthRef = (dcOrVars, vars) => {
 }
 getAttendanceByMonthRef.operationName = 'GetAttendanceByMonth';
 
-export function getAttendanceByMonth(dcOrVars, vars) {
-  return executeQuery(getAttendanceByMonthRef(dcOrVars, vars));
+export function getAttendanceByMonth(dcOrVars, varsOrOptions, options) {
+  
+  const { dc: dcInstance, vars: inputVars, options: inputOpts } = validateArgsWithOptions(connectorConfig, dcOrVars, varsOrOptions, options, true, true);
+  return executeQuery(getAttendanceByMonthRef(dcInstance, inputVars), inputOpts && { fetchPolicy: inputOpts.fetchPolicy });
 }
 

@@ -29,8 +29,12 @@ This README will guide you through the process of using the generated JavaScript
   - [*UpsertStudent*](#upsertstudent)
   - [*UpsertQuickLink*](#upsertquicklink)
   - [*DeleteQuickLink*](#deletequicklink)
+  - [*UpsertAnnouncement*](#upsertannouncement)
+  - [*DeleteAnnouncement*](#deleteannouncement)
   - [*UpsertAssignment*](#upsertassignment)
   - [*DeleteAssignment*](#deleteassignment)
+  - [*UpsertPoll*](#upsertpoll)
+  - [*DeletePoll*](#deletepoll)
 
 # Accessing the connector
 A connector is a collection of Queries and Mutations. One SDK is generated for each connector - this SDK is generated for the connector `default`. You can find more information about connectors in the [Data Connect documentation](https://firebase.google.com/docs/data-connect#how-does).
@@ -80,7 +84,7 @@ Below are examples of how to use the `default` connector's generated functions t
 ## GetAllAppData
 You can execute the `GetAllAppData` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
 ```typescript
-getAllAppData(): QueryPromise<GetAllAppDataData, undefined>;
+getAllAppData(options?: ExecuteQueryOptions): QueryPromise<GetAllAppDataData, undefined>;
 
 interface GetAllAppDataRef {
   ...
@@ -91,7 +95,7 @@ export const getAllAppDataRef: GetAllAppDataRef;
 ```
 You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
 ```typescript
-getAllAppData(dc: DataConnect): QueryPromise<GetAllAppDataData, undefined>;
+getAllAppData(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetAllAppDataData, undefined>;
 
 interface GetAllAppDataRef {
   ...
@@ -120,81 +124,83 @@ export interface GetAllAppDataData {
     name?: string | null;
     points: number;
   } & Student_Key)[];
-    announcements: ({
+  announcements: ({
+    id: UUIDString;
+    date: DateString;
+    title: string;
+    content?: string | null;
+    type?: string | null;
+  } & Announcement_Key)[];
+  assignments: ({
+    id: UUIDString;
+    dueDate: DateString;
+    title: string;
+    submissions?: unknown | null;
+  } & Assignment_Key)[];
+  dDays: ({
+    id: UUIDString;
+    name: string;
+    date: DateString;
+  } & DDay_Key)[];
+  weeklyPlans: ({
+    id: UUIDString;
+    weekKey: string;
+    day: string;
+    period: number;
+    subject?: string | null;
+    content?: string | null;
+  } & WeeklyPlan_Key)[];
+  appConfigs: ({
+    id: number;
+    calendarId1?: string | null;
+    calendarId2?: string | null;
+    calendarId3?: string | null;
+    thermometerGoal?: number | null;
+    thermometerReward?: string | null;
+  } & AppConfig_Key)[];
+  quickLinks: ({
+    id: UUIDString;
+    title: string;
+    url: string;
+    icon?: string | null;
+    desc?: string | null;
+  } & QuickLink_Key)[];
+  polls: ({
+    id: UUIDString;
+    question: string;
+    options?: string[] | null;
+    votes?: number[] | null;
+  } & Poll_Key)[];
+  newsletters: ({
+    id: UUIDString;
+    date: DateString;
+    title: string;
+    content?: string | null;
+    collected: boolean;
+  } & Newsletter_Key)[];
+  activityChecks: ({
+    id: number;
+    content?: string | null;
+    type?: string | null;
+  } & ActivityCheck_Key)[];
+  activityCompletions: ({
+    id: UUIDString;
+    student: {
       id: UUIDString;
-      date: DateString;
-      title: string;
-      content?: string | null;
-    } & Announcement_Key)[];
-      assignments: ({
-        id: UUIDString;
-        dueDate: DateString;
-        title: string;
-        submissions?: unknown | null;
-      } & Assignment_Key)[];
-        dDays: ({
-          id: UUIDString;
-          name: string;
-          date: DateString;
-        } & DDay_Key)[];
-          weeklyPlans: ({
-            id: UUIDString;
-            weekKey: string;
-            day: string;
-            period: number;
-            subject?: string | null;
-            content?: string | null;
-          } & WeeklyPlan_Key)[];
-            appConfigs: ({
-              id: number;
-              calendarId1?: string | null;
-              calendarId2?: string | null;
-              calendarId3?: string | null;
-              thermometerGoal?: number | null;
-              thermometerReward?: string | null;
-            } & AppConfig_Key)[];
-              quickLinks: ({
-                id: UUIDString;
-                title: string;
-                url: string;
-                icon?: string | null;
-              } & QuickLink_Key)[];
-                polls: ({
-                  id: UUIDString;
-                  question: string;
-                  options?: string[] | null;
-                  votes?: number[] | null;
-                } & Poll_Key)[];
-                  newsletters: ({
-                    id: UUIDString;
-                    date: DateString;
-                    title: string;
-                    content?: string | null;
-                    collected: boolean;
-                  } & Newsletter_Key)[];
-                    activityChecks: ({
-                      id: number;
-                      content?: string | null;
-                      type?: string | null;
-                    } & ActivityCheck_Key)[];
-                      activityCompletions: ({
-                        id: UUIDString;
-                        student: {
-                          id: UUIDString;
-                        } & Student_Key;
-                          timestamp: TimestampString;
-                      } & ActivityCompletion_Key)[];
-                        studentRecords: ({
-                          id: UUIDString;
-                          student: {
-                            id: UUIDString;
-                          } & Student_Key;
-                            type: string;
-                            content?: string | null;
-                            category?: string | null;
-                            date: DateString;
-                            createdAt: TimestampString;
-                        } & StudentRecord_Key)[];
+    } & Student_Key;
+    timestamp: TimestampString;
+  } & ActivityCompletion_Key)[];
+  studentRecords: ({
+    id: UUIDString;
+    student: {
+      id: UUIDString;
+    } & Student_Key;
+    type: string;
+    content?: string | null;
+    category?: string | null;
+    date: DateString;
+    createdAt: TimestampString;
+  } & StudentRecord_Key)[];
 }
 ```
 ### Using `GetAllAppData`'s action shortcut function
@@ -295,7 +301,7 @@ executeQuery(ref).then((response) => {
 ## GetAttendanceByDate
 You can execute the `GetAttendanceByDate` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
 ```typescript
-getAttendanceByDate(vars: GetAttendanceByDateVariables): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
+getAttendanceByDate(vars: GetAttendanceByDateVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
 
 interface GetAttendanceByDateRef {
   ...
@@ -306,7 +312,7 @@ export const getAttendanceByDateRef: GetAttendanceByDateRef;
 ```
 You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
 ```typescript
-getAttendanceByDate(dc: DataConnect, vars: GetAttendanceByDateVariables): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
+getAttendanceByDate(dc: DataConnect, vars: GetAttendanceByDateVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
 
 interface GetAttendanceByDateRef {
   ...
@@ -340,9 +346,9 @@ export interface GetAttendanceByDateData {
     student: {
       id: UUIDString;
     } & Student_Key;
-      date: DateString;
-      status: string;
-      note?: string | null;
+    date: DateString;
+    status: string;
+    note?: string | null;
   } & Attendance_Key)[];
 }
 ```
@@ -412,7 +418,7 @@ executeQuery(ref).then((response) => {
 ## GetAttendanceByMonth
 You can execute the `GetAttendanceByMonth` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
 ```typescript
-getAttendanceByMonth(vars: GetAttendanceByMonthVariables): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
+getAttendanceByMonth(vars: GetAttendanceByMonthVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
 
 interface GetAttendanceByMonthRef {
   ...
@@ -423,7 +429,7 @@ export const getAttendanceByMonthRef: GetAttendanceByMonthRef;
 ```
 You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
 ```typescript
-getAttendanceByMonth(dc: DataConnect, vars: GetAttendanceByMonthVariables): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
+getAttendanceByMonth(dc: DataConnect, vars: GetAttendanceByMonthVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
 
 interface GetAttendanceByMonthRef {
   ...
@@ -458,9 +464,9 @@ export interface GetAttendanceByMonthData {
     student: {
       id: UUIDString;
     } & Student_Key;
-      date: DateString;
-      status: string;
-      note?: string | null;
+    date: DateString;
+    status: string;
+    note?: string | null;
   } & Attendance_Key)[];
 }
 ```
@@ -2332,6 +2338,7 @@ export interface UpsertQuickLinkVariables {
   title: string;
   url: string;
   icon?: string | null;
+  desc?: string | null;
 }
 ```
 ### Return Type
@@ -2355,13 +2362,14 @@ const upsertQuickLinkVars: UpsertQuickLinkVariables = {
   title: ..., 
   url: ..., 
   icon: ..., // optional
+  desc: ..., // optional
 };
 
 // Call the `upsertQuickLink()` function to execute the mutation.
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await upsertQuickLink(upsertQuickLinkVars);
 // Variables can be defined inline as well.
-const { data } = await upsertQuickLink({ id: ..., title: ..., url: ..., icon: ..., });
+const { data } = await upsertQuickLink({ id: ..., title: ..., url: ..., icon: ..., desc: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2388,12 +2396,13 @@ const upsertQuickLinkVars: UpsertQuickLinkVariables = {
   title: ..., 
   url: ..., 
   icon: ..., // optional
+  desc: ..., // optional
 };
 
 // Call the `upsertQuickLinkRef()` function to get a reference to the mutation.
 const ref = upsertQuickLinkRef(upsertQuickLinkVars);
 // Variables can be defined inline as well.
-const ref = upsertQuickLinkRef({ id: ..., title: ..., url: ..., icon: ..., });
+const ref = upsertQuickLinkRef({ id: ..., title: ..., url: ..., icon: ..., desc: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2518,6 +2527,236 @@ console.log(data.quickLink_delete);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.quickLink_delete);
+});
+```
+
+## UpsertAnnouncement
+You can execute the `UpsertAnnouncement` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+upsertAnnouncement(vars: UpsertAnnouncementVariables): MutationPromise<UpsertAnnouncementData, UpsertAnnouncementVariables>;
+
+interface UpsertAnnouncementRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpsertAnnouncementVariables): MutationRef<UpsertAnnouncementData, UpsertAnnouncementVariables>;
+}
+export const upsertAnnouncementRef: UpsertAnnouncementRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+upsertAnnouncement(dc: DataConnect, vars: UpsertAnnouncementVariables): MutationPromise<UpsertAnnouncementData, UpsertAnnouncementVariables>;
+
+interface UpsertAnnouncementRef {
+  ...
+  (dc: DataConnect, vars: UpsertAnnouncementVariables): MutationRef<UpsertAnnouncementData, UpsertAnnouncementVariables>;
+}
+export const upsertAnnouncementRef: UpsertAnnouncementRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the upsertAnnouncementRef:
+```typescript
+const name = upsertAnnouncementRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `UpsertAnnouncement` mutation requires an argument of type `UpsertAnnouncementVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface UpsertAnnouncementVariables {
+  id?: UUIDString | null;
+  date: DateString;
+  title: string;
+  content?: string | null;
+  type?: string | null;
+}
+```
+### Return Type
+Recall that executing the `UpsertAnnouncement` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `UpsertAnnouncementData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface UpsertAnnouncementData {
+  announcement_upsert: Announcement_Key;
+}
+```
+### Using `UpsertAnnouncement`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, upsertAnnouncement, UpsertAnnouncementVariables } from '@dashboard/dataconnect';
+
+// The `UpsertAnnouncement` mutation requires an argument of type `UpsertAnnouncementVariables`:
+const upsertAnnouncementVars: UpsertAnnouncementVariables = {
+  id: ..., // optional
+  date: ..., 
+  title: ..., 
+  content: ..., // optional
+  type: ..., // optional
+};
+
+// Call the `upsertAnnouncement()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await upsertAnnouncement(upsertAnnouncementVars);
+// Variables can be defined inline as well.
+const { data } = await upsertAnnouncement({ id: ..., date: ..., title: ..., content: ..., type: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await upsertAnnouncement(dataConnect, upsertAnnouncementVars);
+
+console.log(data.announcement_upsert);
+
+// Or, you can use the `Promise` API.
+upsertAnnouncement(upsertAnnouncementVars).then((response) => {
+  const data = response.data;
+  console.log(data.announcement_upsert);
+});
+```
+
+### Using `UpsertAnnouncement`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, upsertAnnouncementRef, UpsertAnnouncementVariables } from '@dashboard/dataconnect';
+
+// The `UpsertAnnouncement` mutation requires an argument of type `UpsertAnnouncementVariables`:
+const upsertAnnouncementVars: UpsertAnnouncementVariables = {
+  id: ..., // optional
+  date: ..., 
+  title: ..., 
+  content: ..., // optional
+  type: ..., // optional
+};
+
+// Call the `upsertAnnouncementRef()` function to get a reference to the mutation.
+const ref = upsertAnnouncementRef(upsertAnnouncementVars);
+// Variables can be defined inline as well.
+const ref = upsertAnnouncementRef({ id: ..., date: ..., title: ..., content: ..., type: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = upsertAnnouncementRef(dataConnect, upsertAnnouncementVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.announcement_upsert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.announcement_upsert);
+});
+```
+
+## DeleteAnnouncement
+You can execute the `DeleteAnnouncement` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deleteAnnouncement(vars: DeleteAnnouncementVariables): MutationPromise<DeleteAnnouncementData, DeleteAnnouncementVariables>;
+
+interface DeleteAnnouncementRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteAnnouncementVariables): MutationRef<DeleteAnnouncementData, DeleteAnnouncementVariables>;
+}
+export const deleteAnnouncementRef: DeleteAnnouncementRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deleteAnnouncement(dc: DataConnect, vars: DeleteAnnouncementVariables): MutationPromise<DeleteAnnouncementData, DeleteAnnouncementVariables>;
+
+interface DeleteAnnouncementRef {
+  ...
+  (dc: DataConnect, vars: DeleteAnnouncementVariables): MutationRef<DeleteAnnouncementData, DeleteAnnouncementVariables>;
+}
+export const deleteAnnouncementRef: DeleteAnnouncementRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteAnnouncementRef:
+```typescript
+const name = deleteAnnouncementRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeleteAnnouncement` mutation requires an argument of type `DeleteAnnouncementVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeleteAnnouncementVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `DeleteAnnouncement` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeleteAnnouncementData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeleteAnnouncementData {
+  announcement_delete?: Announcement_Key | null;
+}
+```
+### Using `DeleteAnnouncement`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deleteAnnouncement, DeleteAnnouncementVariables } from '@dashboard/dataconnect';
+
+// The `DeleteAnnouncement` mutation requires an argument of type `DeleteAnnouncementVariables`:
+const deleteAnnouncementVars: DeleteAnnouncementVariables = {
+  id: ..., 
+};
+
+// Call the `deleteAnnouncement()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deleteAnnouncement(deleteAnnouncementVars);
+// Variables can be defined inline as well.
+const { data } = await deleteAnnouncement({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deleteAnnouncement(dataConnect, deleteAnnouncementVars);
+
+console.log(data.announcement_delete);
+
+// Or, you can use the `Promise` API.
+deleteAnnouncement(deleteAnnouncementVars).then((response) => {
+  const data = response.data;
+  console.log(data.announcement_delete);
+});
+```
+
+### Using `DeleteAnnouncement`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deleteAnnouncementRef, DeleteAnnouncementVariables } from '@dashboard/dataconnect';
+
+// The `DeleteAnnouncement` mutation requires an argument of type `DeleteAnnouncementVariables`:
+const deleteAnnouncementVars: DeleteAnnouncementVariables = {
+  id: ..., 
+};
+
+// Call the `deleteAnnouncementRef()` function to get a reference to the mutation.
+const ref = deleteAnnouncementRef(deleteAnnouncementVars);
+// Variables can be defined inline as well.
+const ref = deleteAnnouncementRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deleteAnnouncementRef(dataConnect, deleteAnnouncementVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.announcement_delete);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.announcement_delete);
 });
 ```
 
@@ -2745,6 +2984,233 @@ console.log(data.assignment_delete);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.assignment_delete);
+});
+```
+
+## UpsertPoll
+You can execute the `UpsertPoll` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+upsertPoll(vars: UpsertPollVariables): MutationPromise<UpsertPollData, UpsertPollVariables>;
+
+interface UpsertPollRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpsertPollVariables): MutationRef<UpsertPollData, UpsertPollVariables>;
+}
+export const upsertPollRef: UpsertPollRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+upsertPoll(dc: DataConnect, vars: UpsertPollVariables): MutationPromise<UpsertPollData, UpsertPollVariables>;
+
+interface UpsertPollRef {
+  ...
+  (dc: DataConnect, vars: UpsertPollVariables): MutationRef<UpsertPollData, UpsertPollVariables>;
+}
+export const upsertPollRef: UpsertPollRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the upsertPollRef:
+```typescript
+const name = upsertPollRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `UpsertPoll` mutation requires an argument of type `UpsertPollVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface UpsertPollVariables {
+  id?: UUIDString | null;
+  question: string;
+  options: string[];
+  votes: number[];
+}
+```
+### Return Type
+Recall that executing the `UpsertPoll` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `UpsertPollData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface UpsertPollData {
+  poll_upsert: Poll_Key;
+}
+```
+### Using `UpsertPoll`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, upsertPoll, UpsertPollVariables } from '@dashboard/dataconnect';
+
+// The `UpsertPoll` mutation requires an argument of type `UpsertPollVariables`:
+const upsertPollVars: UpsertPollVariables = {
+  id: ..., // optional
+  question: ..., 
+  options: ..., 
+  votes: ..., 
+};
+
+// Call the `upsertPoll()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await upsertPoll(upsertPollVars);
+// Variables can be defined inline as well.
+const { data } = await upsertPoll({ id: ..., question: ..., options: ..., votes: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await upsertPoll(dataConnect, upsertPollVars);
+
+console.log(data.poll_upsert);
+
+// Or, you can use the `Promise` API.
+upsertPoll(upsertPollVars).then((response) => {
+  const data = response.data;
+  console.log(data.poll_upsert);
+});
+```
+
+### Using `UpsertPoll`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, upsertPollRef, UpsertPollVariables } from '@dashboard/dataconnect';
+
+// The `UpsertPoll` mutation requires an argument of type `UpsertPollVariables`:
+const upsertPollVars: UpsertPollVariables = {
+  id: ..., // optional
+  question: ..., 
+  options: ..., 
+  votes: ..., 
+};
+
+// Call the `upsertPollRef()` function to get a reference to the mutation.
+const ref = upsertPollRef(upsertPollVars);
+// Variables can be defined inline as well.
+const ref = upsertPollRef({ id: ..., question: ..., options: ..., votes: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = upsertPollRef(dataConnect, upsertPollVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.poll_upsert);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.poll_upsert);
+});
+```
+
+## DeletePoll
+You can execute the `DeletePoll` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
+```typescript
+deletePoll(vars: DeletePollVariables): MutationPromise<DeletePollData, DeletePollVariables>;
+
+interface DeletePollRef {
+  ...
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeletePollVariables): MutationRef<DeletePollData, DeletePollVariables>;
+}
+export const deletePollRef: DeletePollRef;
+```
+You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
+```typescript
+deletePoll(dc: DataConnect, vars: DeletePollVariables): MutationPromise<DeletePollData, DeletePollVariables>;
+
+interface DeletePollRef {
+  ...
+  (dc: DataConnect, vars: DeletePollVariables): MutationRef<DeletePollData, DeletePollVariables>;
+}
+export const deletePollRef: DeletePollRef;
+```
+
+If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deletePollRef:
+```typescript
+const name = deletePollRef.operationName;
+console.log(name);
+```
+
+### Variables
+The `DeletePoll` mutation requires an argument of type `DeletePollVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+
+```typescript
+export interface DeletePollVariables {
+  id: UUIDString;
+}
+```
+### Return Type
+Recall that executing the `DeletePoll` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
+
+The `data` property is an object of type `DeletePollData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
+```typescript
+export interface DeletePollData {
+  poll_delete?: Poll_Key | null;
+}
+```
+### Using `DeletePoll`'s action shortcut function
+
+```typescript
+import { getDataConnect } from 'firebase/data-connect';
+import { connectorConfig, deletePoll, DeletePollVariables } from '@dashboard/dataconnect';
+
+// The `DeletePoll` mutation requires an argument of type `DeletePollVariables`:
+const deletePollVars: DeletePollVariables = {
+  id: ..., 
+};
+
+// Call the `deletePoll()` function to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await deletePoll(deletePollVars);
+// Variables can be defined inline as well.
+const { data } = await deletePoll({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the action shortcut function.
+const dataConnect = getDataConnect(connectorConfig);
+const { data } = await deletePoll(dataConnect, deletePollVars);
+
+console.log(data.poll_delete);
+
+// Or, you can use the `Promise` API.
+deletePoll(deletePollVars).then((response) => {
+  const data = response.data;
+  console.log(data.poll_delete);
+});
+```
+
+### Using `DeletePoll`'s `MutationRef` function
+
+```typescript
+import { getDataConnect, executeMutation } from 'firebase/data-connect';
+import { connectorConfig, deletePollRef, DeletePollVariables } from '@dashboard/dataconnect';
+
+// The `DeletePoll` mutation requires an argument of type `DeletePollVariables`:
+const deletePollVars: DeletePollVariables = {
+  id: ..., 
+};
+
+// Call the `deletePollRef()` function to get a reference to the mutation.
+const ref = deletePollRef(deletePollVars);
+// Variables can be defined inline as well.
+const ref = deletePollRef({ id: ..., });
+
+// You can also pass in a `DataConnect` instance to the `MutationRef` function.
+const dataConnect = getDataConnect(connectorConfig);
+const ref = deletePollRef(dataConnect, deletePollVars);
+
+// Call `executeMutation()` on the reference to execute the mutation.
+// You can use the `await` keyword to wait for the promise to resolve.
+const { data } = await executeMutation(ref);
+
+console.log(data.poll_delete);
+
+// Or, you can use the `Promise` API.
+executeMutation(ref).then((response) => {
+  const data = response.data;
+  console.log(data.poll_delete);
 });
 ```
 

@@ -91,17 +91,32 @@ mutation UpsertStudent($id: UUID, $name: String, $number: Int, $gender: String, 
   })
 }
 
-mutation UpsertQuickLink($id: UUID, $title: String!, $url: String!, $icon: String) @auth(level: PUBLIC) {
+mutation UpsertQuickLink($id: UUID, $title: String!, $url: String!, $icon: String, $desc: String) @auth(level: PUBLIC) {
   quickLink_upsert(data: {
     id: $id,
     title: $title,
     url: $url,
-    icon: $icon
+    icon: $icon,
+    desc: $desc
   })
 }
 
 mutation DeleteQuickLink($id: UUID!) @auth(level: PUBLIC) {
   quickLink_delete(id: $id)
+}
+
+mutation UpsertAnnouncement($id: UUID, $date: Date!, $title: String!, $content: String, $type: String) @auth(level: PUBLIC) {
+  announcement_upsert(data: {
+    id: $id,
+    date: $date,
+    title: $title,
+    content: $content,
+    type: $type
+  })
+}
+
+mutation DeleteAnnouncement($id: UUID!) @auth(level: PUBLIC) {
+  announcement_delete(id: $id)
 }
 
 mutation UpsertAssignment($id: UUID, $dueDate: Date!, $title: String!, $submissions: Any) @auth(level: PUBLIC) {
@@ -115,4 +130,17 @@ mutation UpsertAssignment($id: UUID, $dueDate: Date!, $title: String!, $submissi
 
 mutation DeleteAssignment($id: UUID!) @auth(level: PUBLIC) {
   assignment_delete(id: $id)
+}
+
+mutation UpsertPoll($id: UUID, $question: String!, $options: [String!]!, $votes: [Int!]!) @auth(level: PUBLIC) {
+  poll_upsert(data: {
+    id: $id,
+    question: $question,
+    options: $options,
+    votes: $votes
+  })
+}
+
+mutation DeletePoll($id: UUID!) @auth(level: PUBLIC) {
+  poll_delete(id: $id)
 }

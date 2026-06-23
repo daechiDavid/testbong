@@ -4,7 +4,7 @@ import { shuffleArray } from '../utils/helpers';
 import './ToolsPage.css';
 
 export default function ToolsPage() {
-  const { state, dispatch, showToast } = useApp();
+  const { state, dispatch, showToast, addPoll, deletePoll, votePoll } = useApp();
   const { students, polls, isAdmin } = state;
 
   // ===== Random Picker =====
@@ -128,29 +128,31 @@ export default function ToolsPage() {
     return !!getVotedPolls()[pollId];
   };
 
-  const handleAddPoll = () => {
+  const handleAddPoll = async () => {
     if (!newPollQ.trim() || newPollOpts.filter(o => o.trim()).length < 2) {
       showToast('질문과 최소 2개 항목을 입력하세요', 'error');
       return;
     }
     const opts = newPollOpts.filter(o => o.trim());
-    dispatch({ type: 'ADD_POLL', payload: { id: Date.now(), question: newPollQ, options: opts, votes: opts.map(() => 0), isActive: true } });
+    const newId = crypto.randomUUID();
+    const pollData = { id: newId, question: newPollQ, options: opts, votes: opts.map(() => 0), isActive: true };
+    await addPoll(pollData);
     setNewPollQ(''); setNewPollOpts(['', '']);
     showToast('투표가 생성되었습니다!', 'success');
   };
 
-  const handleVote = (pollId, optIdx) => {
+  const handleVote = async (pollId, optIdx) => {
     if (hasVoted(pollId)) {
       showToast('이미 투표하셨습니다!', 'warning');
       return;
     }
-    dispatch({ type: 'VOTE_POLL', payload: { pollId, optionIndex: optIdx } });
+    await votePoll(pollId, optIdx);
     markPollVoted(pollId);
     showToast('투표가 완료되었습니다!', 'success');
   };
 
-  const handleDeletePoll = (pollId) => {
-    dispatch({ type: 'DELETE_POLL', payload: pollId });
+  const handleDeletePoll = async (pollId) => {
+    await deletePoll(pollId);
     showToast('투표가 삭제되었습니다.', 'success');
   };
 

@@ -33,7 +33,7 @@ export default function LinksPage() {
       updateLink({ ...formData, url, id: editingId });
       showToast('수정되었습니다.', 'success');
     } else {
-      addLink({ ...formData, url, id: Date.now() });
+      addLink({ ...formData, url, id: crypto.randomUUID() });
       showToast('추가되었습니다.', 'success');
     }
     setShowForm(false);

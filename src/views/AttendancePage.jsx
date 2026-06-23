@@ -13,6 +13,7 @@ export default function AttendancePage() {
   const { state, updateAttendance, loadAttendanceByDate, loadMonthlyAttendance, showToast } = useApp();
   const { students, attendance, selectedAttendanceDate, monthlyAttendance, isAdmin } = state;
   const [activeSelector, setActiveSelector] = useState(null);
+  const [monthlyActiveCell, setMonthlyActiveCell] = useState(null); // { studentId, date }
   const [viewMode, setViewMode] = useState('daily'); // daily | monthly
   const [monthYear, setMonthYear] = useState({ year: new Date().getFullYear(), month: new Date().getMonth() });
 
@@ -20,6 +21,19 @@ export default function AttendancePage() {
   const handleDateChange = (e) => {
     const date = e.target.value;
     loadAttendanceByDate(date);
+  };
+
+  // 월별 출결 변경 핸들러
+  const handleMonthlyStatus = async (studentId, date, status) => {
+    if (!isAdmin) {
+      showToast('관리자 모드에서만 수정할 수 있습니다.', 'error');
+      return;
+    }
+    await updateAttendance(studentId, status, '', date);
+    await loadMonthlyAttendance(monthYear.year, monthYear.month);
+    const s = students.find(st => st.id === studentId);
+    showToast(`${s.name} (${date.slice(5).replace('-', '/')}) → ${STATUS_MAP[status].label}`, 'success');
+    setMonthlyActiveCell(null);
   };
 
   // 월별 보기 시 데이터 로드
@@ -202,14 +216,40 @@ export default function AttendancePage() {
                       const record = monthlyAttendance[d]?.[s.id];
                       const status = record?.status || null;
                       const statusInfo = status ? STATUS_MAP[status] : null;
+                      const isCellActive = monthlyActiveCell?.studentId === s.id && monthlyActiveCell?.date === d;
                       return (
-                        <td key={d} className={`monthly-cell ${status || 'no-data'}`} title={record?.note || ''}>
+                        <td 
+                          key={d} 
+                          className={`monthly-cell ${status || 'no-data'} ${isCellActive ? 'active' : ''}`} 
+                          title={record?.note || ''}
+                          onClick={() => {
+                            if (isAdmin) {
+                              setMonthlyActiveCell(isCellActive ? null : { studentId: s.id, date: d });
+                            }
+                          }}
+                          style={{ position: 'relative', cursor: isAdmin ? 'pointer' : 'default' }}
+                        >
                           {statusInfo ? (
                             <span className={`monthly-status ${status}`}>
                               {status === 'present' ? '○' : status === 'absent' ? '✕' : status === 'late' ? '△' : '▽'}
                             </span>
                           ) : (
                             <span className="monthly-status no-data">-</span>
+                          )}
+
+                          {/* 월별 출결 즉시 변경 선택기 */}
+                          {isAdmin && isCellActive && (
+                            <div className="attendance-status-selector show monthly-selector" onClick={e => e.stopPropagation()}>
+                              {Object.entries(STATUS_MAP).map(([key, val]) => (
+                                <button 
+                                  key={key} 
+                                  className={`status-option ${status === key ? 'active' : ''}`} 
+                                  onClick={() => handleMonthlyStatus(s.id, d, key)}
+                                >
+                                  {val.icon} {val.label}
+                                </button>
+                              ))}
+                            </div>
                           )}
                         </td>
                       );

@@ -1,4 +1,4 @@
-import { ConnectorConfig, DataConnect, QueryRef, QueryPromise, MutationRef, MutationPromise } from 'firebase/data-connect';
+import { ConnectorConfig, DataConnect, QueryRef, QueryPromise, ExecuteQueryOptions, MutationRef, MutationPromise } from 'firebase/data-connect';
 
 export const connectorConfig: ConnectorConfig;
 
@@ -53,6 +53,14 @@ export interface DeleteActivityCompletionVariables {
   id: UUIDString;
 }
 
+export interface DeleteAnnouncementData {
+  announcement_delete?: Announcement_Key | null;
+}
+
+export interface DeleteAnnouncementVariables {
+  id: UUIDString;
+}
+
 export interface DeleteAssignmentData {
   assignment_delete?: Assignment_Key | null;
 }
@@ -74,6 +82,14 @@ export interface DeleteDDayData {
 }
 
 export interface DeleteDDayVariables {
+  id: UUIDString;
+}
+
+export interface DeletePollData {
+  poll_delete?: Poll_Key | null;
+}
+
+export interface DeletePollVariables {
   id: UUIDString;
 }
 
@@ -100,81 +116,83 @@ export interface GetAllAppDataData {
     name?: string | null;
     points: number;
   } & Student_Key)[];
-    announcements: ({
+  announcements: ({
+    id: UUIDString;
+    date: DateString;
+    title: string;
+    content?: string | null;
+    type?: string | null;
+  } & Announcement_Key)[];
+  assignments: ({
+    id: UUIDString;
+    dueDate: DateString;
+    title: string;
+    submissions?: unknown | null;
+  } & Assignment_Key)[];
+  dDays: ({
+    id: UUIDString;
+    name: string;
+    date: DateString;
+  } & DDay_Key)[];
+  weeklyPlans: ({
+    id: UUIDString;
+    weekKey: string;
+    day: string;
+    period: number;
+    subject?: string | null;
+    content?: string | null;
+  } & WeeklyPlan_Key)[];
+  appConfigs: ({
+    id: number;
+    calendarId1?: string | null;
+    calendarId2?: string | null;
+    calendarId3?: string | null;
+    thermometerGoal?: number | null;
+    thermometerReward?: string | null;
+  } & AppConfig_Key)[];
+  quickLinks: ({
+    id: UUIDString;
+    title: string;
+    url: string;
+    icon?: string | null;
+    desc?: string | null;
+  } & QuickLink_Key)[];
+  polls: ({
+    id: UUIDString;
+    question: string;
+    options?: string[] | null;
+    votes?: number[] | null;
+  } & Poll_Key)[];
+  newsletters: ({
+    id: UUIDString;
+    date: DateString;
+    title: string;
+    content?: string | null;
+    collected: boolean;
+  } & Newsletter_Key)[];
+  activityChecks: ({
+    id: number;
+    content?: string | null;
+    type?: string | null;
+  } & ActivityCheck_Key)[];
+  activityCompletions: ({
+    id: UUIDString;
+    student: {
       id: UUIDString;
-      date: DateString;
-      title: string;
-      content?: string | null;
-    } & Announcement_Key)[];
-      assignments: ({
-        id: UUIDString;
-        dueDate: DateString;
-        title: string;
-        submissions?: unknown | null;
-      } & Assignment_Key)[];
-        dDays: ({
-          id: UUIDString;
-          name: string;
-          date: DateString;
-        } & DDay_Key)[];
-          weeklyPlans: ({
-            id: UUIDString;
-            weekKey: string;
-            day: string;
-            period: number;
-            subject?: string | null;
-            content?: string | null;
-          } & WeeklyPlan_Key)[];
-            appConfigs: ({
-              id: number;
-              calendarId1?: string | null;
-              calendarId2?: string | null;
-              calendarId3?: string | null;
-              thermometerGoal?: number | null;
-              thermometerReward?: string | null;
-            } & AppConfig_Key)[];
-              quickLinks: ({
-                id: UUIDString;
-                title: string;
-                url: string;
-                icon?: string | null;
-              } & QuickLink_Key)[];
-                polls: ({
-                  id: UUIDString;
-                  question: string;
-                  options?: string[] | null;
-                  votes?: number[] | null;
-                } & Poll_Key)[];
-                  newsletters: ({
-                    id: UUIDString;
-                    date: DateString;
-                    title: string;
-                    content?: string | null;
-                    collected: boolean;
-                  } & Newsletter_Key)[];
-                    activityChecks: ({
-                      id: number;
-                      content?: string | null;
-                      type?: string | null;
-                    } & ActivityCheck_Key)[];
-                      activityCompletions: ({
-                        id: UUIDString;
-                        student: {
-                          id: UUIDString;
-                        } & Student_Key;
-                          timestamp: TimestampString;
-                      } & ActivityCompletion_Key)[];
-                        studentRecords: ({
-                          id: UUIDString;
-                          student: {
-                            id: UUIDString;
-                          } & Student_Key;
-                            type: string;
-                            content?: string | null;
-                            category?: string | null;
-                            date: DateString;
-                            createdAt: TimestampString;
-                        } & StudentRecord_Key)[];
+    } & Student_Key;
+    timestamp: TimestampString;
+  } & ActivityCompletion_Key)[];
+  studentRecords: ({
+    id: UUIDString;
+    student: {
+      id: UUIDString;
+    } & Student_Key;
+    type: string;
+    content?: string | null;
+    category?: string | null;
+    date: DateString;
+    createdAt: TimestampString;
+  } & StudentRecord_Key)[];
 }
 
 export interface GetAttendanceByDateData {
@@ -183,9 +201,9 @@ export interface GetAttendanceByDateData {
     student: {
       id: UUIDString;
     } & Student_Key;
-      date: DateString;
-      status: string;
-      note?: string | null;
+    date: DateString;
+    status: string;
+    note?: string | null;
   } & Attendance_Key)[];
 }
 
@@ -199,9 +217,9 @@ export interface GetAttendanceByMonthData {
     student: {
       id: UUIDString;
     } & Student_Key;
-      date: DateString;
-      status: string;
-      note?: string | null;
+    date: DateString;
+    status: string;
+    note?: string | null;
   } & Attendance_Key)[];
 }
 
@@ -303,6 +321,18 @@ export interface UpsertActivityCompletionVariables {
   timestamp: TimestampString;
 }
 
+export interface UpsertAnnouncementData {
+  announcement_upsert: Announcement_Key;
+}
+
+export interface UpsertAnnouncementVariables {
+  id?: UUIDString | null;
+  date: DateString;
+  title: string;
+  content?: string | null;
+  type?: string | null;
+}
+
 export interface UpsertAppConfigData {
   appConfig_upsert: AppConfig_Key;
 }
@@ -339,6 +369,17 @@ export interface UpsertAttendanceVariables {
   note?: string | null;
 }
 
+export interface UpsertPollData {
+  poll_upsert: Poll_Key;
+}
+
+export interface UpsertPollVariables {
+  id?: UUIDString | null;
+  question: string;
+  options: string[];
+  votes: number[];
+}
+
 export interface UpsertQuickLinkData {
   quickLink_upsert: QuickLink_Key;
 }
@@ -348,6 +389,7 @@ export interface UpsertQuickLinkVariables {
   title: string;
   url: string;
   icon?: string | null;
+  desc?: string | null;
 }
 
 export interface UpsertStudentData {
@@ -591,6 +633,30 @@ export const deleteQuickLinkRef: DeleteQuickLinkRef;
 export function deleteQuickLink(vars: DeleteQuickLinkVariables): MutationPromise<DeleteQuickLinkData, DeleteQuickLinkVariables>;
 export function deleteQuickLink(dc: DataConnect, vars: DeleteQuickLinkVariables): MutationPromise<DeleteQuickLinkData, DeleteQuickLinkVariables>;
 
+interface UpsertAnnouncementRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpsertAnnouncementVariables): MutationRef<UpsertAnnouncementData, UpsertAnnouncementVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpsertAnnouncementVariables): MutationRef<UpsertAnnouncementData, UpsertAnnouncementVariables>;
+  operationName: string;
+}
+export const upsertAnnouncementRef: UpsertAnnouncementRef;
+
+export function upsertAnnouncement(vars: UpsertAnnouncementVariables): MutationPromise<UpsertAnnouncementData, UpsertAnnouncementVariables>;
+export function upsertAnnouncement(dc: DataConnect, vars: UpsertAnnouncementVariables): MutationPromise<UpsertAnnouncementData, UpsertAnnouncementVariables>;
+
+interface DeleteAnnouncementRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeleteAnnouncementVariables): MutationRef<DeleteAnnouncementData, DeleteAnnouncementVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeleteAnnouncementVariables): MutationRef<DeleteAnnouncementData, DeleteAnnouncementVariables>;
+  operationName: string;
+}
+export const deleteAnnouncementRef: DeleteAnnouncementRef;
+
+export function deleteAnnouncement(vars: DeleteAnnouncementVariables): MutationPromise<DeleteAnnouncementData, DeleteAnnouncementVariables>;
+export function deleteAnnouncement(dc: DataConnect, vars: DeleteAnnouncementVariables): MutationPromise<DeleteAnnouncementData, DeleteAnnouncementVariables>;
+
 interface UpsertAssignmentRef {
   /* Allow users to create refs without passing in DataConnect */
   (vars: UpsertAssignmentVariables): MutationRef<UpsertAssignmentData, UpsertAssignmentVariables>;
@@ -615,6 +681,30 @@ export const deleteAssignmentRef: DeleteAssignmentRef;
 export function deleteAssignment(vars: DeleteAssignmentVariables): MutationPromise<DeleteAssignmentData, DeleteAssignmentVariables>;
 export function deleteAssignment(dc: DataConnect, vars: DeleteAssignmentVariables): MutationPromise<DeleteAssignmentData, DeleteAssignmentVariables>;
 
+interface UpsertPollRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: UpsertPollVariables): MutationRef<UpsertPollData, UpsertPollVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: UpsertPollVariables): MutationRef<UpsertPollData, UpsertPollVariables>;
+  operationName: string;
+}
+export const upsertPollRef: UpsertPollRef;
+
+export function upsertPoll(vars: UpsertPollVariables): MutationPromise<UpsertPollData, UpsertPollVariables>;
+export function upsertPoll(dc: DataConnect, vars: UpsertPollVariables): MutationPromise<UpsertPollData, UpsertPollVariables>;
+
+interface DeletePollRef {
+  /* Allow users to create refs without passing in DataConnect */
+  (vars: DeletePollVariables): MutationRef<DeletePollData, DeletePollVariables>;
+  /* Allow users to pass in custom DataConnect instances */
+  (dc: DataConnect, vars: DeletePollVariables): MutationRef<DeletePollData, DeletePollVariables>;
+  operationName: string;
+}
+export const deletePollRef: DeletePollRef;
+
+export function deletePoll(vars: DeletePollVariables): MutationPromise<DeletePollData, DeletePollVariables>;
+export function deletePoll(dc: DataConnect, vars: DeletePollVariables): MutationPromise<DeletePollData, DeletePollVariables>;
+
 interface GetAllAppDataRef {
   /* Allow users to create refs without passing in DataConnect */
   (): QueryRef<GetAllAppDataData, undefined>;
@@ -624,8 +714,8 @@ interface GetAllAppDataRef {
 }
 export const getAllAppDataRef: GetAllAppDataRef;
 
-export function getAllAppData(): QueryPromise<GetAllAppDataData, undefined>;
-export function getAllAppData(dc: DataConnect): QueryPromise<GetAllAppDataData, undefined>;
+export function getAllAppData(options?: ExecuteQueryOptions): QueryPromise<GetAllAppDataData, undefined>;
+export function getAllAppData(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetAllAppDataData, undefined>;
 
 interface GetAttendanceByDateRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -636,8 +726,8 @@ interface GetAttendanceByDateRef {
 }
 export const getAttendanceByDateRef: GetAttendanceByDateRef;
 
-export function getAttendanceByDate(vars: GetAttendanceByDateVariables): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
-export function getAttendanceByDate(dc: DataConnect, vars: GetAttendanceByDateVariables): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
+export function getAttendanceByDate(vars: GetAttendanceByDateVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
+export function getAttendanceByDate(dc: DataConnect, vars: GetAttendanceByDateVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
 
 interface GetAttendanceByMonthRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -648,6 +738,6 @@ interface GetAttendanceByMonthRef {
 }
 export const getAttendanceByMonthRef: GetAttendanceByMonthRef;
 
-export function getAttendanceByMonth(vars: GetAttendanceByMonthVariables): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
-export function getAttendanceByMonth(dc: DataConnect, vars: GetAttendanceByMonthVariables): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
+export function getAttendanceByMonth(vars: GetAttendanceByMonthVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
+export function getAttendanceByMonth(dc: DataConnect, vars: GetAttendanceByMonthVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
 

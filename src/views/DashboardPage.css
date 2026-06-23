@@ -448,10 +448,11 @@
 
 .pretty-lunch-box {
   background: linear-gradient(135deg, #FFF8E1 0%, #FFF3E0 100%);
-  padding: 1.25rem;
+  padding: 0.75rem 1.25rem; /* 내부 패딩을 1.25rem에서 줄임 */
   border-radius: var(--radius-lg);
   border: 1px solid #FFE0B2;
   box-shadow: 0 4px 12px rgba(255, 152, 0, 0.08);
+  width: 100%; /* 부모 너비에 맞춤 */
 }
 
 .lunch-menu-text {
@@ -468,6 +469,8 @@
   align-items: center;
   justify-content: center;
   min-height: 100px;
+  padding-top: 0.25rem; /* 위젯 헤더와의 간격 축소 */
+  padding-bottom: 0.75rem; /* 아래쪽 간격 축소 */
 }
 
 .lunch-calories {
