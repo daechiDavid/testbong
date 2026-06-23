@@ -365,7 +365,7 @@ export default function DashboardPage() {
         <div key="notice" className="card dashboard-widget notice-card-container">
           <div className="card-header" style={{ cursor: isAdmin ? 'move' : 'default' }}>
             <h3 className="card-title"><span className="emoji">📢</span> 공지사항</h3>
-            {isAdmin && <button className="btn btn-sm btn-primary" onClick={() => setShowNoticeForm(!showNoticeForm)}>+ 새 공지</button>}
+            {isAdmin && <button className="btn btn-sm btn-primary new-notice-btn" onClick={() => setShowNoticeForm(!showNoticeForm)}>+ 새 공지</button>}
           </div>
           <div className="widget-content notice-list">
             {isAdmin && showNoticeForm && (

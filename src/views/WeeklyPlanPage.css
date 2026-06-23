@@ -165,14 +165,21 @@
 }
 
 .plan-subject {
-  font-weight: 700;
-  color: var(--primary);
-  font-size: 0.85rem;
+  font-weight: 800;
+  color: #1E3A8A;
+  font-size: 1rem;
+  background: #EFF6FF;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+  margin-bottom: 4px;
 }
 
 .plan-content {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
+  font-size: 0.85rem;
+  color: #4B5563;
+  line-height: 1.4;
+  margin-top: 4px;
 }
 
 .plan-empty {
