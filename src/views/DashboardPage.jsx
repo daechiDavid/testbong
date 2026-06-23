@@ -56,7 +56,7 @@ const defaultLayouts = {
 
 export default function DashboardPage() {
   // AppContext에서 DB 연동 함수들을 가져옴
-  const { state, dispatch, showToast, updateSettings, addDDay, deleteDDay, addAnnouncement, updateAnnouncement, deleteAnnouncement } = useApp();
+  const { state, showToast, updateSettings, addDDay, deleteDDay, addAnnouncement, updateAnnouncement, deleteAnnouncement } = useApp();
   const { students, announcements, settings, weeklyPlans, ddays = [], isAdmin } = state;
 
   const [layouts, setLayouts] = useState(() => {

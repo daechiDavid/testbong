@@ -4,7 +4,7 @@ import { shuffleArray } from '../utils/helpers';
 import './ToolsPage.css';
 
 export default function ToolsPage() {
-  const { state, dispatch, showToast, addPoll, deletePoll, votePoll } = useApp();
+  const { state, showToast, addPoll, deletePoll, votePoll } = useApp();
   const { students, polls, isAdmin } = state;
 
   // ===== Random Picker =====
