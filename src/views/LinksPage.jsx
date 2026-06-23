@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import { generateUUID } from '../utils/helpers';
 import './LinksPage.css';
 
 export default function LinksPage() {
@@ -33,7 +34,7 @@ export default function LinksPage() {
       updateLink({ ...formData, url, id: editingId });
       showToast('수정되었습니다.', 'success');
     } else {
-      addLink({ ...formData, url, id: crypto.randomUUID() });
+      addLink({ ...formData, url, id: generateUUID() });
       showToast('추가되었습니다.', 'success');
     }
     setShowForm(false);

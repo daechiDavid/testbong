@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { shuffleArray } from '../utils/helpers';
+import { shuffleArray, generateUUID } from '../utils/helpers';
 import './ToolsPage.css';
 
 export default function ToolsPage() {
@@ -134,7 +134,7 @@ export default function ToolsPage() {
       return;
     }
     const opts = newPollOpts.filter(o => o.trim());
-    const newId = crypto.randomUUID();
+    const newId = generateUUID();
     const pollData = { id: newId, question: newPollQ, options: opts, votes: opts.map(() => 0), isActive: true };
     await addPoll(pollData);
     setNewPollQ(''); setNewPollOpts(['', '']);

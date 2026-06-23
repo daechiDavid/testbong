@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { getDayName, getDday, isTodayBirthday, getCurrentPeriod } from '../utils/helpers';
+import { getDayName, getDday, isTodayBirthday, getCurrentPeriod, generateUUID } from '../utils/helpers';
 import { fetchTodayLunch } from '../utils/neisApi';
 import { getWeekStart, toISODate } from '../context/AppContext';
 import Thermometer from '../components/common/Thermometer';
@@ -114,7 +114,7 @@ export default function DashboardPage() {
       await updateAnnouncement({ id: editNoticeId, ...newNotice, date: dateStr });
       showToast('공지사항이 수정되었습니다', 'success');
     } else {
-      const newId = crypto.randomUUID();
+      const newId = generateUUID();
       await addAnnouncement({ id: newId, ...newNotice, date: dateStr });
       showToast('공지사항이 등록되었습니다', 'success');
     }
