@@ -63,7 +63,8 @@ export default function DashboardPage() {
     try {
       const saved = localStorage.getItem('dashboard_layouts');
       return saved ? JSON.parse(saved) : defaultLayouts;
-    } catch (e) {
+    } catch {
+      // 로컬 스토리지 파싱 실패 시 기본 레이아웃 사용
       return defaultLayouts;
     }
   });
