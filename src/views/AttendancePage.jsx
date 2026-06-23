@@ -30,7 +30,6 @@ export default function AttendancePage() {
       return;
     }
     await updateAttendance(studentId, status, '', date);
-    await loadMonthlyAttendance(monthYear.year, monthYear.month);
     const s = students.find(st => st.id === studentId);
     showToast(`${s.name} (${date.slice(5).replace('-', '/')}) → ${STATUS_MAP[status].label}`, 'success');
     setMonthlyActiveCell(null);
