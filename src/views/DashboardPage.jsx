@@ -59,6 +59,15 @@ export default function DashboardPage() {
   const { state, dispatch, showToast, updateSettings, addDDay, deleteDDay } = useApp();
   const { students, announcements, settings, weeklyPlans, ddays = [], isAdmin } = state;
 
+  const [layouts, setLayouts] = useState(() => {
+    try {
+      const saved = localStorage.getItem('dashboard_layouts');
+      return saved ? JSON.parse(saved) : defaultLayouts;
+    } catch (e) {
+      return defaultLayouts;
+    }
+  });
+
   const [lunchInfo, setLunchInfo] = useState(null);
   const [isLoadingLunch, setIsLoadingLunch] = useState(true);
   const [showDdayForm, setShowDdayForm] = useState(false);
@@ -88,7 +97,7 @@ export default function DashboardPage() {
   const handleAddNotice = () => {
     if (!newNotice.title.trim()) return;
     const dateStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    
+
     if (editNoticeId) {
       dispatch({
         type: 'UPDATE_ANNOUNCEMENT',
@@ -103,7 +112,7 @@ export default function DashboardPage() {
       });
       showToast('공지사항이 등록되었습니다', 'success');
     }
-    
+
     setNewNotice({ title: '', content: '', type: 'general' });
     setShowNoticeForm(false);
     setEditNoticeId(null);
@@ -126,7 +135,7 @@ export default function DashboardPage() {
   const weekStart = getWeekStart(today);
   const weekKey = toISODate(weekStart);
   const todayPlan = weeklyPlans[weekKey]?.[dayName] || {};
-  
+
   const PERIOD_TIMES = {
     1: '09:00-09:40',
     2: '09:50-10:30',
@@ -181,9 +190,11 @@ export default function DashboardPage() {
   const goalPoints = settings?.thermometerGoal || 1500;
   const thermometerReward = settings?.thermometerReward || '';
 
-  const handleLayoutChange = () => {
-    // 임시로 레이아웃 변경 저장 및 겹침 버그 유발 방지를 위해 기능 차단
-    return;
+  const handleLayoutChange = (currentLayout, allLayouts) => {
+    if (isAdmin) {
+      setLayouts(allLayouts);
+      localStorage.setItem('dashboard_layouts', JSON.stringify(allLayouts));
+    }
   };
 
   return (
@@ -205,13 +216,13 @@ export default function DashboardPage() {
       {/* 대시보드 위젯 그리드 레이아웃: 블럭 이동 및 크기 조절 가능 */}
       <ResponsiveGridLayout
         className="dashboard-layout"
-        layouts={defaultLayouts}
+        layouts={layouts}
         breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
         cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
         rowHeight={220}
         onLayoutChange={handleLayoutChange}
         isDraggable={isAdmin}
-        isResizable={false}
+        isResizable={isAdmin}
         draggableHandle=".card-header"
       >
         {/* Schedule */}
@@ -228,9 +239,9 @@ export default function DashboardPage() {
                     <div>
                       <div className="schedule-subject">{item.subject}</div>
                       <div className="schedule-time">{item.time}</div>
-                      {item.content && <div className="schedule-content" style={{fontSize:'0.75rem', color:'var(--text-secondary)', marginTop:'2px'}}>{item.content}</div>}
+                      {item.content && <div className="schedule-content" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '2px' }}>{item.content}</div>}
                     </div>
-                    {currentPeriod === item.period && <span className="badge badge-primary" style={{marginLeft:'auto'}}>수업 중</span>}
+                    {currentPeriod === item.period && <span className="badge badge-primary" style={{ marginLeft: 'auto' }}>수업 중</span>}
                   </div>
                 ))}
               </div>
@@ -238,7 +249,7 @@ export default function DashboardPage() {
               <div className="empty-state">
                 <div className="empty-icon">🏖️</div>
                 <p>오늘은 수업이 없습니다</p>
-                <p style={{fontSize:'0.75rem', color:'var(--text-secondary)'}}>주간 일정에서 시간표를 입력해주세요</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>주간 일정에서 시간표를 입력해주세요</p>
               </div>
             )}
           </div>
@@ -246,12 +257,12 @@ export default function DashboardPage() {
 
         {/* Thermometer */}
         <div key="thermometer" className="dashboard-widget">
-          <Thermometer 
-            current={totalPoints} 
-            goal={goalPoints} 
-            reward={thermometerReward} 
-            isAdmin={isAdmin} 
-            onUpdate={handleUpdateThermometer} 
+          <Thermometer
+            current={totalPoints}
+            goal={goalPoints}
+            reward={thermometerReward}
+            isAdmin={isAdmin}
+            onUpdate={handleUpdateThermometer}
           />
         </div>
 
@@ -292,9 +303,9 @@ export default function DashboardPage() {
           <div className="widget-content">
             {showDdayForm && isAdmin && (
               <div className="dday-form" style={{ padding: '1rem', background: 'var(--gray-50)', borderRadius: 'var(--radius-md)', marginBottom: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                <input type="text" placeholder="이모지" value={newDday.emoji} onChange={e => setNewDday({...newDday, emoji: e.target.value})} className="form-input" style={{ width: '60px' }} />
-                <input type="text" placeholder="내용" value={newDday.name} onChange={e => setNewDday({...newDday, name: e.target.value})} className="form-input" style={{ flex: 1 }} />
-                <input type="date" value={newDday.date} onChange={e => setNewDday({...newDday, date: e.target.value})} className="form-input" />
+                <input type="text" placeholder="이모지" value={newDday.emoji} onChange={e => setNewDday({ ...newDday, emoji: e.target.value })} className="form-input" style={{ width: '60px' }} />
+                <input type="text" placeholder="내용" value={newDday.name} onChange={e => setNewDday({ ...newDday, name: e.target.value })} className="form-input" style={{ flex: 1 }} />
+                <input type="date" value={newDday.date} onChange={e => setNewDday({ ...newDday, date: e.target.value })} className="form-input" />
                 <button className="btn btn-primary" onClick={handleAddDday}>추가</button>
               </div>
             )}
@@ -353,20 +364,20 @@ export default function DashboardPage() {
           <div className="widget-content notice-list">
             {isAdmin && showNoticeForm && (
               <div className="notice-form" style={{ padding: '1rem', background: 'var(--gray-50)', borderRadius: 'var(--radius-md)', marginBottom: '1rem' }}>
-                <input className="form-input" placeholder="제목" value={newNotice.title} onChange={e => setNewNotice({...newNotice, title: e.target.value})} style={{marginBottom:'0.5rem'}} />
-                <textarea className="form-input" placeholder="내용" value={newNotice.content} onChange={e => setNewNotice({...newNotice, content: e.target.value})} rows="3" style={{marginBottom:'0.5rem',resize:'vertical'}} />
-                <div style={{display:'flex',gap:'0.5rem'}}>
-                  <select className="form-input" value={newNotice.type} onChange={e => setNewNotice({...newNotice, type: e.target.value})} style={{flex:1}}>
+                <input className="form-input" placeholder="제목" value={newNotice.title} onChange={e => setNewNotice({ ...newNotice, title: e.target.value })} style={{ marginBottom: '0.5rem' }} />
+                <textarea className="form-input" placeholder="내용" value={newNotice.content} onChange={e => setNewNotice({ ...newNotice, content: e.target.value })} rows="3" style={{ marginBottom: '0.5rem', resize: 'vertical' }} />
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <select className="form-input" value={newNotice.type} onChange={e => setNewNotice({ ...newNotice, type: e.target.value })} style={{ flex: 1 }}>
                     <option value="general">일반</option>
                     <option value="important">중요</option>
                     <option value="newsletter">통신문</option>
                   </select>
                   <button className="btn btn-primary" onClick={handleAddNotice}>{editNoticeId ? '수정' : '등록'}</button>
-                  {editNoticeId && <button className="btn btn-secondary" onClick={() => {setShowNoticeForm(false); setEditNoticeId(null); setNewNotice({title:'', content:'', type:'general'})}}>취소</button>}
+                  {editNoticeId && <button className="btn btn-secondary" onClick={() => { setShowNoticeForm(false); setEditNoticeId(null); setNewNotice({ title: '', content: '', type: 'general' }) }}>취소</button>}
                 </div>
               </div>
             )}
-            
+
             <div className="notices-list">
               {announcements.length > 0 ? announcements.map(n => (
                 <div key={n.id} className="notice-item" style={{ flexDirection: 'column', alignItems: 'flex-start', padding: '1rem', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', marginBottom: '0.75rem', background: 'white' }}>

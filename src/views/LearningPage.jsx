@@ -55,7 +55,7 @@ export default function LearningPage() {
           updateAssignmentSubmissions(existingAssignment.id, { [studentId]: { timestamp: new Date().toISOString() } });
         } else {
           addAssignment({
-            id: Date.now(),
+            id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
             title: activityContent,
             subject: '활동',
             type: state.activityCheck?.type || '수행평가',
@@ -75,8 +75,8 @@ export default function LearningPage() {
     }
   };
 
-  // 과제 목록 역순 정렬 및 페이지네이션
-  const sortedAssignments = [...assignments].sort((a, b) => b.id - a.id);
+  // 과제 목록 최근 항목이 위로 오도록 역순 정렬 및 페이지네이션
+  const sortedAssignments = [...assignments].reverse();
   const totalPages = Math.ceil(sortedAssignments.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const displayAssignments = sortedAssignments.slice(startIndex, startIndex + itemsPerPage);
@@ -121,7 +121,7 @@ export default function LearningPage() {
                   );
                   if (!existingAssignment && tempActivityContent.trim() !== '') {
                     addAssignment({
-                      id: Date.now(),
+                      id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
                       title: tempActivityContent,
                       subject: '활동',
                       type: tempActivityType,

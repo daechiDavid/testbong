@@ -170,7 +170,7 @@ function reducer(state, action) {
     case 'UPDATE_ACTIVITY_CONTENT':
       return {
         ...state,
-        activityCheck: { ...state.activityCheck, content: action.payload.content, type: action.payload.type || state.activityCheck.type }
+        activityCheck: { ...state.activityCheck, content: action.payload.content, type: action.payload.type || state.activityCheck.type, completions: {} }
       };
     case 'MARK_ACTIVITY_COMPLETED':
       return {
@@ -478,7 +478,12 @@ export function AppProvider({ children }) {
   const addAssignmentFunc = async (assignmentData) => {
     dispatch({ type: 'ADD_ASSIGNMENT', payload: assignmentData });
     try {
-      await upsertAssignment(assignmentData);
+      await upsertAssignment({
+        id: assignmentData.id,
+        dueDate: assignmentData.dueDate,
+        title: assignmentData.title,
+        submissions: assignmentData.submissions
+      });
     } catch(e) { console.error(e); }
   };
 
@@ -487,7 +492,12 @@ export function AppProvider({ children }) {
     const assignment = state.assignments.find(a => a.id === id);
     if (assignment) {
       try {
-        await upsertAssignment({ ...assignment, submissions: { ...assignment.submissions, ...submissions } });
+        await upsertAssignment({
+          id: assignment.id,
+          dueDate: assignment.dueDate,
+          title: assignment.title,
+          submissions: { ...assignment.submissions, ...submissions }
+        });
       } catch(e) { console.error(e); }
     }
   };
