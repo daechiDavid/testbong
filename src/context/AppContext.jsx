@@ -361,7 +361,7 @@ export function AppProvider({ children }) {
     await upsertAttendance({ studentId, date: targetDate, status, note });
   };
 
-  const loadAttendanceByDateFunc = async (date) => {
+  const loadAttendanceByDateFunc = useCallback(async (date) => {
     dispatch({ type: 'SET_SELECTED_ATTENDANCE_DATE', payload: date });
     try {
       const { data } = await getAttendanceByDate({ date });
@@ -374,9 +374,9 @@ export function AppProvider({ children }) {
     } catch (error) {
       console.error('Load attendance error:', error);
     }
-  };
+  }, [state.students]);
 
-  const loadMonthlyAttendanceFunc = async (year, month) => {
+  const loadMonthlyAttendanceFunc = useCallback(async (year, month) => {
     const startDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
     const endDate = `${year}-${String(month + 1).padStart(2, '0')}-${new Date(year, month + 1, 0).getDate()}`;
     try {
@@ -392,7 +392,7 @@ export function AppProvider({ children }) {
     } catch (error) {
       console.error('Load monthly attendance error:', error);
     }
-  };
+  }, []);
 
   const addStudentRecordFunc = async (studentId, type, content, category = '') => {
     const date = new Date().toISOString().split('T')[0];
@@ -461,15 +461,27 @@ export function AppProvider({ children }) {
   const addLinkFunc = async (linkData) => {
     dispatch({ type: 'ADD_LINK', payload: linkData });
     try {
-      await upsertQuickLink(linkData);
-    } catch(e) { console.error(e); }
+      await upsertQuickLink({
+        id: linkData.id,
+        title: linkData.title,
+        url: linkData.url,
+        icon: linkData.icon || '🔗',
+        desc: linkData.desc || null
+      });
+    } catch(e) { console.error('Add Link Error:', e); }
   };
 
   const updateLinkFunc = async (linkData) => {
     dispatch({ type: 'UPDATE_LINK', payload: linkData });
     try {
-      await upsertQuickLink(linkData);
-    } catch(e) { console.error(e); }
+      await upsertQuickLink({
+        id: linkData.id,
+        title: linkData.title,
+        url: linkData.url,
+        icon: linkData.icon || '🔗',
+        desc: linkData.desc || null
+      });
+    } catch(e) { console.error('Update Link Error:', e); }
   };
 
   const deleteLinkFunc = async (id) => {
