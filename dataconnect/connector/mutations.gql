@@ -62,12 +62,12 @@ mutation UpdateNewsletter($id: UUID!, $collected: Boolean!) @auth(level: PUBLIC)
   newsletter_update(id: $id, data: { collected: $collected })
 }
 
-mutation UpsertActivityCompletion($id: UUID, $studentId: UUID!, $timestamp: Timestamp!) @auth(level: PUBLIC) {
-  activityCompletion_upsert(data: { id: $id, studentId: $studentId, timestamp: $timestamp })
+mutation UpsertActivityCompletion($studentId: UUID!, $timestamp: Timestamp!) @auth(level: PUBLIC) {
+  activityCompletion_upsert(data: { studentId: $studentId, timestamp: $timestamp })
 }
 
-mutation DeleteActivityCompletion($id: UUID!) @auth(level: PUBLIC) {
-  activityCompletion_delete(id: $id)
+mutation DeleteActivityCompletion($studentId: UUID!) @auth(level: PUBLIC) {
+  activityCompletion_delete(key: { studentId: $studentId })
 }
 
 mutation UpsertActivityCheck($id: Int!, $content: String, $type: String) @auth(level: PUBLIC) {

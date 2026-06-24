@@ -67,7 +67,6 @@ query GetAllAppData @auth(level: PUBLIC) {
     type
   }
   activityCompletions {
-    id
     student { id }
     timestamp
   }

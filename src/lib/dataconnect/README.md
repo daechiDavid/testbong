@@ -183,12 +183,11 @@ export interface GetAllAppDataData {
     type?: string | null;
   } & ActivityCheck_Key)[];
   activityCompletions: ({
-    id: UUIDString;
     student: {
       id: UUIDString;
     } & Student_Key;
     timestamp: TimestampString;
-  } & ActivityCompletion_Key)[];
+  })[];
   studentRecords: ({
     id: UUIDString;
     student: {
@@ -1734,7 +1733,6 @@ The `UpsertActivityCompletion` mutation requires an argument of type `UpsertActi
 
 ```typescript
 export interface UpsertActivityCompletionVariables {
-  id?: UUIDString | null;
   studentId: UUIDString;
   timestamp: TimestampString;
 }
@@ -1756,7 +1754,6 @@ import { connectorConfig, upsertActivityCompletion, UpsertActivityCompletionVari
 
 // The `UpsertActivityCompletion` mutation requires an argument of type `UpsertActivityCompletionVariables`:
 const upsertActivityCompletionVars: UpsertActivityCompletionVariables = {
-  id: ..., // optional
   studentId: ..., 
   timestamp: ..., 
 };
@@ -1765,7 +1762,7 @@ const upsertActivityCompletionVars: UpsertActivityCompletionVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await upsertActivityCompletion(upsertActivityCompletionVars);
 // Variables can be defined inline as well.
-const { data } = await upsertActivityCompletion({ id: ..., studentId: ..., timestamp: ..., });
+const { data } = await upsertActivityCompletion({ studentId: ..., timestamp: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -1788,7 +1785,6 @@ import { connectorConfig, upsertActivityCompletionRef, UpsertActivityCompletionV
 
 // The `UpsertActivityCompletion` mutation requires an argument of type `UpsertActivityCompletionVariables`:
 const upsertActivityCompletionVars: UpsertActivityCompletionVariables = {
-  id: ..., // optional
   studentId: ..., 
   timestamp: ..., 
 };
@@ -1796,7 +1792,7 @@ const upsertActivityCompletionVars: UpsertActivityCompletionVariables = {
 // Call the `upsertActivityCompletionRef()` function to get a reference to the mutation.
 const ref = upsertActivityCompletionRef(upsertActivityCompletionVars);
 // Variables can be defined inline as well.
-const ref = upsertActivityCompletionRef({ id: ..., studentId: ..., timestamp: ..., });
+const ref = upsertActivityCompletionRef({ studentId: ..., timestamp: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -1849,7 +1845,7 @@ The `DeleteActivityCompletion` mutation requires an argument of type `DeleteActi
 
 ```typescript
 export interface DeleteActivityCompletionVariables {
-  id: UUIDString;
+  studentId: UUIDString;
 }
 ```
 ### Return Type
@@ -1869,14 +1865,14 @@ import { connectorConfig, deleteActivityCompletion, DeleteActivityCompletionVari
 
 // The `DeleteActivityCompletion` mutation requires an argument of type `DeleteActivityCompletionVariables`:
 const deleteActivityCompletionVars: DeleteActivityCompletionVariables = {
-  id: ..., 
+  studentId: ..., 
 };
 
 // Call the `deleteActivityCompletion()` function to execute the mutation.
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await deleteActivityCompletion(deleteActivityCompletionVars);
 // Variables can be defined inline as well.
-const { data } = await deleteActivityCompletion({ id: ..., });
+const { data } = await deleteActivityCompletion({ studentId: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -1899,13 +1895,13 @@ import { connectorConfig, deleteActivityCompletionRef, DeleteActivityCompletionV
 
 // The `DeleteActivityCompletion` mutation requires an argument of type `DeleteActivityCompletionVariables`:
 const deleteActivityCompletionVars: DeleteActivityCompletionVariables = {
-  id: ..., 
+  studentId: ..., 
 };
 
 // Call the `deleteActivityCompletionRef()` function to get a reference to the mutation.
 const ref = deleteActivityCompletionRef(deleteActivityCompletionVars);
 // Variables can be defined inline as well.
-const ref = deleteActivityCompletionRef({ id: ..., });
+const ref = deleteActivityCompletionRef({ studentId: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);

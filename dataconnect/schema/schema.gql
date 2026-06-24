@@ -90,8 +90,7 @@ type ActivityCheck @table {
   type: String
 }
 
-type ActivityCompletion @table {
-  id: UUID! @default(expr: "uuidV4()")
+type ActivityCompletion @table(name: "activity_completion_v2", key: ["student"]) {
   student: Student!
   timestamp: Timestamp!
 }

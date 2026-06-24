@@ -499,11 +499,26 @@ export function AppProvider({ children }) {
 
   const cancelActivityCompletionFunc = async (studentId) => {
     dispatch({ type: 'CANCEL_ACTIVITY_COMPLETION', payload: studentId });
-    // In DataConnect, we might need the ID to delete. 
-    // This is a known limitation if we don't fetch the ID first. We'll leave it as a no-op DB wise for now or implement properly later.
+    try {
+      await deleteActivityCompletion({ studentId });
+    } catch (e) {
+      console.error('Failed to delete activity completion:', e);
+    }
   };
 
   const updateActivityContentFunc = async (content, type) => {
+    // 기존에 완료했던 학생들 정보를 리셋할 때, DB에서도 일괄 삭제
+    if (content === '' || content !== state.activityCheck?.content) {
+      const currentCompletions = Object.keys(state.activityCheck?.completions || {});
+      for (const studentId of currentCompletions) {
+        try {
+          await deleteActivityCompletion({ studentId });
+        } catch (e) {
+          console.error('Failed to clear old completion for student', studentId, e);
+        }
+      }
+    }
+    
     dispatch({ type: 'UPDATE_ACTIVITY_CONTENT', payload: { content, type } });
     await upsertActivityCheck({ id: 1, content, type });
   };

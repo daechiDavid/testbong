@@ -16,7 +16,7 @@ export interface ActivityCheck_Key {
 }
 
 export interface ActivityCompletion_Key {
-  id: UUIDString;
+  studentId: UUIDString;
   __typename?: 'ActivityCompletion_Key';
 }
 
@@ -51,7 +51,7 @@ export interface DeleteActivityCompletionData {
 }
 
 export interface DeleteActivityCompletionVariables {
-  id: UUIDString;
+  studentId: UUIDString;
 }
 
 export interface DeleteAnnouncementData {
@@ -169,12 +169,11 @@ export interface GetAllAppDataData {
     type?: string | null;
   } & ActivityCheck_Key)[];
   activityCompletions: ({
-    id: UUIDString;
     student: {
       id: UUIDString;
     } & Student_Key;
     timestamp: TimestampString;
-  } & ActivityCompletion_Key)[];
+  })[];
   studentRecords: ({
     id: UUIDString;
     student: {
@@ -307,7 +306,6 @@ export interface UpsertActivityCompletionData {
 }
 
 export interface UpsertActivityCompletionVariables {
-  id?: UUIDString | null;
   studentId: UUIDString;
   timestamp: TimestampString;
 }
