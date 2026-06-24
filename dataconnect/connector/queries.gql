@@ -1,20 +1,20 @@
 # dataconnect/connector/queries.gql
 
 query GetAllAppData @auth(level: PUBLIC) {
-  students {
+  students(limit: 100) {
     id
     number
     name
     points
   }
-  announcements {
+  announcements(limit: 1000) {
     id
     date
     title
     content
     type
   }
-  assignments(orderBy: [{ createdAt: DESC }]) {
+  assignments(orderBy: [{ createdAt: DESC }], limit: 1000) {
     id
     dueDate
     title
@@ -23,12 +23,12 @@ query GetAllAppData @auth(level: PUBLIC) {
     createdAt
     submissions
   }
-  dDays {
+  dDays(limit: 100) {
     id
     name
     date
   }
-  weeklyPlans {
+  weeklyPlans(limit: 1000) {
     id
     weekKey
     day
@@ -44,27 +44,27 @@ query GetAllAppData @auth(level: PUBLIC) {
     thermometerGoal
     thermometerReward
   }
-  quickLinks {
+  quickLinks(limit: 100) {
     id
     title
     url
     icon
     desc
   }
-  polls {
+  polls(limit: 100) {
     id
     question
     options
     votes
   }
-  newsletters {
+  newsletters(limit: 1000) {
     id
     date
     title
     content
     collected
   }
-  studentRecords {
+  studentRecords(limit: 3000) {
     id
     student { id }
     type
@@ -76,7 +76,7 @@ query GetAllAppData @auth(level: PUBLIC) {
 }
 
 query GetAttendanceByDate($date: Date!) @auth(level: PUBLIC) {
-  attendances(where: { date: { eq: $date } }) {
+  attendances(where: { date: { eq: $date } }, limit: 100) {
     student { id }
     date
     status
@@ -85,7 +85,7 @@ query GetAttendanceByDate($date: Date!) @auth(level: PUBLIC) {
 }
 
 query GetAttendanceByMonth($startDate: Date!, $endDate: Date!) @auth(level: PUBLIC) {
-  attendances(where: { date: { ge: $startDate, le: $endDate } }) {
+  attendances(where: { date: { ge: $startDate, le: $endDate } }, limit: 2000) {
     student { id }
     date
     status
