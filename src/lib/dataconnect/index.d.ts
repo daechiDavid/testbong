@@ -10,6 +10,16 @@ export type DateString = string;
 
 
 
+export interface ActivityCheck_Key {
+  id: UUIDString;
+  __typename?: 'ActivityCheck_Key';
+}
+
+export interface ActivityCompletion_Key {
+  id: UUIDString;
+  __typename?: 'ActivityCompletion_Key';
+}
+
 export interface Announcement_Key {
   id: UUIDString;
   __typename?: 'Announcement_Key';
@@ -20,9 +30,19 @@ export interface AppConfig_Key {
   __typename?: 'AppConfig_Key';
 }
 
+export interface AssignmentObsolete_Key {
+  id: UUIDString;
+  __typename?: 'AssignmentObsolete_Key';
+}
+
 export interface Assignment_Key {
   id: UUIDString;
   __typename?: 'Assignment_Key';
+}
+
+export interface AttendanceObsolete_Key {
+  id: UUIDString;
+  __typename?: 'AttendanceObsolete_Key';
 }
 
 export interface Attendance_Key {
