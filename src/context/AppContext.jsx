@@ -261,7 +261,7 @@ export function AppProvider({ children }) {
         if (newsletters) dispatch({ type: 'SET_NEWSLETTERS', payload: newsletters.sort((a,b)=>new Date(b.date)-new Date(a.date)) });
 
         // 출석 초기값 (오늘)
-        const today = new Date().toISOString().split('T')[0];
+        const today = toISODate(new Date());
         const { data: attendanceData } = await getAttendanceByDate({ date: today });
         const attMap = {};
         if (students) {
@@ -384,7 +384,7 @@ export function AppProvider({ children }) {
   };
 
   const updateAttendanceFunc = async (studentId, status, note = '', date = null) => {
-    const targetDate = date || new Date().toISOString().split('T')[0];
+    const targetDate = date || toISODate(new Date());
     
     let finalId;
     if (targetDate === state.selectedAttendanceDate) {
@@ -434,8 +434,9 @@ export function AppProvider({ children }) {
       const monthly = {};
       if (data && data.attendances) {
         data.attendances.forEach(a => {
-          if (!monthly[a.date]) monthly[a.date] = {};
-          monthly[a.date][a.student.id] = { id: a.id, status: a.status, note: a.note || '' };
+          const d = a.date.split('T')[0];
+          if (!monthly[d]) monthly[d] = {};
+          monthly[d][a.student.id] = { id: a.id, status: a.status, note: a.note || '' };
         });
       }
       dispatch({ type: 'SET_MONTHLY_ATTENDANCE', payload: monthly });
@@ -445,7 +446,7 @@ export function AppProvider({ children }) {
   }, []);
 
   const addStudentRecordFunc = async (studentId, type, content, category = '') => {
-    const date = new Date().toISOString().split('T')[0];
+    const date = toISODate(new Date());
     try {
       const { data } = await insertStudentRecord({ studentId, type, content, category, date });
       if (data && data.studentRecord_insert) {
