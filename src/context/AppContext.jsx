@@ -383,6 +383,15 @@ export function AppProvider({ children }) {
     await updateStudentPoints({ id: studentId, points: 0 });
   };
 
+  const formatUUID = (id) => {
+    if (!id || typeof id !== 'string') return id;
+    const str = id.replace(/-/g, '');
+    if (str.length === 32) {
+      return `${str.slice(0,8)}-${str.slice(8,12)}-${str.slice(12,16)}-${str.slice(16,20)}-${str.slice(20)}`;
+    }
+    return id;
+  };
+
   const updateAttendanceFunc = async (studentId, status, note = '', date = null) => {
     const targetDate = date || toISODate(new Date());
     
@@ -392,6 +401,10 @@ export function AppProvider({ children }) {
     } else {
       finalId = state.monthlyAttendance[targetDate]?.[studentId]?.id;
     }
+
+    // 객체가 들어왔을 경우 방어
+    if (finalId && typeof finalId === 'object') finalId = finalId.id;
+    finalId = formatUUID(finalId);
 
     dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note, id: finalId } });
     dispatch({ type: 'UPDATE_MONTHLY_ATTENDANCE', payload: { date: targetDate, studentId, status, id: finalId } });
@@ -408,7 +421,8 @@ export function AppProvider({ children }) {
         return;
       }
       if (!finalId && res.data?.attendance_upsert) {
-        const newId = typeof res.data.attendance_upsert === 'object' ? res.data.attendance_upsert.id : res.data.attendance_upsert;
+        let newId = typeof res.data.attendance_upsert === 'object' ? res.data.attendance_upsert.id : res.data.attendance_upsert;
+        newId = formatUUID(newId);
         dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note, id: newId } });
         dispatch({ type: 'UPDATE_MONTHLY_ATTENDANCE', payload: { date: targetDate, studentId, status, id: newId } });
       }

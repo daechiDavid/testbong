@@ -62,11 +62,13 @@ export default function AttendancePage() {
 
   const handleSaveAllToday = async () => {
     if (!isAdmin) return;
-    const promises = students.map(s => {
+    
+    // 순차적 처리로 변경 (서버 과부하 방지)
+    for (const s of students) {
       const att = attendance[s.id] || { status: 'present', note: '' };
-      return updateAttendance(s.id, att.status, att.note || '', selectedAttendanceDate);
-    });
-    await Promise.all(promises);
+      await updateAttendance(s.id, att.status, att.note || '', selectedAttendanceDate);
+    }
+    
     showToast('오늘의 출석 현황이 모두 저장되었습니다.', 'success');
   };
 
