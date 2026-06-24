@@ -25,6 +25,7 @@ import {
   deleteAssignment,
   upsertAnnouncement,
   deleteAnnouncement,
+  deleteAttendance,
   upsertPoll,
   deletePoll
 } from '../lib/dataconnect';
@@ -383,15 +384,6 @@ export function AppProvider({ children }) {
     await updateStudentPoints({ id: studentId, points: 0 });
   };
 
-  const formatUUID = (id) => {
-    if (!id || typeof id !== 'string') return id;
-    const str = id.replace(/-/g, '');
-    if (str.length === 32) {
-      return `${str.slice(0,8)}-${str.slice(8,12)}-${str.slice(12,16)}-${str.slice(16,20)}-${str.slice(20)}`;
-    }
-    return id;
-  };
-
   const updateAttendanceFunc = async (studentId, status, note = '', date = null) => {
     const targetDate = date || toISODate(new Date());
     
@@ -404,7 +396,6 @@ export function AppProvider({ children }) {
 
     // 객체가 들어왔을 경우 방어
     if (finalId && typeof finalId === 'object') finalId = finalId.id;
-    finalId = formatUUID(finalId);
 
     dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note, id: finalId } });
     dispatch({ type: 'UPDATE_MONTHLY_ATTENDANCE', payload: { date: targetDate, studentId, status, id: finalId } });
@@ -421,8 +412,7 @@ export function AppProvider({ children }) {
         return;
       }
       if (!finalId && res.data?.attendance_upsert) {
-        let newId = typeof res.data.attendance_upsert === 'object' ? res.data.attendance_upsert.id : res.data.attendance_upsert;
-        newId = formatUUID(newId);
+        const newId = typeof res.data.attendance_upsert === 'object' ? res.data.attendance_upsert.id : res.data.attendance_upsert;
         dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note, id: newId } });
         dispatch({ type: 'UPDATE_MONTHLY_ATTENDANCE', payload: { date: targetDate, studentId, status, id: newId } });
       }
@@ -440,7 +430,17 @@ export function AppProvider({ children }) {
       const attMap = {};
       state.students.forEach(s => { attMap[s.id] = { status: 'present', note: '' }; });
       if (data && data.attendances) {
-        data.attendances.forEach(a => { attMap[a.student.id] = { id: a.id, status: a.status, note: a.note || '' }; });
+        const seen = {};
+        data.attendances.forEach(a => {
+          const key = a.student.id;
+          if (seen[key]) {
+            // 중복 데이터 삭제 처리
+            deleteAttendance({ id: a.id }).catch(e => console.error('Failed to clean duplicate attendance:', e));
+          } else {
+            seen[key] = true;
+            attMap[a.student.id] = { id: a.id, status: a.status, note: a.note || '' };
+          }
+        });
       }
       dispatch({ type: 'SET_ATTENDANCE_MAP', payload: attMap });
     } catch (error) {
@@ -455,10 +455,18 @@ export function AppProvider({ children }) {
       const { data } = await getAttendanceByMonth({ startDate, endDate });
       const monthly = {};
       if (data && data.attendances) {
+        const seen = {};
         data.attendances.forEach(a => {
           const d = a.date.split('T')[0];
-          if (!monthly[d]) monthly[d] = {};
-          monthly[d][a.student.id] = { id: a.id, status: a.status, note: a.note || '' };
+          const key = `${d}_${a.student.id}`;
+          if (seen[key]) {
+            // 중복 데이터 삭제 처리
+            deleteAttendance({ id: a.id }).catch(e => console.error('Failed to clean duplicate monthly attendance:', e));
+          } else {
+            seen[key] = true;
+            if (!monthly[d]) monthly[d] = {};
+            monthly[d][a.student.id] = { id: a.id, status: a.status, note: a.note || '' };
+          }
         });
       }
       dispatch({ type: 'SET_MONTHLY_ATTENDANCE', payload: monthly });
