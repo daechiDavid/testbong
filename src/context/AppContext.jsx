@@ -7,7 +7,6 @@ import {
   getAttendanceByDate,
   getAttendanceByMonth,
   upsertWeeklyPlan,
-  upsertAppConfig,
   insertDDay,
   deleteDDay,
   updateStudentPoints,

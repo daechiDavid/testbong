@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/purity */
 import { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import './LearningPage.css';
