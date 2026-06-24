@@ -224,7 +224,7 @@ export default function LearningPage() {
                   }} title="삭제">🗑️</button>
                 )}
               </div>
-              
+
               {selectedAssignment?.id === a.id && (
                 <div className="assignment-students-inline" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light)', width: '100%' }}>
                   <div style={{ marginBottom: '0.5rem', fontWeight: 600, fontSize: '0.875rem', color: '#059669' }}>✅ 제출자</div>
@@ -236,7 +236,7 @@ export default function LearningPage() {
                     ))}
                     {students.filter(s => a.submissions?.[s.id]).length === 0 && <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>제출자가 없습니다.</span>}
                   </div>
-                  
+
                   <div style={{ marginBottom: '0.5rem', fontWeight: 600, fontSize: '0.875rem', color: '#DC2626' }}>❌ 미제출자</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                     {students.filter(s => !a.submissions?.[s.id]).map(s => (

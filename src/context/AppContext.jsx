@@ -386,7 +386,7 @@ export function AppProvider({ children }) {
   const updateAttendanceFunc = async (studentId, status, note = '', date = null) => {
     const targetDate = date || new Date().toISOString().split('T')[0];
     
-    let finalId = null;
+    let finalId;
     if (targetDate === state.selectedAttendanceDate) {
       finalId = state.attendance[studentId]?.id;
     } else {

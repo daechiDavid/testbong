@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { auth } from '../utils/firebase';
-import { signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 
 export function useAdminMode() {
   const { state, dispatch, showToast } = useApp();
