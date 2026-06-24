@@ -401,6 +401,12 @@ export function AppProvider({ children }) {
 
     try {
       const res = await upsertAttendance(vars);
+      if (res.errors) {
+        console.error('Upsert attendance GraphQL error:', res.errors);
+        dispatch({ type: 'SET_TOAST', payload: { message: '출석 저장 중 GraphQL 오류가 발생했습니다: ' + JSON.stringify(res.errors), type: 'error' } });
+        setTimeout(() => dispatch({ type: 'SET_TOAST', payload: null }), 5000);
+        return;
+      }
       if (!finalId && res.data?.attendance_upsert) {
         const newId = typeof res.data.attendance_upsert === 'object' ? res.data.attendance_upsert.id : res.data.attendance_upsert;
         dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note, id: newId } });
@@ -408,6 +414,8 @@ export function AppProvider({ children }) {
       }
     } catch (e) {
       console.error('Upsert attendance error:', e);
+      dispatch({ type: 'SET_TOAST', payload: { message: '출석 저장 중 서버 오류가 발생했습니다: ' + e.message, type: 'error' } });
+      setTimeout(() => dispatch({ type: 'SET_TOAST', payload: null }), 5000);
     }
   };
 
