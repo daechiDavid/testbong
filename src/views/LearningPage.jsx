@@ -194,7 +194,6 @@ export default function LearningPage() {
           const pct = Math.round((submittedCount / total) * 100);
           const remaining = total - submittedCount;
           return (
-          return (
             <div key={a.id} className="assignment-card clickable" onClick={() => setSelectedAssignment(selectedAssignment?.id === a.id ? null : a)} style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
               <div style={{ display: 'flex', width: '100%', alignItems: 'center', gap: '1rem' }}>
                 <div className="assignment-icon" style={{ background: a.type === '수행평가' ? '#FFF4ED' : '#ECFDF5' }}>
