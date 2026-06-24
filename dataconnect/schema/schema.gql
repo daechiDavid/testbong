@@ -15,7 +15,7 @@ type Student @table {
   aiSummary: String
 }
 
-type Attendance @table(key: ["student", "date"]) {
+type Attendance @table(name: "attendance_v2", key: ["student", "date"]) {
   student: Student!
   date: Date!
   status: String!
