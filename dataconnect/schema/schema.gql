@@ -15,8 +15,7 @@ type Student @table {
   aiSummary: String
 }
 
-type Attendance @table {
-  id: UUID! @default(expr: "uuidV4()")
+type Attendance @table(key: ["student", "date"]) {
   student: Student!
   date: Date!
   status: String!

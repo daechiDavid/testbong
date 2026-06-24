@@ -36,7 +36,8 @@ export interface Assignment_Key {
 }
 
 export interface Attendance_Key {
-  id: UUIDString;
+  studentId: UUIDString;
+  date: DateString;
   __typename?: 'Attendance_Key';
 }
 
@@ -66,14 +67,6 @@ export interface DeleteAssignmentData {
 }
 
 export interface DeleteAssignmentVariables {
-  id: UUIDString;
-}
-
-export interface DeleteAttendanceData {
-  attendance_delete?: Attendance_Key | null;
-}
-
-export interface DeleteAttendanceVariables {
   id: UUIDString;
 }
 
@@ -197,14 +190,13 @@ export interface GetAllAppDataData {
 
 export interface GetAttendanceByDateData {
   attendances: ({
-    id: UUIDString;
     student: {
       id: UUIDString;
     } & Student_Key;
     date: DateString;
     status: string;
     note?: string | null;
-  } & Attendance_Key)[];
+  })[];
 }
 
 export interface GetAttendanceByDateVariables {
@@ -213,14 +205,13 @@ export interface GetAttendanceByDateVariables {
 
 export interface GetAttendanceByMonthData {
   attendances: ({
-    id: UUIDString;
     student: {
       id: UUIDString;
     } & Student_Key;
     date: DateString;
     status: string;
     note?: string | null;
-  } & Attendance_Key)[];
+  })[];
 }
 
 export interface GetAttendanceByMonthVariables {
@@ -362,7 +353,6 @@ export interface UpsertAttendanceData {
 }
 
 export interface UpsertAttendanceVariables {
-  id?: UUIDString | null;
   studentId: UUIDString;
   date: DateString;
   status: string;
@@ -500,18 +490,6 @@ export const upsertAttendanceRef: UpsertAttendanceRef;
 
 export function upsertAttendance(vars: UpsertAttendanceVariables): MutationPromise<UpsertAttendanceData, UpsertAttendanceVariables>;
 export function upsertAttendance(dc: DataConnect, vars: UpsertAttendanceVariables): MutationPromise<UpsertAttendanceData, UpsertAttendanceVariables>;
-
-interface DeleteAttendanceRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: DeleteAttendanceVariables): MutationRef<DeleteAttendanceData, DeleteAttendanceVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: DeleteAttendanceVariables): MutationRef<DeleteAttendanceData, DeleteAttendanceVariables>;
-  operationName: string;
-}
-export const deleteAttendanceRef: DeleteAttendanceRef;
-
-export function deleteAttendance(vars: DeleteAttendanceVariables): MutationPromise<DeleteAttendanceData, DeleteAttendanceVariables>;
-export function deleteAttendance(dc: DataConnect, vars: DeleteAttendanceVariables): MutationPromise<DeleteAttendanceData, DeleteAttendanceVariables>;
 
 interface InsertStudentRecordRef {
   /* Allow users to create refs without passing in DataConnect */

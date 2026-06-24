@@ -14,7 +14,7 @@ If a user is not using a supported framework, they can use the generated SDK dir
 Here's an example of how to use it with the first 5 operations:
 
 ```js
-import { upsertWeeklyPlan, upsertAppConfig, insertDDay, deleteDDay, updateStudentPoints, upsertAttendance, deleteAttendance, insertStudentRecord, deleteStudentRecord, updatePoll } from '@dashboard/dataconnect';
+import { upsertWeeklyPlan, upsertAppConfig, insertDDay, deleteDDay, updateStudentPoints, upsertAttendance, insertStudentRecord, deleteStudentRecord, updatePoll, updateNewsletter } from '@dashboard/dataconnect';
 
 
 // Operation UpsertWeeklyPlan:  For variables, look at type UpsertWeeklyPlanVars in ../index.d.ts
@@ -35,9 +35,6 @@ const { data } = await UpdateStudentPoints(dataConnect, updateStudentPointsVars)
 // Operation UpsertAttendance:  For variables, look at type UpsertAttendanceVars in ../index.d.ts
 const { data } = await UpsertAttendance(dataConnect, upsertAttendanceVars);
 
-// Operation DeleteAttendance:  For variables, look at type DeleteAttendanceVars in ../index.d.ts
-const { data } = await DeleteAttendance(dataConnect, deleteAttendanceVars);
-
 // Operation InsertStudentRecord:  For variables, look at type InsertStudentRecordVars in ../index.d.ts
 const { data } = await InsertStudentRecord(dataConnect, insertStudentRecordVars);
 
@@ -46,6 +43,9 @@ const { data } = await DeleteStudentRecord(dataConnect, deleteStudentRecordVars)
 
 // Operation UpdatePoll:  For variables, look at type UpdatePollVars in ../index.d.ts
 const { data } = await UpdatePoll(dataConnect, updatePollVars);
+
+// Operation UpdateNewsletter:  For variables, look at type UpdateNewsletterVars in ../index.d.ts
+const { data } = await UpdateNewsletter(dataConnect, updateNewsletterVars);
 
 
 ```

@@ -38,13 +38,13 @@ mutation UpdateStudentPoints($id: UUID!, $points: Int!) @auth(level: PUBLIC) {
   student_update(id: $id, data: { points: $points })
 }
 
-mutation UpsertAttendance($id: UUID, $studentId: UUID!, $date: Date!, $status: String!, $note: String) @auth(level: PUBLIC) {
-  attendance_upsert(data: { id: $id, studentId: $studentId, date: $date, status: $status, note: $note })
+mutation UpsertAttendance($studentId: UUID!, $date: Date!, $status: String!, $note: String) @auth(level: PUBLIC) {
+  attendance_upsert(data: { studentId: $studentId, date: $date, status: $status, note: $note })
 }
 
-mutation DeleteAttendance($id: UUID!) @auth(level: PUBLIC) {
-  attendance_delete(id: $id)
-}
+# mutation DeleteAttendance($id: UUID!) @auth(level: PUBLIC) {
+#   attendance_delete(id: $id)
+# }
 
 mutation InsertStudentRecord($studentId: UUID!, $type: String!, $content: String, $category: String, $date: Date!) @auth(level: PUBLIC) {
   studentRecord_insert(data: { studentId: $studentId, type: $type, content: $content, category: $category, date: $date })

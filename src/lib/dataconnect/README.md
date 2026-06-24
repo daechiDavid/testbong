@@ -18,7 +18,6 @@ This README will guide you through the process of using the generated JavaScript
   - [*DeleteDDay*](#deletedday)
   - [*UpdateStudentPoints*](#updatestudentpoints)
   - [*UpsertAttendance*](#upsertattendance)
-  - [*DeleteAttendance*](#deleteattendance)
   - [*InsertStudentRecord*](#insertstudentrecord)
   - [*DeleteStudentRecord*](#deletestudentrecord)
   - [*UpdatePoll*](#updatepoll)
@@ -342,14 +341,13 @@ The `data` property is an object of type `GetAttendanceByDateData`, which is def
 ```typescript
 export interface GetAttendanceByDateData {
   attendances: ({
-    id: UUIDString;
     student: {
       id: UUIDString;
     } & Student_Key;
     date: DateString;
     status: string;
     note?: string | null;
-  } & Attendance_Key)[];
+  })[];
 }
 ```
 ### Using `GetAttendanceByDate`'s action shortcut function
@@ -460,14 +458,13 @@ The `data` property is an object of type `GetAttendanceByMonthData`, which is de
 ```typescript
 export interface GetAttendanceByMonthData {
   attendances: ({
-    id: UUIDString;
     student: {
       id: UUIDString;
     } & Student_Key;
     date: DateString;
     status: string;
     note?: string | null;
-  } & Attendance_Key)[];
+  })[];
 }
 ```
 ### Using `GetAttendanceByMonth`'s action shortcut function
@@ -1165,7 +1162,6 @@ The `UpsertAttendance` mutation requires an argument of type `UpsertAttendanceVa
 
 ```typescript
 export interface UpsertAttendanceVariables {
-  id?: UUIDString | null;
   studentId: UUIDString;
   date: DateString;
   status: string;
@@ -1189,7 +1185,6 @@ import { connectorConfig, upsertAttendance, UpsertAttendanceVariables } from '@d
 
 // The `UpsertAttendance` mutation requires an argument of type `UpsertAttendanceVariables`:
 const upsertAttendanceVars: UpsertAttendanceVariables = {
-  id: ..., // optional
   studentId: ..., 
   date: ..., 
   status: ..., 
@@ -1200,7 +1195,7 @@ const upsertAttendanceVars: UpsertAttendanceVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await upsertAttendance(upsertAttendanceVars);
 // Variables can be defined inline as well.
-const { data } = await upsertAttendance({ id: ..., studentId: ..., date: ..., status: ..., note: ..., });
+const { data } = await upsertAttendance({ studentId: ..., date: ..., status: ..., note: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -1223,7 +1218,6 @@ import { connectorConfig, upsertAttendanceRef, UpsertAttendanceVariables } from 
 
 // The `UpsertAttendance` mutation requires an argument of type `UpsertAttendanceVariables`:
 const upsertAttendanceVars: UpsertAttendanceVariables = {
-  id: ..., // optional
   studentId: ..., 
   date: ..., 
   status: ..., 
@@ -1233,7 +1227,7 @@ const upsertAttendanceVars: UpsertAttendanceVariables = {
 // Call the `upsertAttendanceRef()` function to get a reference to the mutation.
 const ref = upsertAttendanceRef(upsertAttendanceVars);
 // Variables can be defined inline as well.
-const ref = upsertAttendanceRef({ id: ..., studentId: ..., date: ..., status: ..., note: ..., });
+const ref = upsertAttendanceRef({ studentId: ..., date: ..., status: ..., note: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -1249,115 +1243,6 @@ console.log(data.attendance_upsert);
 executeMutation(ref).then((response) => {
   const data = response.data;
   console.log(data.attendance_upsert);
-});
-```
-
-## DeleteAttendance
-You can execute the `DeleteAttendance` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
-```typescript
-deleteAttendance(vars: DeleteAttendanceVariables): MutationPromise<DeleteAttendanceData, DeleteAttendanceVariables>;
-
-interface DeleteAttendanceRef {
-  ...
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: DeleteAttendanceVariables): MutationRef<DeleteAttendanceData, DeleteAttendanceVariables>;
-}
-export const deleteAttendanceRef: DeleteAttendanceRef;
-```
-You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
-```typescript
-deleteAttendance(dc: DataConnect, vars: DeleteAttendanceVariables): MutationPromise<DeleteAttendanceData, DeleteAttendanceVariables>;
-
-interface DeleteAttendanceRef {
-  ...
-  (dc: DataConnect, vars: DeleteAttendanceVariables): MutationRef<DeleteAttendanceData, DeleteAttendanceVariables>;
-}
-export const deleteAttendanceRef: DeleteAttendanceRef;
-```
-
-If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteAttendanceRef:
-```typescript
-const name = deleteAttendanceRef.operationName;
-console.log(name);
-```
-
-### Variables
-The `DeleteAttendance` mutation requires an argument of type `DeleteAttendanceVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
-
-```typescript
-export interface DeleteAttendanceVariables {
-  id: UUIDString;
-}
-```
-### Return Type
-Recall that executing the `DeleteAttendance` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
-
-The `data` property is an object of type `DeleteAttendanceData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
-```typescript
-export interface DeleteAttendanceData {
-  attendance_delete?: Attendance_Key | null;
-}
-```
-### Using `DeleteAttendance`'s action shortcut function
-
-```typescript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, deleteAttendance, DeleteAttendanceVariables } from '@dashboard/dataconnect';
-
-// The `DeleteAttendance` mutation requires an argument of type `DeleteAttendanceVariables`:
-const deleteAttendanceVars: DeleteAttendanceVariables = {
-  id: ..., 
-};
-
-// Call the `deleteAttendance()` function to execute the mutation.
-// You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await deleteAttendance(deleteAttendanceVars);
-// Variables can be defined inline as well.
-const { data } = await deleteAttendance({ id: ..., });
-
-// You can also pass in a `DataConnect` instance to the action shortcut function.
-const dataConnect = getDataConnect(connectorConfig);
-const { data } = await deleteAttendance(dataConnect, deleteAttendanceVars);
-
-console.log(data.attendance_delete);
-
-// Or, you can use the `Promise` API.
-deleteAttendance(deleteAttendanceVars).then((response) => {
-  const data = response.data;
-  console.log(data.attendance_delete);
-});
-```
-
-### Using `DeleteAttendance`'s `MutationRef` function
-
-```typescript
-import { getDataConnect, executeMutation } from 'firebase/data-connect';
-import { connectorConfig, deleteAttendanceRef, DeleteAttendanceVariables } from '@dashboard/dataconnect';
-
-// The `DeleteAttendance` mutation requires an argument of type `DeleteAttendanceVariables`:
-const deleteAttendanceVars: DeleteAttendanceVariables = {
-  id: ..., 
-};
-
-// Call the `deleteAttendanceRef()` function to get a reference to the mutation.
-const ref = deleteAttendanceRef(deleteAttendanceVars);
-// Variables can be defined inline as well.
-const ref = deleteAttendanceRef({ id: ..., });
-
-// You can also pass in a `DataConnect` instance to the `MutationRef` function.
-const dataConnect = getDataConnect(connectorConfig);
-const ref = deleteAttendanceRef(dataConnect, deleteAttendanceVars);
-
-// Call `executeMutation()` on the reference to execute the mutation.
-// You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await executeMutation(ref);
-
-console.log(data.attendance_delete);
-
-// Or, you can use the `Promise` API.
-executeMutation(ref).then((response) => {
-  const data = response.data;
-  console.log(data.attendance_delete);
 });
 ```
 

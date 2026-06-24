@@ -91,20 +91,6 @@ exports.upsertAttendance = function upsertAttendance(dcOrVars, vars) {
 }
 ;
 
-const deleteAttendanceRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'DeleteAttendance', inputVars);
-}
-deleteAttendanceRef.operationName = 'DeleteAttendance';
-exports.deleteAttendanceRef = deleteAttendanceRef;
-
-exports.deleteAttendance = function deleteAttendance(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(deleteAttendanceRef(dcInstance, inputVars));
-}
-;
-
 const insertStudentRecordRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
   dcInstance._useGeneratedSdk();

@@ -25,7 +25,6 @@ import {
   deleteAssignment,
   upsertAnnouncement,
   deleteAnnouncement,
-  deleteAttendance,
   upsertPoll,
   deletePoll
 } from '../lib/dataconnect';
@@ -387,21 +386,12 @@ export function AppProvider({ children }) {
   const updateAttendanceFunc = async (studentId, status, note = '', date = null) => {
     const targetDate = date || toISODate(new Date());
     
-    let finalId;
-    if (targetDate === state.selectedAttendanceDate) {
-      finalId = state.attendance[studentId]?.id;
-    } else {
-      finalId = state.monthlyAttendance[targetDate]?.[studentId]?.id;
-    }
-
-    // 객체가 들어왔을 경우 방어
-    if (finalId && typeof finalId === 'object') finalId = finalId.id;
-
-    dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note, id: finalId } });
-    dispatch({ type: 'UPDATE_MONTHLY_ATTENDANCE', payload: { date: targetDate, studentId, status, id: finalId } });
+    // 데이터베이스가 복합 고유 키(studentId, date)로 알아서 식별/업데이트하므로
+    // 더 이상 id를 찾아서 전달할 필요가 없습니다.
+    dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note, id: '' } });
+    dispatch({ type: 'UPDATE_MONTHLY_ATTENDANCE', payload: { date: targetDate, studentId, status, id: '' } });
     
     const vars = { studentId, date: targetDate, status, note };
-    if (finalId) vars.id = finalId;
 
     try {
       const res = await upsertAttendance(vars);
@@ -411,15 +401,10 @@ export function AppProvider({ children }) {
         setTimeout(() => dispatch({ type: 'SET_TOAST', payload: null }), 5000);
         return;
       }
-      if (!finalId && res.data?.attendance_upsert) {
-        const newId = typeof res.data.attendance_upsert === 'object' ? res.data.attendance_upsert.id : res.data.attendance_upsert;
-        dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note, id: newId } });
-        dispatch({ type: 'UPDATE_MONTHLY_ATTENDANCE', payload: { date: targetDate, studentId, status, id: newId } });
-      }
-    } catch (e) {
-      console.error('Upsert attendance error:', e);
-      dispatch({ type: 'SET_TOAST', payload: { message: '출석 저장 중 서버 오류가 발생했습니다: ' + e.message, type: 'error' } });
-      setTimeout(() => dispatch({ type: 'SET_TOAST', payload: null }), 5000);
+    } catch (error) {
+      console.error("Error upserting attendance: ", error);
+      dispatch({ type: 'SET_TOAST', payload: { message: '출석 저장 중 오류가 발생했습니다.', type: 'error' } });
+      setTimeout(() => dispatch({ type: 'SET_TOAST', payload: null }), 3000);
     }
   };
 
@@ -430,16 +415,8 @@ export function AppProvider({ children }) {
       const attMap = {};
       state.students.forEach(s => { attMap[s.id] = { status: 'present', note: '' }; });
       if (data && data.attendances) {
-        const seen = {};
         data.attendances.forEach(a => {
-          const key = a.student.id;
-          if (seen[key]) {
-            // 중복 데이터 삭제 처리
-            deleteAttendance({ id: a.id }).catch(e => console.error('Failed to clean duplicate attendance:', e));
-          } else {
-            seen[key] = true;
-            attMap[a.student.id] = { id: a.id, status: a.status, note: a.note || '' };
-          }
+          attMap[a.student.id] = { status: a.status, note: a.note || '' };
         });
       }
       dispatch({ type: 'SET_ATTENDANCE_MAP', payload: attMap });
@@ -455,18 +432,10 @@ export function AppProvider({ children }) {
       const { data } = await getAttendanceByMonth({ startDate, endDate });
       const monthly = {};
       if (data && data.attendances) {
-        const seen = {};
         data.attendances.forEach(a => {
           const d = a.date.split('T')[0];
-          const key = `${d}_${a.student.id}`;
-          if (seen[key]) {
-            // 중복 데이터 삭제 처리
-            deleteAttendance({ id: a.id }).catch(e => console.error('Failed to clean duplicate monthly attendance:', e));
-          } else {
-            seen[key] = true;
-            if (!monthly[d]) monthly[d] = {};
-            monthly[d][a.student.id] = { id: a.id, status: a.status, note: a.note || '' };
-          }
+          if (!monthly[d]) monthly[d] = {};
+          monthly[d][a.student.id] = { status: a.status, note: a.note || '' };
         });
       }
       dispatch({ type: 'SET_MONTHLY_ATTENDANCE', payload: monthly });
