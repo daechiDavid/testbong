@@ -80,9 +80,15 @@ function reducer(state, action) {
     case 'SET_ASSIGNMENTS': return { ...state, assignments: action.payload };
     case 'SET_ATTENDANCE_MAP': return { ...state, attendance: action.payload };
     case 'SET_SELECTED_ATTENDANCE_DATE': return { ...state, selectedAttendanceDate: action.payload };
-    case 'SET_MONTHLY_ATTENDANCE': return { ...state, monthlyAttendance: action.payload };
+    case 'SET_MONTHLY_ATTENDANCE': {
+      const newMonthly = { ...state.monthlyAttendance };
+      for (const [date, records] of Object.entries(action.payload)) {
+        newMonthly[date] = { ...newMonthly[date], ...records };
+      }
+      return { ...state, monthlyAttendance: newMonthly };
+    }
     case 'UPDATE_MONTHLY_ATTENDANCE': {
-      const { date, studentId, status } = action.payload;
+      const { date, studentId, status, id } = action.payload;
       const dateRecords = state.monthlyAttendance[date] || {};
       return {
         ...state,
@@ -90,7 +96,11 @@ function reducer(state, action) {
           ...state.monthlyAttendance,
           [date]: {
             ...dateRecords,
-            [studentId]: { status, note: dateRecords[studentId]?.note || '' }
+            [studentId]: { 
+              status, 
+              note: dateRecords[studentId]?.note || '',
+              id: id || dateRecords[studentId]?.id
+            }
           }
         }
       };
@@ -100,7 +110,11 @@ function reducer(state, action) {
         ...state,
         attendance: {
           ...state.attendance,
-          [action.payload.studentId]: { status: action.payload.status, note: action.payload.note || '' },
+          [action.payload.studentId]: { 
+            status: action.payload.status, 
+            note: action.payload.note || '',
+            id: action.payload.id || state.attendance[action.payload.studentId]?.id
+          },
         },
       };
     case 'UPDATE_POINTS':
@@ -371,9 +385,30 @@ export function AppProvider({ children }) {
 
   const updateAttendanceFunc = async (studentId, status, note = '', date = null) => {
     const targetDate = date || new Date().toISOString().split('T')[0];
-    dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note } });
-    dispatch({ type: 'UPDATE_MONTHLY_ATTENDANCE', payload: { date: targetDate, studentId, status } });
-    await upsertAttendance({ studentId, date: targetDate, status, note });
+    
+    let finalId = null;
+    if (targetDate === state.selectedAttendanceDate) {
+      finalId = state.attendance[studentId]?.id;
+    } else {
+      finalId = state.monthlyAttendance[targetDate]?.[studentId]?.id;
+    }
+
+    dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note, id: finalId } });
+    dispatch({ type: 'UPDATE_MONTHLY_ATTENDANCE', payload: { date: targetDate, studentId, status, id: finalId } });
+    
+    const vars = { studentId, date: targetDate, status, note };
+    if (finalId) vars.id = finalId;
+
+    try {
+      const res = await upsertAttendance(vars);
+      if (!finalId && res.data?.attendance_upsert) {
+        const newId = typeof res.data.attendance_upsert === 'object' ? res.data.attendance_upsert.id : res.data.attendance_upsert;
+        dispatch({ type: 'SET_ATTENDANCE', payload: { studentId, status, note, id: newId } });
+        dispatch({ type: 'UPDATE_MONTHLY_ATTENDANCE', payload: { date: targetDate, studentId, status, id: newId } });
+      }
+    } catch (e) {
+      console.error('Upsert attendance error:', e);
+    }
   };
 
   const loadAttendanceByDateFunc = useCallback(async (date) => {
@@ -383,7 +418,7 @@ export function AppProvider({ children }) {
       const attMap = {};
       state.students.forEach(s => { attMap[s.id] = { status: 'present', note: '' }; });
       if (data && data.attendances) {
-        data.attendances.forEach(a => { attMap[a.student.id] = { status: a.status, note: a.note || '' }; });
+        data.attendances.forEach(a => { attMap[a.student.id] = { id: a.id, status: a.status, note: a.note || '' }; });
       }
       dispatch({ type: 'SET_ATTENDANCE_MAP', payload: attMap });
     } catch (error) {
@@ -400,7 +435,7 @@ export function AppProvider({ children }) {
       if (data && data.attendances) {
         data.attendances.forEach(a => {
           if (!monthly[a.date]) monthly[a.date] = {};
-          monthly[a.date][a.student.id] = { status: a.status, note: a.note || '' };
+          monthly[a.date][a.student.id] = { id: a.id, status: a.status, note: a.note || '' };
         });
       }
       dispatch({ type: 'SET_MONTHLY_ATTENDANCE', payload: monthly });

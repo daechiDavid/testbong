@@ -369,17 +369,25 @@ export default function DashboardPage() {
           </div>
           <div className="widget-content notice-list">
             {isAdmin && showNoticeForm && (
-              <div className="notice-form" style={{ padding: '1rem', background: 'var(--gray-50)', borderRadius: 'var(--radius-md)', marginBottom: '1rem' }}>
-                <input className="form-input" placeholder="제목" value={newNotice.title} onChange={e => setNewNotice({ ...newNotice, title: e.target.value })} style={{ marginBottom: '0.5rem' }} />
-                <textarea className="form-input" placeholder="내용" value={newNotice.content} onChange={e => setNewNotice({ ...newNotice, content: e.target.value })} rows="3" style={{ marginBottom: '0.5rem', resize: 'vertical' }} />
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
-                  <select className="form-input" value={newNotice.type} onChange={e => setNewNotice({ ...newNotice, type: e.target.value })} style={{ flex: 1 }}>
-                    <option value="general">일반</option>
-                    <option value="important">중요</option>
-                    <option value="newsletter">통신문</option>
-                  </select>
-                  <button className="btn btn-primary" onClick={handleAddNotice}>{editNoticeId ? '수정' : '등록'}</button>
-                  {editNoticeId && <button className="btn btn-secondary" onClick={() => { setShowNoticeForm(false); setEditNoticeId(null); setNewNotice({ title: '', content: '', type: 'general' }) }}>취소</button>}
+              <div className="notice-modal-overlay" onClick={() => { setShowNoticeForm(false); setEditNoticeId(null); setNewNotice({ title: '', content: '', type: 'general' }); }}>
+                <div className="notice-modal-content" onClick={e => e.stopPropagation()}>
+                  <div className="notice-modal-header">
+                    <h3>{editNoticeId ? '✏️ 공지사항 수정' : '📢 새 공지사항'}</h3>
+                    <button className="notice-close-btn" onClick={() => { setShowNoticeForm(false); setEditNoticeId(null); setNewNotice({ title: '', content: '', type: 'general' }); }}>&times;</button>
+                  </div>
+                  <div className="notice-modal-body">
+                    <input className="form-input" placeholder="제목을 입력하세요" value={newNotice.title} onChange={e => setNewNotice({ ...newNotice, title: e.target.value })} />
+                    <textarea className="form-input" placeholder="내용을 입력하세요" value={newNotice.content} onChange={e => setNewNotice({ ...newNotice, content: e.target.value })} rows="5" style={{ resize: 'vertical' }} />
+                    <select className="form-input" value={newNotice.type} onChange={e => setNewNotice({ ...newNotice, type: e.target.value })}>
+                      <option value="general">일반</option>
+                      <option value="important">중요</option>
+                      <option value="newsletter">통신문</option>
+                    </select>
+                  </div>
+                  <div className="notice-modal-footer">
+                    <button className="btn btn-secondary" onClick={() => { setShowNoticeForm(false); setEditNoticeId(null); setNewNotice({ title: '', content: '', type: 'general' }); }}>취소</button>
+                    <button className="btn btn-primary" onClick={handleAddNotice}>{editNoticeId ? '수정' : '등록'}</button>
+                  </div>
                 </div>
               </div>
             )}

@@ -194,33 +194,60 @@ export default function LearningPage() {
           const pct = Math.round((submittedCount / total) * 100);
           const remaining = total - submittedCount;
           return (
-            <div key={a.id} className="assignment-card clickable" onClick={() => setSelectedAssignment(a)}>
-              <div className="assignment-icon" style={{ background: a.type === '수행평가' ? '#FFF4ED' : '#ECFDF5' }}>
-                {a.type === '수행평가' ? '📋' : '📝'}
-              </div>
-              <div className="assignment-details">
-                <div className="assignment-title">{a.title}</div>
-                <div className="assignment-info" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', width: '100%' }}>
-                  <span className={`badge ${a.type === '수행평가' ? 'badge-primary' : 'badge-success'}`}>{a.type}</span>
-                  <span>{a.subject}</span>
-                  <span>마감: {a.dueDate || a.due_date}</span>
-                  {remaining > 0 && <span style={{ color: 'var(--danger)' }}>미제출 {remaining}명</span>}
+          return (
+            <div key={a.id} className="assignment-card clickable" onClick={() => setSelectedAssignment(selectedAssignment?.id === a.id ? null : a)} style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', width: '100%', alignItems: 'center', gap: '1rem' }}>
+                <div className="assignment-icon" style={{ background: a.type === '수행평가' ? '#FFF4ED' : '#ECFDF5' }}>
+                  {a.type === '수행평가' ? '📋' : '📝'}
                 </div>
-              </div>
-              <div className="assignment-progress-bar">
-                <div className="progress-bar">
-                  <div className={`progress-fill ${pct >= 80 ? 'green' : pct >= 50 ? '' : 'red'}`} style={{ width: `${pct}%` }} />
+                <div className="assignment-details">
+                  <div className="assignment-title">{a.title}</div>
+                  <div className="assignment-info" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', width: '100%' }}>
+                    <span className={`badge ${a.type === '수행평가' ? 'badge-primary' : 'badge-success'}`}>{a.type}</span>
+                    <span>{a.subject}</span>
+                    <span>마감: {a.dueDate || a.due_date}</span>
+                    {remaining > 0 && <span style={{ color: 'var(--danger)' }}>미제출 {remaining}명</span>}
+                  </div>
                 </div>
+                <div className="assignment-progress-bar">
+                  <div className="progress-bar">
+                    <div className={`progress-fill ${pct >= 80 ? 'green' : pct >= 50 ? '' : 'red'}`} style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+                <div className="assignment-percentage">{pct}%</div>
+                {isAdmin && (
+                  <button className="assignment-delete-btn" onClick={(e) => {
+                    e.stopPropagation();
+                    if (confirm('이 항목을 정말 삭제하시겠습니까?')) {
+                      deleteAssignment(a.id);
+                      showToast('삭제되었습니다.', 'success');
+                    }
+                  }} title="삭제">🗑️</button>
+                )}
               </div>
-              <div className="assignment-percentage">{pct}%</div>
-              {isAdmin && (
-                <button className="assignment-delete-btn" onClick={(e) => {
-                  e.stopPropagation();
-                  if (confirm('이 항목을 정말 삭제하시겠습니까?')) {
-                    deleteAssignment(a.id);
-                    showToast('삭제되었습니다.', 'success');
-                  }
-                }} title="삭제">🗑️</button>
+              
+              {selectedAssignment?.id === a.id && (
+                <div className="assignment-students-inline" style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--border-light)', width: '100%' }}>
+                  <div style={{ marginBottom: '0.5rem', fontWeight: 600, fontSize: '0.875rem', color: '#059669' }}>✅ 제출자</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+                    {students.filter(s => a.submissions?.[s.id]).map(s => (
+                      <button key={s.id} className="badge" style={{ border: 'none', background: '#D1FAE5', color: '#065F46', padding: '0.4rem 0.75rem', fontSize: '0.875rem', cursor: 'default' }}>
+                        {s.number}. {s.name}
+                      </button>
+                    ))}
+                    {students.filter(s => a.submissions?.[s.id]).length === 0 && <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>제출자가 없습니다.</span>}
+                  </div>
+                  
+                  <div style={{ marginBottom: '0.5rem', fontWeight: 600, fontSize: '0.875rem', color: '#DC2626' }}>❌ 미제출자</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    {students.filter(s => !a.submissions?.[s.id]).map(s => (
+                      <button key={s.id} className="badge" style={{ border: 'none', background: '#FEE2E2', color: '#991B1B', padding: '0.4rem 0.75rem', fontSize: '0.875rem', cursor: 'default' }}>
+                        {s.number}. {s.name}
+                      </button>
+                    ))}
+                    {students.filter(s => !a.submissions?.[s.id]).length === 0 && <span style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>미제출자가 없습니다.</span>}
+                  </div>
+                </div>
               )}
             </div>
           );
@@ -238,58 +265,6 @@ export default function LearningPage() {
         </div>
       )}
 
-      {/* Submission Status Modal */}
-      {selectedAssignment && (
-        <div className="modal-overlay" onClick={() => setSelectedAssignment(null)}>
-          <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
-            <div className="modal-header">
-              <h3>📋 {selectedAssignment.title} 제출 현황</h3>
-              <button className="close-btn" onClick={() => setSelectedAssignment(null)}>×</button>
-            </div>
-            <div className="modal-body">
-              <div className="submission-stats" style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-                <div className="stat-box" style={{ flex: 1, padding: '1rem', background: '#ECFDF5', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
-                  <div style={{ color: '#059669', fontWeight: 800, fontSize: '1.5rem' }}>
-                    {Object.keys(selectedAssignment.submissions || {}).length}명
-                  </div>
-                  <div style={{ fontSize: '0.85rem', color: '#047857' }}>제출완료</div>
-                </div>
-                <div className="stat-box" style={{ flex: 1, padding: '1rem', background: '#FEF2F2', borderRadius: 'var(--radius-md)', textAlign: 'center' }}>
-                  <div style={{ color: '#DC2626', fontWeight: 800, fontSize: '1.5rem' }}>
-                    {students.length - Object.keys(selectedAssignment.submissions || {}).length}명
-                  </div>
-                  <div style={{ fontSize: '0.85rem', color: '#B91C1C' }}>미제출</div>
-                </div>
-              </div>
-
-              <div className="submission-lists" style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
-                <div style={{ flex: 1, padding: '1rem', background: '#F8FAFC', borderRadius: 'var(--radius-md)' }}>
-                  <h4 style={{ marginBottom: '0.75rem', color: '#059669', borderBottom: '2px solid #D1FAE5', paddingBottom: '0.5rem' }}>✅ 제출자</h4>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    {students.filter(s => selectedAssignment.submissions?.[s.id]).map(s => (
-                      <div key={s.id} className="badge" style={{ background: '#D1FAE5', color: '#065F46', padding: '0.4rem 0.75rem', fontSize: '0.875rem' }}>
-                        {s.number}. {s.name}
-                      </div>
-                    ))}
-                    {students.filter(s => selectedAssignment.submissions?.[s.id]).length === 0 && <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>제출자가 없습니다.</span>}
-                  </div>
-                </div>
-                <div style={{ flex: 1, padding: '1rem', background: '#F8FAFC', borderRadius: 'var(--radius-md)' }}>
-                  <h4 style={{ marginBottom: '0.75rem', color: '#DC2626', borderBottom: '2px solid #FEE2E2', paddingBottom: '0.5rem' }}>❌ 미제출자</h4>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                    {students.filter(s => !selectedAssignment.submissions?.[s.id]).map(s => (
-                      <div key={s.id} className="badge" style={{ background: '#FEE2E2', color: '#991B1B', padding: '0.4rem 0.75rem', fontSize: '0.875rem' }}>
-                        {s.number}. {s.name}
-                      </div>
-                    ))}
-                    {students.filter(s => !selectedAssignment.submissions?.[s.id]).length === 0 && <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>미제출자가 없습니다.</span>}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -81,6 +81,7 @@
   height: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
+  table-layout: fixed;
 }
 
 .weekly-table th, .weekly-table td {
@@ -166,9 +167,9 @@
 
 .plan-subject {
   font-weight: 800;
-  color: #1E3A8A;
+  color: var(--primary-dark);
   font-size: 1rem;
-  background: #EFF6FF;
+  background: var(--primary-50);
   padding: 4px 8px;
   border-radius: 6px;
   display: inline-block;
@@ -177,8 +178,8 @@
 
 .plan-content {
   font-size: 0.85rem;
-  color: #4B5563;
-  line-height: 1.4;
+  color: var(--gray-700);
+  line-height: 1.5;
   margin-top: 4px;
 }
 
