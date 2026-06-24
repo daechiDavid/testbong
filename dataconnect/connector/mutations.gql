@@ -62,17 +62,7 @@ mutation UpdateNewsletter($id: UUID!, $collected: Boolean!) @auth(level: PUBLIC)
   newsletter_update(id: $id, data: { collected: $collected })
 }
 
-mutation UpsertActivityCompletion($studentId: UUID!, $timestamp: Timestamp!) @auth(level: PUBLIC) {
-  activityCompletion_upsert(data: { studentId: $studentId, timestamp: $timestamp })
-}
 
-mutation DeleteActivityCompletion($studentId: UUID!) @auth(level: PUBLIC) {
-  activityCompletion_delete(key: { studentId: $studentId })
-}
-
-mutation UpsertActivityCheck($id: Int!, $content: String, $type: String) @auth(level: PUBLIC) {
-  activityCheck_upsert(data: { id: $id, content: $content, type: $type })
-}
 
 mutation UpsertStudent($id: UUID, $name: String, $number: Int, $gender: String, $birthday: String, $parentPhone: String, $allergies: String, $healthNotes: String, $points: Int, $group: Int, $seatIndex: Int, $aiSummary: String) @auth(level: PUBLIC) {
   student_upsert(data: { 
@@ -119,11 +109,14 @@ mutation DeleteAnnouncement($id: UUID!) @auth(level: PUBLIC) {
   announcement_delete(id: $id)
 }
 
-mutation UpsertAssignment($id: UUID, $dueDate: Date!, $title: String!, $submissions: Any) @auth(level: PUBLIC) {
+mutation UpsertAssignment($id: UUID, $dueDate: Date!, $title: String!, $subject: String!, $type: String!, $createdAt: Timestamp, $submissions: Any) @auth(level: PUBLIC) {
   assignment_upsert(data: {
     id: $id,
     dueDate: $dueDate,
     title: $title,
+    subject: $subject,
+    type: $type,
+    createdAt: $createdAt,
     submissions: $submissions
   })
 }

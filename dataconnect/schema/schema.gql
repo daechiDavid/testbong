@@ -30,10 +30,13 @@ type Announcement @table {
   type: String
 }
 
-type Assignment @table {
+type Assignment @table(name: "assignment_v2") {
   id: UUID! @default(expr: "uuidV4()")
   dueDate: Date!
   title: String!
+  subject: String!
+  type: String!
+  createdAt: Timestamp! @default(expr: "request.time")
   submissions: Any # JSON object for submissions
 }
 
@@ -84,16 +87,7 @@ type Newsletter @table {
   collected: Boolean! @default(expr: "false")
 }
 
-type ActivityCheck @table {
-  id: Int!
-  content: String
-  type: String
-}
 
-type ActivityCompletion @table(name: "activity_completion_v2", key: ["student"]) {
-  student: Student!
-  timestamp: Timestamp!
-}
 
 type StudentRecord @table {
   id: UUID! @default(expr: "uuidV4()")

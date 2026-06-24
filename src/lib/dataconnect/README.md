@@ -22,9 +22,6 @@ This README will guide you through the process of using the generated JavaScript
   - [*DeleteStudentRecord*](#deletestudentrecord)
   - [*UpdatePoll*](#updatepoll)
   - [*UpdateNewsletter*](#updatenewsletter)
-  - [*UpsertActivityCompletion*](#upsertactivitycompletion)
-  - [*DeleteActivityCompletion*](#deleteactivitycompletion)
-  - [*UpsertActivityCheck*](#upsertactivitycheck)
   - [*UpsertStudent*](#upsertstudent)
   - [*UpsertQuickLink*](#upsertquicklink)
   - [*DeleteQuickLink*](#deletequicklink)
@@ -134,6 +131,9 @@ export interface GetAllAppDataData {
     id: UUIDString;
     dueDate: DateString;
     title: string;
+    subject: string;
+    type: string;
+    createdAt: TimestampString;
     submissions?: unknown | null;
   } & Assignment_Key)[];
   dDays: ({
@@ -177,17 +177,6 @@ export interface GetAllAppDataData {
     content?: string | null;
     collected: boolean;
   } & Newsletter_Key)[];
-  activityChecks: ({
-    id: number;
-    content?: string | null;
-    type?: string | null;
-  } & ActivityCheck_Key)[];
-  activityCompletions: ({
-    student: {
-      id: UUIDString;
-    } & Student_Key;
-    timestamp: TimestampString;
-  })[];
   studentRecords: ({
     id: UUIDString;
     student: {
@@ -225,8 +214,6 @@ console.log(data.appConfigs);
 console.log(data.quickLinks);
 console.log(data.polls);
 console.log(data.newsletters);
-console.log(data.activityChecks);
-console.log(data.activityCompletions);
 console.log(data.studentRecords);
 
 // Or, you can use the `Promise` API.
@@ -241,8 +228,6 @@ getAllAppData().then((response) => {
   console.log(data.quickLinks);
   console.log(data.polls);
   console.log(data.newsletters);
-  console.log(data.activityChecks);
-  console.log(data.activityCompletions);
   console.log(data.studentRecords);
 });
 ```
@@ -274,8 +259,6 @@ console.log(data.appConfigs);
 console.log(data.quickLinks);
 console.log(data.polls);
 console.log(data.newsletters);
-console.log(data.activityChecks);
-console.log(data.activityCompletions);
 console.log(data.studentRecords);
 
 // Or, you can use the `Promise` API.
@@ -290,8 +273,6 @@ executeQuery(ref).then((response) => {
   console.log(data.quickLinks);
   console.log(data.polls);
   console.log(data.newsletters);
-  console.log(data.activityChecks);
-  console.log(data.activityCompletions);
   console.log(data.studentRecords);
 });
 ```
@@ -1699,342 +1680,6 @@ executeMutation(ref).then((response) => {
 });
 ```
 
-## UpsertActivityCompletion
-You can execute the `UpsertActivityCompletion` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
-```typescript
-upsertActivityCompletion(vars: UpsertActivityCompletionVariables): MutationPromise<UpsertActivityCompletionData, UpsertActivityCompletionVariables>;
-
-interface UpsertActivityCompletionRef {
-  ...
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: UpsertActivityCompletionVariables): MutationRef<UpsertActivityCompletionData, UpsertActivityCompletionVariables>;
-}
-export const upsertActivityCompletionRef: UpsertActivityCompletionRef;
-```
-You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
-```typescript
-upsertActivityCompletion(dc: DataConnect, vars: UpsertActivityCompletionVariables): MutationPromise<UpsertActivityCompletionData, UpsertActivityCompletionVariables>;
-
-interface UpsertActivityCompletionRef {
-  ...
-  (dc: DataConnect, vars: UpsertActivityCompletionVariables): MutationRef<UpsertActivityCompletionData, UpsertActivityCompletionVariables>;
-}
-export const upsertActivityCompletionRef: UpsertActivityCompletionRef;
-```
-
-If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the upsertActivityCompletionRef:
-```typescript
-const name = upsertActivityCompletionRef.operationName;
-console.log(name);
-```
-
-### Variables
-The `UpsertActivityCompletion` mutation requires an argument of type `UpsertActivityCompletionVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
-
-```typescript
-export interface UpsertActivityCompletionVariables {
-  studentId: UUIDString;
-  timestamp: TimestampString;
-}
-```
-### Return Type
-Recall that executing the `UpsertActivityCompletion` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
-
-The `data` property is an object of type `UpsertActivityCompletionData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
-```typescript
-export interface UpsertActivityCompletionData {
-  activityCompletion_upsert: ActivityCompletion_Key;
-}
-```
-### Using `UpsertActivityCompletion`'s action shortcut function
-
-```typescript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, upsertActivityCompletion, UpsertActivityCompletionVariables } from '@dashboard/dataconnect';
-
-// The `UpsertActivityCompletion` mutation requires an argument of type `UpsertActivityCompletionVariables`:
-const upsertActivityCompletionVars: UpsertActivityCompletionVariables = {
-  studentId: ..., 
-  timestamp: ..., 
-};
-
-// Call the `upsertActivityCompletion()` function to execute the mutation.
-// You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await upsertActivityCompletion(upsertActivityCompletionVars);
-// Variables can be defined inline as well.
-const { data } = await upsertActivityCompletion({ studentId: ..., timestamp: ..., });
-
-// You can also pass in a `DataConnect` instance to the action shortcut function.
-const dataConnect = getDataConnect(connectorConfig);
-const { data } = await upsertActivityCompletion(dataConnect, upsertActivityCompletionVars);
-
-console.log(data.activityCompletion_upsert);
-
-// Or, you can use the `Promise` API.
-upsertActivityCompletion(upsertActivityCompletionVars).then((response) => {
-  const data = response.data;
-  console.log(data.activityCompletion_upsert);
-});
-```
-
-### Using `UpsertActivityCompletion`'s `MutationRef` function
-
-```typescript
-import { getDataConnect, executeMutation } from 'firebase/data-connect';
-import { connectorConfig, upsertActivityCompletionRef, UpsertActivityCompletionVariables } from '@dashboard/dataconnect';
-
-// The `UpsertActivityCompletion` mutation requires an argument of type `UpsertActivityCompletionVariables`:
-const upsertActivityCompletionVars: UpsertActivityCompletionVariables = {
-  studentId: ..., 
-  timestamp: ..., 
-};
-
-// Call the `upsertActivityCompletionRef()` function to get a reference to the mutation.
-const ref = upsertActivityCompletionRef(upsertActivityCompletionVars);
-// Variables can be defined inline as well.
-const ref = upsertActivityCompletionRef({ studentId: ..., timestamp: ..., });
-
-// You can also pass in a `DataConnect` instance to the `MutationRef` function.
-const dataConnect = getDataConnect(connectorConfig);
-const ref = upsertActivityCompletionRef(dataConnect, upsertActivityCompletionVars);
-
-// Call `executeMutation()` on the reference to execute the mutation.
-// You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await executeMutation(ref);
-
-console.log(data.activityCompletion_upsert);
-
-// Or, you can use the `Promise` API.
-executeMutation(ref).then((response) => {
-  const data = response.data;
-  console.log(data.activityCompletion_upsert);
-});
-```
-
-## DeleteActivityCompletion
-You can execute the `DeleteActivityCompletion` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
-```typescript
-deleteActivityCompletion(vars: DeleteActivityCompletionVariables): MutationPromise<DeleteActivityCompletionData, DeleteActivityCompletionVariables>;
-
-interface DeleteActivityCompletionRef {
-  ...
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: DeleteActivityCompletionVariables): MutationRef<DeleteActivityCompletionData, DeleteActivityCompletionVariables>;
-}
-export const deleteActivityCompletionRef: DeleteActivityCompletionRef;
-```
-You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
-```typescript
-deleteActivityCompletion(dc: DataConnect, vars: DeleteActivityCompletionVariables): MutationPromise<DeleteActivityCompletionData, DeleteActivityCompletionVariables>;
-
-interface DeleteActivityCompletionRef {
-  ...
-  (dc: DataConnect, vars: DeleteActivityCompletionVariables): MutationRef<DeleteActivityCompletionData, DeleteActivityCompletionVariables>;
-}
-export const deleteActivityCompletionRef: DeleteActivityCompletionRef;
-```
-
-If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the deleteActivityCompletionRef:
-```typescript
-const name = deleteActivityCompletionRef.operationName;
-console.log(name);
-```
-
-### Variables
-The `DeleteActivityCompletion` mutation requires an argument of type `DeleteActivityCompletionVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
-
-```typescript
-export interface DeleteActivityCompletionVariables {
-  studentId: UUIDString;
-}
-```
-### Return Type
-Recall that executing the `DeleteActivityCompletion` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
-
-The `data` property is an object of type `DeleteActivityCompletionData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
-```typescript
-export interface DeleteActivityCompletionData {
-  activityCompletion_delete?: ActivityCompletion_Key | null;
-}
-```
-### Using `DeleteActivityCompletion`'s action shortcut function
-
-```typescript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, deleteActivityCompletion, DeleteActivityCompletionVariables } from '@dashboard/dataconnect';
-
-// The `DeleteActivityCompletion` mutation requires an argument of type `DeleteActivityCompletionVariables`:
-const deleteActivityCompletionVars: DeleteActivityCompletionVariables = {
-  studentId: ..., 
-};
-
-// Call the `deleteActivityCompletion()` function to execute the mutation.
-// You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await deleteActivityCompletion(deleteActivityCompletionVars);
-// Variables can be defined inline as well.
-const { data } = await deleteActivityCompletion({ studentId: ..., });
-
-// You can also pass in a `DataConnect` instance to the action shortcut function.
-const dataConnect = getDataConnect(connectorConfig);
-const { data } = await deleteActivityCompletion(dataConnect, deleteActivityCompletionVars);
-
-console.log(data.activityCompletion_delete);
-
-// Or, you can use the `Promise` API.
-deleteActivityCompletion(deleteActivityCompletionVars).then((response) => {
-  const data = response.data;
-  console.log(data.activityCompletion_delete);
-});
-```
-
-### Using `DeleteActivityCompletion`'s `MutationRef` function
-
-```typescript
-import { getDataConnect, executeMutation } from 'firebase/data-connect';
-import { connectorConfig, deleteActivityCompletionRef, DeleteActivityCompletionVariables } from '@dashboard/dataconnect';
-
-// The `DeleteActivityCompletion` mutation requires an argument of type `DeleteActivityCompletionVariables`:
-const deleteActivityCompletionVars: DeleteActivityCompletionVariables = {
-  studentId: ..., 
-};
-
-// Call the `deleteActivityCompletionRef()` function to get a reference to the mutation.
-const ref = deleteActivityCompletionRef(deleteActivityCompletionVars);
-// Variables can be defined inline as well.
-const ref = deleteActivityCompletionRef({ studentId: ..., });
-
-// You can also pass in a `DataConnect` instance to the `MutationRef` function.
-const dataConnect = getDataConnect(connectorConfig);
-const ref = deleteActivityCompletionRef(dataConnect, deleteActivityCompletionVars);
-
-// Call `executeMutation()` on the reference to execute the mutation.
-// You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await executeMutation(ref);
-
-console.log(data.activityCompletion_delete);
-
-// Or, you can use the `Promise` API.
-executeMutation(ref).then((response) => {
-  const data = response.data;
-  console.log(data.activityCompletion_delete);
-});
-```
-
-## UpsertActivityCheck
-You can execute the `UpsertActivityCheck` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
-```typescript
-upsertActivityCheck(vars: UpsertActivityCheckVariables): MutationPromise<UpsertActivityCheckData, UpsertActivityCheckVariables>;
-
-interface UpsertActivityCheckRef {
-  ...
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: UpsertActivityCheckVariables): MutationRef<UpsertActivityCheckData, UpsertActivityCheckVariables>;
-}
-export const upsertActivityCheckRef: UpsertActivityCheckRef;
-```
-You can also pass in a `DataConnect` instance to the action shortcut function or `MutationRef` function.
-```typescript
-upsertActivityCheck(dc: DataConnect, vars: UpsertActivityCheckVariables): MutationPromise<UpsertActivityCheckData, UpsertActivityCheckVariables>;
-
-interface UpsertActivityCheckRef {
-  ...
-  (dc: DataConnect, vars: UpsertActivityCheckVariables): MutationRef<UpsertActivityCheckData, UpsertActivityCheckVariables>;
-}
-export const upsertActivityCheckRef: UpsertActivityCheckRef;
-```
-
-If you need the name of the operation without creating a ref, you can retrieve the operation name by calling the `operationName` property on the upsertActivityCheckRef:
-```typescript
-const name = upsertActivityCheckRef.operationName;
-console.log(name);
-```
-
-### Variables
-The `UpsertActivityCheck` mutation requires an argument of type `UpsertActivityCheckVariables`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
-
-```typescript
-export interface UpsertActivityCheckVariables {
-  id: number;
-  content?: string | null;
-  type?: string | null;
-}
-```
-### Return Type
-Recall that executing the `UpsertActivityCheck` mutation returns a `MutationPromise` that resolves to an object with a `data` property.
-
-The `data` property is an object of type `UpsertActivityCheckData`, which is defined in [dataconnect/index.d.ts](./index.d.ts). It has the following fields:
-```typescript
-export interface UpsertActivityCheckData {
-  activityCheck_upsert: ActivityCheck_Key;
-}
-```
-### Using `UpsertActivityCheck`'s action shortcut function
-
-```typescript
-import { getDataConnect } from 'firebase/data-connect';
-import { connectorConfig, upsertActivityCheck, UpsertActivityCheckVariables } from '@dashboard/dataconnect';
-
-// The `UpsertActivityCheck` mutation requires an argument of type `UpsertActivityCheckVariables`:
-const upsertActivityCheckVars: UpsertActivityCheckVariables = {
-  id: ..., 
-  content: ..., // optional
-  type: ..., // optional
-};
-
-// Call the `upsertActivityCheck()` function to execute the mutation.
-// You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await upsertActivityCheck(upsertActivityCheckVars);
-// Variables can be defined inline as well.
-const { data } = await upsertActivityCheck({ id: ..., content: ..., type: ..., });
-
-// You can also pass in a `DataConnect` instance to the action shortcut function.
-const dataConnect = getDataConnect(connectorConfig);
-const { data } = await upsertActivityCheck(dataConnect, upsertActivityCheckVars);
-
-console.log(data.activityCheck_upsert);
-
-// Or, you can use the `Promise` API.
-upsertActivityCheck(upsertActivityCheckVars).then((response) => {
-  const data = response.data;
-  console.log(data.activityCheck_upsert);
-});
-```
-
-### Using `UpsertActivityCheck`'s `MutationRef` function
-
-```typescript
-import { getDataConnect, executeMutation } from 'firebase/data-connect';
-import { connectorConfig, upsertActivityCheckRef, UpsertActivityCheckVariables } from '@dashboard/dataconnect';
-
-// The `UpsertActivityCheck` mutation requires an argument of type `UpsertActivityCheckVariables`:
-const upsertActivityCheckVars: UpsertActivityCheckVariables = {
-  id: ..., 
-  content: ..., // optional
-  type: ..., // optional
-};
-
-// Call the `upsertActivityCheckRef()` function to get a reference to the mutation.
-const ref = upsertActivityCheckRef(upsertActivityCheckVars);
-// Variables can be defined inline as well.
-const ref = upsertActivityCheckRef({ id: ..., content: ..., type: ..., });
-
-// You can also pass in a `DataConnect` instance to the `MutationRef` function.
-const dataConnect = getDataConnect(connectorConfig);
-const ref = upsertActivityCheckRef(dataConnect, upsertActivityCheckVars);
-
-// Call `executeMutation()` on the reference to execute the mutation.
-// You can use the `await` keyword to wait for the promise to resolve.
-const { data } = await executeMutation(ref);
-
-console.log(data.activityCheck_upsert);
-
-// Or, you can use the `Promise` API.
-executeMutation(ref).then((response) => {
-  const data = response.data;
-  console.log(data.activityCheck_upsert);
-});
-```
-
 ## UpsertStudent
 You can execute the `UpsertStudent` mutation using the following action shortcut function, or by calling `executeMutation()` after calling the following `MutationRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
 ```typescript
@@ -2678,6 +2323,9 @@ export interface UpsertAssignmentVariables {
   id?: UUIDString | null;
   dueDate: DateString;
   title: string;
+  subject: string;
+  type: string;
+  createdAt?: TimestampString | null;
   submissions?: unknown | null;
 }
 ```
@@ -2701,6 +2349,9 @@ const upsertAssignmentVars: UpsertAssignmentVariables = {
   id: ..., // optional
   dueDate: ..., 
   title: ..., 
+  subject: ..., 
+  type: ..., 
+  createdAt: ..., // optional
   submissions: ..., // optional
 };
 
@@ -2708,7 +2359,7 @@ const upsertAssignmentVars: UpsertAssignmentVariables = {
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await upsertAssignment(upsertAssignmentVars);
 // Variables can be defined inline as well.
-const { data } = await upsertAssignment({ id: ..., dueDate: ..., title: ..., submissions: ..., });
+const { data } = await upsertAssignment({ id: ..., dueDate: ..., title: ..., subject: ..., type: ..., createdAt: ..., submissions: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -2734,13 +2385,16 @@ const upsertAssignmentVars: UpsertAssignmentVariables = {
   id: ..., // optional
   dueDate: ..., 
   title: ..., 
+  subject: ..., 
+  type: ..., 
+  createdAt: ..., // optional
   submissions: ..., // optional
 };
 
 // Call the `upsertAssignmentRef()` function to get a reference to the mutation.
 const ref = upsertAssignmentRef(upsertAssignmentVars);
 // Variables can be defined inline as well.
-const ref = upsertAssignmentRef({ id: ..., dueDate: ..., title: ..., submissions: ..., });
+const ref = upsertAssignmentRef({ id: ..., dueDate: ..., title: ..., subject: ..., type: ..., createdAt: ..., submissions: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);

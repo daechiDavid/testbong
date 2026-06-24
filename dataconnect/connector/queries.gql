@@ -14,10 +14,13 @@ query GetAllAppData @auth(level: PUBLIC) {
     content
     type
   }
-  assignments {
+  assignments(orderBy: [{ createdAt: DESC }]) {
     id
     dueDate
     title
+    subject
+    type
+    createdAt
     submissions
   }
   dDays {
@@ -60,15 +63,6 @@ query GetAllAppData @auth(level: PUBLIC) {
     title
     content
     collected
-  }
-  activityChecks {
-    id
-    content
-    type
-  }
-  activityCompletions {
-    student { id }
-    timestamp
   }
   studentRecords {
     id

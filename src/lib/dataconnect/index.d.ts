@@ -10,16 +10,6 @@ export type DateString = string;
 
 
 
-export interface ActivityCheck_Key {
-  id: number;
-  __typename?: 'ActivityCheck_Key';
-}
-
-export interface ActivityCompletion_Key {
-  studentId: UUIDString;
-  __typename?: 'ActivityCompletion_Key';
-}
-
 export interface Announcement_Key {
   id: UUIDString;
   __typename?: 'Announcement_Key';
@@ -44,14 +34,6 @@ export interface Attendance_Key {
 export interface DDay_Key {
   id: UUIDString;
   __typename?: 'DDay_Key';
-}
-
-export interface DeleteActivityCompletionData {
-  activityCompletion_delete?: ActivityCompletion_Key | null;
-}
-
-export interface DeleteActivityCompletionVariables {
-  studentId: UUIDString;
 }
 
 export interface DeleteAnnouncementData {
@@ -120,6 +102,9 @@ export interface GetAllAppDataData {
     id: UUIDString;
     dueDate: DateString;
     title: string;
+    subject: string;
+    type: string;
+    createdAt: TimestampString;
     submissions?: unknown | null;
   } & Assignment_Key)[];
   dDays: ({
@@ -163,17 +148,6 @@ export interface GetAllAppDataData {
     content?: string | null;
     collected: boolean;
   } & Newsletter_Key)[];
-  activityChecks: ({
-    id: number;
-    content?: string | null;
-    type?: string | null;
-  } & ActivityCheck_Key)[];
-  activityCompletions: ({
-    student: {
-      id: UUIDString;
-    } & Student_Key;
-    timestamp: TimestampString;
-  })[];
   studentRecords: ({
     id: UUIDString;
     student: {
@@ -291,25 +265,6 @@ export interface UpdateStudentPointsVariables {
   points: number;
 }
 
-export interface UpsertActivityCheckData {
-  activityCheck_upsert: ActivityCheck_Key;
-}
-
-export interface UpsertActivityCheckVariables {
-  id: number;
-  content?: string | null;
-  type?: string | null;
-}
-
-export interface UpsertActivityCompletionData {
-  activityCompletion_upsert: ActivityCompletion_Key;
-}
-
-export interface UpsertActivityCompletionVariables {
-  studentId: UUIDString;
-  timestamp: TimestampString;
-}
-
 export interface UpsertAnnouncementData {
   announcement_upsert: Announcement_Key;
 }
@@ -343,6 +298,9 @@ export interface UpsertAssignmentVariables {
   id?: UUIDString | null;
   dueDate: DateString;
   title: string;
+  subject: string;
+  type: string;
+  createdAt?: TimestampString | null;
   submissions?: unknown | null;
 }
 
@@ -536,42 +494,6 @@ export const updateNewsletterRef: UpdateNewsletterRef;
 
 export function updateNewsletter(vars: UpdateNewsletterVariables): MutationPromise<UpdateNewsletterData, UpdateNewsletterVariables>;
 export function updateNewsletter(dc: DataConnect, vars: UpdateNewsletterVariables): MutationPromise<UpdateNewsletterData, UpdateNewsletterVariables>;
-
-interface UpsertActivityCompletionRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: UpsertActivityCompletionVariables): MutationRef<UpsertActivityCompletionData, UpsertActivityCompletionVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: UpsertActivityCompletionVariables): MutationRef<UpsertActivityCompletionData, UpsertActivityCompletionVariables>;
-  operationName: string;
-}
-export const upsertActivityCompletionRef: UpsertActivityCompletionRef;
-
-export function upsertActivityCompletion(vars: UpsertActivityCompletionVariables): MutationPromise<UpsertActivityCompletionData, UpsertActivityCompletionVariables>;
-export function upsertActivityCompletion(dc: DataConnect, vars: UpsertActivityCompletionVariables): MutationPromise<UpsertActivityCompletionData, UpsertActivityCompletionVariables>;
-
-interface DeleteActivityCompletionRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: DeleteActivityCompletionVariables): MutationRef<DeleteActivityCompletionData, DeleteActivityCompletionVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: DeleteActivityCompletionVariables): MutationRef<DeleteActivityCompletionData, DeleteActivityCompletionVariables>;
-  operationName: string;
-}
-export const deleteActivityCompletionRef: DeleteActivityCompletionRef;
-
-export function deleteActivityCompletion(vars: DeleteActivityCompletionVariables): MutationPromise<DeleteActivityCompletionData, DeleteActivityCompletionVariables>;
-export function deleteActivityCompletion(dc: DataConnect, vars: DeleteActivityCompletionVariables): MutationPromise<DeleteActivityCompletionData, DeleteActivityCompletionVariables>;
-
-interface UpsertActivityCheckRef {
-  /* Allow users to create refs without passing in DataConnect */
-  (vars: UpsertActivityCheckVariables): MutationRef<UpsertActivityCheckData, UpsertActivityCheckVariables>;
-  /* Allow users to pass in custom DataConnect instances */
-  (dc: DataConnect, vars: UpsertActivityCheckVariables): MutationRef<UpsertActivityCheckData, UpsertActivityCheckVariables>;
-  operationName: string;
-}
-export const upsertActivityCheckRef: UpsertActivityCheckRef;
-
-export function upsertActivityCheck(vars: UpsertActivityCheckVariables): MutationPromise<UpsertActivityCheckData, UpsertActivityCheckVariables>;
-export function upsertActivityCheck(dc: DataConnect, vars: UpsertActivityCheckVariables): MutationPromise<UpsertActivityCheckData, UpsertActivityCheckVariables>;
 
 interface UpsertStudentRef {
   /* Allow users to create refs without passing in DataConnect */

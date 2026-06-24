@@ -16,8 +16,6 @@ import {
   deleteStudentRecord,
   updatePoll,
   updateNewsletter,
-  upsertActivityCompletion,
-  upsertActivityCheck,
   upsertStudent as updateStudentMutation,
   upsertQuickLink,
   deleteQuickLink,
@@ -58,18 +56,10 @@ const initialState = {
   quickLinks: [],
   isAdmin: false,
   settings: {
-    calendarId1: '',
-    calendarId2: '',
-    calendarId3: '',
-    thermometerGoal: 1500,
-    thermometerReward: '아이스크림 파티!'
+    darkMode: false,
+    fontSize: 'medium',
   },
   ddays: [],
-  activityCheck: {
-    content: '오늘의 활동을 입력해주세요.',
-    type: '수행평가',
-    completions: {}
-  },
   studentRecords: {},
 };
 
@@ -198,25 +188,6 @@ function reducer(state, action) {
     case 'ADD_LINK': return { ...state, quickLinks: [...state.quickLinks, action.payload] };
     case 'UPDATE_LINK': return { ...state, quickLinks: state.quickLinks.map(l => l.id === action.payload.id ? action.payload : l) };
     case 'DELETE_LINK': return { ...state, quickLinks: state.quickLinks.filter(l => l.id !== action.payload) };
-    case 'SET_ACTIVITY_CHECK': return { ...state, activityCheck: action.payload };
-    case 'UPDATE_ACTIVITY_CONTENT':
-      return {
-        ...state,
-        activityCheck: { ...state.activityCheck, content: action.payload.content, type: action.payload.type || state.activityCheck.type, completions: {} }
-      };
-    case 'MARK_ACTIVITY_COMPLETED':
-      return {
-        ...state,
-        activityCheck: {
-          ...state.activityCheck,
-          completions: { ...state.activityCheck.completions, [action.payload.studentId]: { timestamp: action.payload.timestamp } }
-        }
-      };
-    case 'CANCEL_ACTIVITY_COMPLETION': {
-      const newComps = { ...state.activityCheck.completions };
-      delete newComps[action.payload];
-      return { ...state, activityCheck: { ...state.activityCheck, completions: newComps } };
-    }
     case 'SET_STUDENT_RECORDS': return { ...state, studentRecords: action.payload };
     case 'ADD_STUDENT_RECORD': {
       const { studentId, record } = action.payload;
@@ -248,8 +219,8 @@ export function AppProvider({ children }) {
         const response = await getAllAppData();
         const {
           students, announcements, assignments, dDays: ddays,
-          weeklyPlans: weekly_plans, appConfigs, quickLinks: quick_links,
-          polls, newsletters, activityChecks, activityCompletions, studentRecords: student_records
+          polls, studentRecords: student_records, newsletters,
+          appConfigs, quickLinks: quick_links, weeklyPlans: weekly_plans
         } = response.data;
 
         if (students) dispatch({ type: 'SET_STUDENTS', payload: students.sort((a,b)=>a.number-b.number) });
@@ -285,15 +256,7 @@ export function AppProvider({ children }) {
           dispatch({ type: 'SET_WEEKLY_PLANS_BULK', payload: plansMap });
         }
 
-        // 활동 체크 매핑
-        const activity_check = activityChecks && activityChecks.length > 0 ? activityChecks[0] : null;
-        if (activity_check) {
-          const comps = {};
-          if (activityCompletions) {
-            activityCompletions.forEach(c => { comps[c.student.id] = { timestamp: c.timestamp }; });
-          }
-          dispatch({ type: 'SET_ACTIVITY_CHECK', payload: { content: activity_check.content, type: activity_check.type, completions: comps } });
-        }
+
 
         // 학생 기록 매핑
         if (student_records) {
@@ -346,15 +309,6 @@ export function AppProvider({ children }) {
       console.error('Weekly plan save error:', error);
     }
   }, []);
-
-  const updateSettings = async (newSettings) => {
-    dispatch({ type: 'UPDATE_SETTINGS', payload: newSettings });
-    try {
-      await upsertAppConfig({ id: 1, ...newSettings });
-    } catch (error) {
-      console.error('App config save error:', error);
-    }
-  };
 
   const addDDay = async (dday) => {
     try {
@@ -491,38 +445,6 @@ export function AppProvider({ children }) {
     await updateNewsletter({ id, collected: newCollected });
   };
 
-  const markActivityCompletedFunc = async (studentId) => {
-    const timestamp = new Date().toISOString();
-    dispatch({ type: 'MARK_ACTIVITY_COMPLETED', payload: { studentId, timestamp } });
-    await upsertActivityCompletion({ studentId, timestamp });
-  };
-
-  const cancelActivityCompletionFunc = async (studentId) => {
-    dispatch({ type: 'CANCEL_ACTIVITY_COMPLETION', payload: studentId });
-    try {
-      await deleteActivityCompletion({ studentId });
-    } catch (e) {
-      console.error('Failed to delete activity completion:', e);
-    }
-  };
-
-  const updateActivityContentFunc = async (content, type) => {
-    // 기존에 완료했던 학생들 정보를 리셋할 때, DB에서도 일괄 삭제
-    if (content === '' || content !== state.activityCheck?.content) {
-      const currentCompletions = Object.keys(state.activityCheck?.completions || {});
-      for (const studentId of currentCompletions) {
-        try {
-          await deleteActivityCompletion({ studentId });
-        } catch (e) {
-          console.error('Failed to clear old completion for student', studentId, e);
-        }
-      }
-    }
-    
-    dispatch({ type: 'UPDATE_ACTIVITY_CONTENT', payload: { content, type } });
-    await upsertActivityCheck({ id: 1, content, type });
-  };
-
   const addLinkFunc = async (linkData) => {
     dispatch({ type: 'ADD_LINK', payload: linkData });
     try {
@@ -556,30 +478,37 @@ export function AppProvider({ children }) {
     } catch(e) { console.error(e); }
   };
 
-  const addAssignmentFunc = async (assignmentData) => {
-    dispatch({ type: 'ADD_ASSIGNMENT', payload: assignmentData });
+  const addAssignmentFunc = async (assignment) => {
+    dispatch({ type: 'ADD_ASSIGNMENT', payload: assignment });
     try {
       await upsertAssignment({
-        id: assignmentData.id,
-        dueDate: assignmentData.dueDate,
-        title: assignmentData.title,
-        submissions: assignmentData.submissions
+        id: assignment.id,
+        dueDate: assignment.dueDate,
+        title: assignment.title,
+        subject: assignment.subject || '',
+        type: assignment.type || '일반',
+        createdAt: new Date().toISOString(),
+        submissions: assignment.submissions
       });
-    } catch(e) { console.error(e); }
+    } catch (e) {
+      console.error('Failed to upsert assignment:', e);
+    }
   };
 
   const updateAssignmentSubmissionsFunc = async (id, submissions) => {
     dispatch({ type: 'UPDATE_ASSIGNMENT_SUBMISSIONS', payload: { id, submissions } });
-    const assignment = state.assignments.find(a => a.id === id);
-    if (assignment) {
-      try {
-        await upsertAssignment({
-          id: assignment.id,
-          dueDate: assignment.dueDate,
-          title: assignment.title,
-          submissions: { ...assignment.submissions, ...submissions }
-        });
-      } catch(e) { console.error(e); }
+    const target = state.assignments.find(a => a.id === id);
+    if (target) {
+      const merged = { ...target.submissions, ...submissions };
+      await upsertAssignment({
+        id: target.id,
+        dueDate: target.dueDate,
+        title: target.title,
+        subject: target.subject || '',
+        type: target.type || '일반',
+        createdAt: target.createdAt || new Date().toISOString(),
+        submissions: merged
+      });
     }
   };
 
@@ -648,8 +577,8 @@ export function AppProvider({ children }) {
       updatePoints: updatePointsFunc, resetPoints: resetPointsFunc,
       updateAttendance: updateAttendanceFunc, loadAttendanceByDate: loadAttendanceByDateFunc, loadMonthlyAttendance: loadMonthlyAttendanceFunc,
       updateStudent: updateStudentFunc, bulkUpdateStudents: bulkUpdateStudentsFunc, addStudentRecord: addStudentRecordFunc, deleteStudentRecord: deleteStudentRecordFunc,
-      saveWeeklyPlan, updateSettings, addDDay, deleteDDay: deleteDDayFunc,
-      votePoll: votePollFunc, collectNewsletter: collectNewsletterFunc, markActivityCompleted: markActivityCompletedFunc, cancelActivityCompletion: cancelActivityCompletionFunc, updateActivityContent: updateActivityContentFunc,
+      saveWeeklyPlan, updateSettings: (s) => dispatch({ type: 'UPDATE_SETTINGS', payload: s }), addDDay, deleteDDay: deleteDDayFunc,
+      votePoll: votePollFunc, collectNewsletter: collectNewsletterFunc,
       addLink: addLinkFunc, updateLink: updateLinkFunc, deleteLink: deleteLinkFunc,
       addAssignment: addAssignmentFunc, updateAssignmentSubmissions: updateAssignmentSubmissionsFunc, deleteAssignment: deleteAssignmentFunc,
       addAnnouncement: addAnnouncementFunc, updateAnnouncement: updateAnnouncementFunc, deleteAnnouncement: deleteAnnouncementFunc,

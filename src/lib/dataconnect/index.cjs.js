@@ -147,48 +147,6 @@ exports.updateNewsletter = function updateNewsletter(dcOrVars, vars) {
 }
 ;
 
-const upsertActivityCompletionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'UpsertActivityCompletion', inputVars);
-}
-upsertActivityCompletionRef.operationName = 'UpsertActivityCompletion';
-exports.upsertActivityCompletionRef = upsertActivityCompletionRef;
-
-exports.upsertActivityCompletion = function upsertActivityCompletion(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(upsertActivityCompletionRef(dcInstance, inputVars));
-}
-;
-
-const deleteActivityCompletionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'DeleteActivityCompletion', inputVars);
-}
-deleteActivityCompletionRef.operationName = 'DeleteActivityCompletion';
-exports.deleteActivityCompletionRef = deleteActivityCompletionRef;
-
-exports.deleteActivityCompletion = function deleteActivityCompletion(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(deleteActivityCompletionRef(dcInstance, inputVars));
-}
-;
-
-const upsertActivityCheckRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'UpsertActivityCheck', inputVars);
-}
-upsertActivityCheckRef.operationName = 'UpsertActivityCheck';
-exports.upsertActivityCheckRef = upsertActivityCheckRef;
-
-exports.upsertActivityCheck = function upsertActivityCheck(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(upsertActivityCheckRef(dcInstance, inputVars));
-}
-;
-
 const upsertStudentRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars);
   dcInstance._useGeneratedSdk();

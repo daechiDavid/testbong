@@ -125,42 +125,6 @@ export function updateNewsletter(dcOrVars, vars) {
   return executeMutation(updateNewsletterRef(dcInstance, inputVars));
 }
 
-export const upsertActivityCompletionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'UpsertActivityCompletion', inputVars);
-}
-upsertActivityCompletionRef.operationName = 'UpsertActivityCompletion';
-
-export function upsertActivityCompletion(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(upsertActivityCompletionRef(dcInstance, inputVars));
-}
-
-export const deleteActivityCompletionRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'DeleteActivityCompletion', inputVars);
-}
-deleteActivityCompletionRef.operationName = 'DeleteActivityCompletion';
-
-export function deleteActivityCompletion(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(deleteActivityCompletionRef(dcInstance, inputVars));
-}
-
-export const upsertActivityCheckRef = (dcOrVars, vars) => {
-  const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars, true);
-  dcInstance._useGeneratedSdk();
-  return mutationRef(dcInstance, 'UpsertActivityCheck', inputVars);
-}
-upsertActivityCheckRef.operationName = 'UpsertActivityCheck';
-
-export function upsertActivityCheck(dcOrVars, vars) {
-  const { dc: dcInstance, vars: inputVars } = validateArgs(connectorConfig, dcOrVars, vars, true);
-  return executeMutation(upsertActivityCheckRef(dcInstance, inputVars));
-}
-
 export const upsertStudentRef = (dcOrVars, vars) => {
   const { dc: dcInstance, vars: inputVars} = validateArgs(connectorConfig, dcOrVars, vars);
   dcInstance._useGeneratedSdk();

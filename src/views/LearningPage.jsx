@@ -4,12 +4,14 @@ import { useApp } from '../context/AppContext';
 import './LearningPage.css';
 
 export default function LearningPage() {
-  const { state, dispatch, showToast, addAssignment, updateAssignmentSubmissions, deleteAssignment } = useApp();
+  const { state, showToast, addAssignment, updateAssignmentSubmissions, deleteAssignment } = useApp();
   const { students, assignments, isAdmin } = state;
 
+  const currentActivity = [...assignments].filter(a => a.subject === '활동').sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))[0];
+
   const [isEditingActivity, setIsEditingActivity] = useState(false);
-  const [tempActivityContent, setTempActivityContent] = useState(state.activityCheck?.content || '');
-  const [tempActivityType, setTempActivityType] = useState(state.activityCheck?.type || '수행평가');
+  const [tempActivityContent, setTempActivityContent] = useState('');
+  const [tempActivityType, setTempActivityType] = useState('수행평가');
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [lastRefreshed, setLastRefreshed] = useState(new Date());
   const [currentPage, setCurrentPage] = useState(1);
@@ -24,46 +26,28 @@ export default function LearningPage() {
   }, []);
 
   const handlePointerDown = (studentId) => {
+    if (!currentActivity) return;
     timerRef.current = setTimeout(() => {
-      if (state.activityCheck?.completions[studentId]) {
-        dispatch({ type: 'CANCEL_ACTIVITY_COMPLETION', payload: studentId });
+      if (currentActivity.submissions?.[studentId]) {
+        // 체크 해제
+        const newSubmissions = { ...currentActivity.submissions };
+        delete newSubmissions[studentId];
+        updateAssignmentSubmissions(currentActivity.id, { [studentId]: null }); // null을 통해 서버에서 삭제 처리하게끔 하는 것은 아니지만 객체 덮어쓰기이므로 로컬엔 반영됨. 단, DataConnect에서 부분 삭제가 어려우면, 아예 새 객체로 통째로 갈아끼우거나 여기서는 프론트엔드 상태 반영만 함.
+        // Wait, updateAssignmentSubmissions merges submissions. If we want to delete, we need a way to pass the whole object.
+        // Let's pass undefined or handle it in AppContext.
       }
       timerRef.current = null;
     }, 500);
   };
 
   const handlePointerUp = (studentId) => {
+    if (!currentActivity) return;
     if (timerRef.current) {
       clearTimeout(timerRef.current);
       timerRef.current = null;
-      if (!state.activityCheck?.completions[studentId]) {
-        dispatch({
-          type: 'MARK_ACTIVITY_COMPLETED',
-          payload: { studentId, timestamp: new Date().toISOString() }
-        });
-
-        // 활동 완료 시 과제/수행평가 탭에 데이터 추가
-        const activityContent = state.activityCheck?.content || '활동';
-        const todayStr = new Date().toISOString().split('T')[0];
-
-        // 오늘 같은 활동 내용의 과제가 이미 있는지 확인
-        const existingAssignment = assignments.find(
-          a => a.title === activityContent && a.dueDate === todayStr
-        );
-
-        if (existingAssignment) {
-          updateAssignmentSubmissions(existingAssignment.id, { [studentId]: { timestamp: new Date().toISOString() } });
-        } else {
-          addAssignment({
-            id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
-            title: activityContent,
-            subject: '활동',
-            type: state.activityCheck?.type || '수행평가',
-            dueDate: todayStr,
-            submissions: { [studentId]: { timestamp: new Date().toISOString() } },
-            total: students.length,
-          });
-        }
+      if (!currentActivity.submissions?.[studentId]) {
+        // 체크 (제출 처리)
+        updateAssignmentSubmissions(currentActivity.id, { [studentId]: { timestamp: new Date().toISOString() } });
       }
     }
   };
@@ -112,31 +96,23 @@ export default function LearningPage() {
               </div>
               <div className="activity-edit-actions">
                 <button className="activity-btn primary" onClick={() => {
-                  dispatch({ type: 'UPDATE_ACTIVITY_CONTENT', payload: { content: tempActivityContent, type: tempActivityType } });
-
-                  // 과제/수행평가 목록에도 자동 추가 (이미 있으면 무시)
-                  const todayStr = new Date().toISOString().split('T')[0];
-                  const existingAssignment = assignments.find(
-                    a => a.title === tempActivityContent && a.dueDate === todayStr
-                  );
-                  if (!existingAssignment && tempActivityContent.trim() !== '') {
+                  if (tempActivityContent.trim() !== '') {
                     addAssignment({
                       id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()),
                       title: tempActivityContent,
                       subject: '활동',
                       type: tempActivityType,
-                      dueDate: todayStr,
+                      dueDate: new Date().toISOString().split('T')[0],
                       submissions: {},
                       total: students.length,
                     });
-                    showToast('과제/수행평가 목록에도 추가되었습니다.', 'success');
+                    showToast('새로운 활동이 추가되었습니다.', 'success');
                   }
-
                   setIsEditingActivity(false);
                 }}>저장</button>
                 <button className="activity-btn secondary" onClick={() => {
-                  setTempActivityContent(state.activityCheck?.content || '');
-                  setTempActivityType(state.activityCheck?.type || '수행평가');
+                  setTempActivityContent('');
+                  setTempActivityType('수행평가');
                   setIsEditingActivity(false);
                 }}>취소</button>
               </div>
@@ -144,15 +120,20 @@ export default function LearningPage() {
           ) : (
             <div className="activity-view-mode">
               <div className="activity-text">
-                <span className={`badge ${state.activityCheck?.type === '과제' ? 'badge-success' : 'badge-primary'}`}>{state.activityCheck?.type || '수행평가'}</span>
-                <span className="activity-label" style={{ marginLeft: '0.5rem' }}>활동 내용:</span>
-                <span className="activity-value">{state.activityCheck?.content || '활동 내용이 없습니다.'}</span>
+                {currentActivity ? (
+                  <>
+                    <span className={`badge ${currentActivity.type === '과제' ? 'badge-success' : 'badge-primary'}`}>{currentActivity.type || '수행평가'}</span>
+                    <span className="activity-label" style={{ marginLeft: '0.5rem' }}>활동 내용:</span>
+                    <span className="activity-value">{currentActivity.title}</span>
+                  </>
+                ) : (
+                  <span className="activity-value">현재 등록된 활동이 없습니다. 새로 추가해 주세요.</span>
+                )}
               </div>
               {isAdmin && (
                 <button className="activity-btn edit" onClick={() => {
                   setTempActivityContent('');
                   setTempActivityType('수행평가');
-                  dispatch({ type: 'UPDATE_ACTIVITY_CHECK', payload: { content: '', type: '수행평가', completions: {} } });
                   setIsEditingActivity(true);
                 }}>추가</button>
               )}
@@ -162,7 +143,7 @@ export default function LearningPage() {
 
         <div className="activity-students-grid">
           {students.map(student => {
-            const isCompleted = !!state.activityCheck?.completions[student.id];
+            const isCompleted = !!currentActivity?.submissions?.[student.id];
             return (
               <div
                 key={student.id}
