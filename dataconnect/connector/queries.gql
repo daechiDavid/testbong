@@ -43,6 +43,7 @@ query GetAllAppData @auth(level: PUBLIC) {
     calendarId3
     thermometerGoal
     thermometerReward
+    dashboardLayouts
   }
   quickLinks(limit: 100) {
     id

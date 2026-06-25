@@ -13,7 +13,7 @@ mutation UpsertWeeklyPlan($id: UUID, $weekKey: String!, $day: String!, $period: 
   )
 }
 
-mutation UpsertAppConfig($id: Int!, $calendarId1: String, $calendarId2: String, $calendarId3: String, $thermometerGoal: Int, $thermometerReward: String) @auth(level: PUBLIC) {
+mutation UpsertAppConfig($id: Int!, $calendarId1: String, $calendarId2: String, $calendarId3: String, $thermometerGoal: Int, $thermometerReward: String, $dashboardLayouts: String) @auth(level: PUBLIC) {
   appConfig_upsert(
     data: {
       id: $id,
@@ -21,7 +21,8 @@ mutation UpsertAppConfig($id: Int!, $calendarId1: String, $calendarId2: String, 
       calendarId2: $calendarId2,
       calendarId3: $calendarId3,
       thermometerGoal: $thermometerGoal,
-      thermometerReward: $thermometerReward
+      thermometerReward: $thermometerReward,
+      dashboardLayouts: $dashboardLayouts
     }
   )
 }

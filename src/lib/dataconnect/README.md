@@ -80,7 +80,7 @@ Below are examples of how to use the `default` connector's generated functions t
 ## GetAllAppData
 You can execute the `GetAllAppData` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
 ```typescript
-getAllAppData(options?: ExecuteQueryOptions): QueryPromise<GetAllAppDataData, undefined>;
+getAllAppData(): QueryPromise<GetAllAppDataData, undefined>;
 
 interface GetAllAppDataRef {
   ...
@@ -91,7 +91,7 @@ export const getAllAppDataRef: GetAllAppDataRef;
 ```
 You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
 ```typescript
-getAllAppData(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetAllAppDataData, undefined>;
+getAllAppData(dc: DataConnect): QueryPromise<GetAllAppDataData, undefined>;
 
 interface GetAllAppDataRef {
   ...
@@ -120,74 +120,75 @@ export interface GetAllAppDataData {
     name?: string | null;
     points: number;
   } & Student_Key)[];
-  announcements: ({
-    id: UUIDString;
-    date: DateString;
-    title: string;
-    content?: string | null;
-    type?: string | null;
-  } & Announcement_Key)[];
-  assignments: ({
-    id: UUIDString;
-    dueDate: DateString;
-    title: string;
-    subject: string;
-    type: string;
-    createdAt: TimestampString;
-    submissions?: unknown | null;
-  } & Assignment_Key)[];
-  dDays: ({
-    id: UUIDString;
-    name: string;
-    date: DateString;
-  } & DDay_Key)[];
-  weeklyPlans: ({
-    id: UUIDString;
-    weekKey: string;
-    day: string;
-    period: number;
-    subject?: string | null;
-    content?: string | null;
-  } & WeeklyPlan_Key)[];
-  appConfigs: ({
-    id: number;
-    calendarId1?: string | null;
-    calendarId2?: string | null;
-    calendarId3?: string | null;
-    thermometerGoal?: number | null;
-    thermometerReward?: string | null;
-  } & AppConfig_Key)[];
-  quickLinks: ({
-    id: UUIDString;
-    title: string;
-    url: string;
-    icon?: string | null;
-    desc?: string | null;
-  } & QuickLink_Key)[];
-  polls: ({
-    id: UUIDString;
-    question: string;
-    options?: string[] | null;
-    votes?: number[] | null;
-  } & Poll_Key)[];
-  newsletters: ({
-    id: UUIDString;
-    date: DateString;
-    title: string;
-    content?: string | null;
-    collected: boolean;
-  } & Newsletter_Key)[];
-  studentRecords: ({
-    id: UUIDString;
-    student: {
+    announcements: ({
       id: UUIDString;
-    } & Student_Key;
-    type: string;
-    content?: string | null;
-    category?: string | null;
-    date: DateString;
-    createdAt: TimestampString;
-  } & StudentRecord_Key)[];
+      date: DateString;
+      title: string;
+      content?: string | null;
+      type?: string | null;
+    } & Announcement_Key)[];
+      assignments: ({
+        id: UUIDString;
+        dueDate: DateString;
+        title: string;
+        subject: string;
+        type: string;
+        createdAt: TimestampString;
+        submissions?: unknown | null;
+      } & Assignment_Key)[];
+        dDays: ({
+          id: UUIDString;
+          name: string;
+          date: DateString;
+        } & DDay_Key)[];
+          weeklyPlans: ({
+            id: UUIDString;
+            weekKey: string;
+            day: string;
+            period: number;
+            subject?: string | null;
+            content?: string | null;
+          } & WeeklyPlan_Key)[];
+            appConfigs: ({
+              id: number;
+              calendarId1?: string | null;
+              calendarId2?: string | null;
+              calendarId3?: string | null;
+              thermometerGoal?: number | null;
+              thermometerReward?: string | null;
+              dashboardLayouts?: string | null;
+            } & AppConfig_Key)[];
+              quickLinks: ({
+                id: UUIDString;
+                title: string;
+                url: string;
+                icon?: string | null;
+                desc?: string | null;
+              } & QuickLink_Key)[];
+                polls: ({
+                  id: UUIDString;
+                  question: string;
+                  options?: string[] | null;
+                  votes?: number[] | null;
+                } & Poll_Key)[];
+                  newsletters: ({
+                    id: UUIDString;
+                    date: DateString;
+                    title: string;
+                    content?: string | null;
+                    collected: boolean;
+                  } & Newsletter_Key)[];
+                    studentRecords: ({
+                      id: UUIDString;
+                      student: {
+                        id: UUIDString;
+                      } & Student_Key;
+                        type: string;
+                        content?: string | null;
+                        category?: string | null;
+                        date: DateString;
+                        createdAt: TimestampString;
+                    } & StudentRecord_Key)[];
 }
 ```
 ### Using `GetAllAppData`'s action shortcut function
@@ -280,7 +281,7 @@ executeQuery(ref).then((response) => {
 ## GetAttendanceByDate
 You can execute the `GetAttendanceByDate` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
 ```typescript
-getAttendanceByDate(vars: GetAttendanceByDateVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
+getAttendanceByDate(vars: GetAttendanceByDateVariables): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
 
 interface GetAttendanceByDateRef {
   ...
@@ -291,7 +292,7 @@ export const getAttendanceByDateRef: GetAttendanceByDateRef;
 ```
 You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
 ```typescript
-getAttendanceByDate(dc: DataConnect, vars: GetAttendanceByDateVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
+getAttendanceByDate(dc: DataConnect, vars: GetAttendanceByDateVariables): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
 
 interface GetAttendanceByDateRef {
   ...
@@ -324,9 +325,9 @@ export interface GetAttendanceByDateData {
     student: {
       id: UUIDString;
     } & Student_Key;
-    date: DateString;
-    status: string;
-    note?: string | null;
+      date: DateString;
+      status: string;
+      note?: string | null;
   })[];
 }
 ```
@@ -396,7 +397,7 @@ executeQuery(ref).then((response) => {
 ## GetAttendanceByMonth
 You can execute the `GetAttendanceByMonth` query using the following action shortcut function, or by calling `executeQuery()` after calling the following `QueryRef` function, both of which are defined in [dataconnect/index.d.ts](./index.d.ts):
 ```typescript
-getAttendanceByMonth(vars: GetAttendanceByMonthVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
+getAttendanceByMonth(vars: GetAttendanceByMonthVariables): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
 
 interface GetAttendanceByMonthRef {
   ...
@@ -407,7 +408,7 @@ export const getAttendanceByMonthRef: GetAttendanceByMonthRef;
 ```
 You can also pass in a `DataConnect` instance to the action shortcut function or `QueryRef` function.
 ```typescript
-getAttendanceByMonth(dc: DataConnect, vars: GetAttendanceByMonthVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
+getAttendanceByMonth(dc: DataConnect, vars: GetAttendanceByMonthVariables): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
 
 interface GetAttendanceByMonthRef {
   ...
@@ -441,9 +442,9 @@ export interface GetAttendanceByMonthData {
     student: {
       id: UUIDString;
     } & Student_Key;
-    date: DateString;
-    status: string;
-    note?: string | null;
+      date: DateString;
+      status: string;
+      note?: string | null;
   })[];
 }
 ```
@@ -691,6 +692,7 @@ export interface UpsertAppConfigVariables {
   calendarId3?: string | null;
   thermometerGoal?: number | null;
   thermometerReward?: string | null;
+  dashboardLayouts?: string | null;
 }
 ```
 ### Return Type
@@ -716,13 +718,14 @@ const upsertAppConfigVars: UpsertAppConfigVariables = {
   calendarId3: ..., // optional
   thermometerGoal: ..., // optional
   thermometerReward: ..., // optional
+  dashboardLayouts: ..., // optional
 };
 
 // Call the `upsertAppConfig()` function to execute the mutation.
 // You can use the `await` keyword to wait for the promise to resolve.
 const { data } = await upsertAppConfig(upsertAppConfigVars);
 // Variables can be defined inline as well.
-const { data } = await upsertAppConfig({ id: ..., calendarId1: ..., calendarId2: ..., calendarId3: ..., thermometerGoal: ..., thermometerReward: ..., });
+const { data } = await upsertAppConfig({ id: ..., calendarId1: ..., calendarId2: ..., calendarId3: ..., thermometerGoal: ..., thermometerReward: ..., dashboardLayouts: ..., });
 
 // You can also pass in a `DataConnect` instance to the action shortcut function.
 const dataConnect = getDataConnect(connectorConfig);
@@ -751,12 +754,13 @@ const upsertAppConfigVars: UpsertAppConfigVariables = {
   calendarId3: ..., // optional
   thermometerGoal: ..., // optional
   thermometerReward: ..., // optional
+  dashboardLayouts: ..., // optional
 };
 
 // Call the `upsertAppConfigRef()` function to get a reference to the mutation.
 const ref = upsertAppConfigRef(upsertAppConfigVars);
 // Variables can be defined inline as well.
-const ref = upsertAppConfigRef({ id: ..., calendarId1: ..., calendarId2: ..., calendarId3: ..., thermometerGoal: ..., thermometerReward: ..., });
+const ref = upsertAppConfigRef({ id: ..., calendarId1: ..., calendarId2: ..., calendarId3: ..., thermometerGoal: ..., thermometerReward: ..., dashboardLayouts: ..., });
 
 // You can also pass in a `DataConnect` instance to the `MutationRef` function.
 const dataConnect = getDataConnect(connectorConfig);

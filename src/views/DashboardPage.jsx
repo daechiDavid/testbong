@@ -59,26 +59,24 @@ export default function DashboardPage() {
   const { state, showToast, updateSettings, addDDay, deleteDDay, addAnnouncement, updateAnnouncement, deleteAnnouncement } = useApp();
   const { students, announcements, settings, weeklyPlans, ddays = [], isAdmin } = state;
 
-  const [layouts, setLayouts] = useState(() => {
-    try {
-      const saved = localStorage.getItem('dashboard_layouts');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        // 저장된 레이아웃 중 static 속성이 오염되어 드래그가 고정되는 현상을 수정합니다.
+  const [layouts, setLayouts] = useState(defaultLayouts);
+
+  useEffect(() => {
+    if (settings?.dashboardLayouts) {
+      try {
+        const parsed = JSON.parse(settings.dashboardLayouts);
         Object.keys(parsed).forEach(breakpoint => {
           parsed[breakpoint] = parsed[breakpoint].map(item => ({
             ...item,
             static: false // 강제로 static(고정) 속성을 비활성화하여 이동 가능하도록 함
           }));
         });
-        return parsed;
+        setLayouts(parsed);
+      } catch (e) {
+        console.error('Failed to parse dashboard layouts from DB:', e);
       }
-      return defaultLayouts;
-    } catch {
-      // 로컬 스토리지 파싱 실패 시 기본 레이아웃 사용
-      return defaultLayouts;
     }
-  });
+  }, [settings?.dashboardLayouts]);
 
   const [lunchInfo, setLunchInfo] = useState(null);
   const [isLoadingLunch, setIsLoadingLunch] = useState(true);
@@ -199,7 +197,10 @@ export default function DashboardPage() {
   const handleLayoutChange = (currentLayout, allLayouts) => {
     if (isAdmin) {
       setLayouts(allLayouts);
-      localStorage.setItem('dashboard_layouts', JSON.stringify(allLayouts));
+      const stringified = JSON.stringify(allLayouts);
+      if (settings?.dashboardLayouts !== stringified) {
+        updateSettings({ ...settings, dashboardLayouts: stringified });
+      }
     }
   };
 

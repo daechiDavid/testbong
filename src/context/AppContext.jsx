@@ -580,7 +580,8 @@ export function AppProvider({ children }) {
         calendarId2: newSettings.calendarId2,
         calendarId3: newSettings.calendarId3,
         thermometerGoal: newSettings.thermometerGoal,
-        thermometerReward: newSettings.thermometerReward
+        thermometerReward: newSettings.thermometerReward,
+        dashboardLayouts: newSettings.dashboardLayouts
       });
     } catch (error) {
       console.error('Update AppConfig error:', error);
