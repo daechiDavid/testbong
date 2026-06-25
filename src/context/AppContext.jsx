@@ -23,7 +23,8 @@ import {
   upsertAnnouncement,
   deleteAnnouncement,
   upsertPoll,
-  deletePoll
+  deletePoll,
+  upsertAppConfig
 } from '../lib/dataconnect';
 
 const AppContext = createContext(null);
@@ -570,13 +571,30 @@ export function AppProvider({ children }) {
     } catch(e) { console.error('Delete poll error:', e); }
   };
 
+  const updateSettingsFunc = async (newSettings) => {
+    dispatch({ type: 'UPDATE_SETTINGS', payload: newSettings });
+    try {
+      await upsertAppConfig({
+        id: 1,
+        calendarId1: newSettings.calendarId1,
+        calendarId2: newSettings.calendarId2,
+        calendarId3: newSettings.calendarId3,
+        thermometerGoal: newSettings.thermometerGoal,
+        thermometerReward: newSettings.thermometerReward
+      });
+    } catch (error) {
+      console.error('Update AppConfig error:', error);
+      showToast('설정 저장에 실패했습니다.', 'error');
+    }
+  };
+
   return (
     <AppContext.Provider value={{
       state, dispatch, showToast, 
       updatePoints: updatePointsFunc, resetPoints: resetPointsFunc,
       updateAttendance: updateAttendanceFunc, loadAttendanceByDate: loadAttendanceByDateFunc, loadMonthlyAttendance: loadMonthlyAttendanceFunc,
       updateStudent: updateStudentFunc, bulkUpdateStudents: bulkUpdateStudentsFunc, addStudentRecord: addStudentRecordFunc, deleteStudentRecord: deleteStudentRecordFunc,
-      saveWeeklyPlan, updateSettings: (s) => dispatch({ type: 'UPDATE_SETTINGS', payload: s }), addDDay, deleteDDay: deleteDDayFunc,
+      saveWeeklyPlan, updateSettings: updateSettingsFunc, addDDay, deleteDDay: deleteDDayFunc,
       votePoll: votePollFunc, collectNewsletter: collectNewsletterFunc,
       addLink: addLinkFunc, updateLink: updateLinkFunc, deleteLink: deleteLinkFunc,
       addAssignment: addAssignmentFunc, updateAssignmentSubmissions: updateAssignmentSubmissionsFunc, deleteAssignment: deleteAssignmentFunc,
