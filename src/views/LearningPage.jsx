@@ -10,7 +10,7 @@ export default function LearningPage() {
 
   const [isEditingActivity, setIsEditingActivity] = useState(false);
   const [tempActivityContent, setTempActivityContent] = useState('');
-  const [tempActivityType, setTempActivityType] = useState('수행평가');
+  const [tempActivityType, setTempActivityType] = useState('과제');
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [lastRefreshed, setLastRefreshed] = useState(new Date());
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,8 +80,8 @@ export default function LearningPage() {
             <div className="activity-edit-mode">
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
                 <select className="form-input" value={tempActivityType} onChange={e => setTempActivityType(e.target.value)} style={{ width: '120px' }}>
-                  <option value="수행평가">수행평가</option>
                   <option value="과제">과제</option>
+                  <option value="수행평가">수행평가</option>
                 </select>
                 <input
                   type="text"
@@ -111,7 +111,7 @@ export default function LearningPage() {
                 }}>저장</button>
                 <button className="activity-btn secondary" onClick={() => {
                   setTempActivityContent('');
-                  setTempActivityType('수행평가');
+                  setTempActivityType('과제');
                   setIsEditingActivity(false);
                 }}>취소</button>
               </div>
@@ -132,7 +132,7 @@ export default function LearningPage() {
               {isAdmin && (
                 <button className="activity-btn edit" onClick={() => {
                   setTempActivityContent('');
-                  setTempActivityType('수행평가');
+                  setTempActivityType('과제');
                   setIsEditingActivity(true);
                 }}>추가</button>
               )}
