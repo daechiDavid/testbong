@@ -55,13 +55,14 @@ const defaultLayouts = {
 };
 
 export default function DashboardPage() {
-  // AppContext에서 DB 연동 함수들을 가져옴
-  const { state, showToast, updateSettings, addDDay, deleteDDay, addAnnouncement, updateAnnouncement, deleteAnnouncement } = useApp();
+  const { state, showToast, updateSettings, addDDay, deleteDDay, addAnnouncement, updateAnnouncement, deleteAnnouncement, isDbLoading } = useApp();
   const { students, announcements, settings, weeklyPlans, ddays = [], isAdmin } = state;
 
-  const [layouts, setLayouts] = useState(defaultLayouts);
+  const [layouts, setLayouts] = useState(null);
 
   useEffect(() => {
+    if (isDbLoading) return;
+
     if (settings?.dashboardLayouts) {
       try {
         const parsed = JSON.parse(settings.dashboardLayouts);
@@ -71,13 +72,15 @@ export default function DashboardPage() {
             static: false // 강제로 static(고정) 속성을 비활성화하여 이동 가능하도록 함
           }));
         });
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLayouts(parsed);
       } catch (e) {
         console.error('Failed to parse dashboard layouts from DB:', e);
+        setLayouts(defaultLayouts);
       }
+    } else {
+      setLayouts(defaultLayouts);
     }
-  }, [settings?.dashboardLayouts]);
+  }, [settings?.dashboardLayouts, isDbLoading]);
 
   const [lunchInfo, setLunchInfo] = useState(null);
   const [isLoadingLunch, setIsLoadingLunch] = useState(true);
@@ -222,6 +225,11 @@ export default function DashboardPage() {
 
       {/* Main Layout */}
       {/* 대시보드 위젯 그리드 레이아웃: 블럭 이동 및 크기 조절 가능 */}
+      {!layouts ? (
+        <div className="empty-state" style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p>대시보드 위젯을 불러오는 중입니다...</p>
+        </div>
+      ) : (
       <ResponsiveGridLayout
         className="dashboard-layout"
         layouts={layouts}
@@ -420,6 +428,7 @@ export default function DashboardPage() {
         </div>
 
       </ResponsiveGridLayout>
+      )}
     </div>
   );
 }
