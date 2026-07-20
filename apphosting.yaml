@@ -1,0 +1,14 @@
+# Firebase App Hosting Configuration
+env:
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: "AIzaSyA6w9fW23z6Se4-efGESIDb8vIfjkVRU-c"
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: "checkbong-fb3dc.firebaseapp.com"
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: "checkbong-fb3dc"
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: "checkbong-fb3dc.firebasestorage.app"
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: "458180956921"
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: "1:458180956921:web:4ab6f294ec133111c14828"
