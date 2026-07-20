@@ -72,12 +72,15 @@ export default function DashboardPage() {
             static: false // 강제로 static(고정) 속성을 비활성화하여 이동 가능하도록 함
           }));
         });
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLayouts(parsed);
       } catch (e) {
         console.error('Failed to parse dashboard layouts from DB:', e);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLayouts(defaultLayouts);
       }
     } else {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLayouts(defaultLayouts);
     }
   }, [settings?.dashboardLayouts, isDbLoading]);
