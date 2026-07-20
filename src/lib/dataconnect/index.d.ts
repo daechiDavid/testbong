@@ -1,4 +1,4 @@
-import { ConnectorConfig, DataConnect, QueryRef, QueryPromise, MutationRef, MutationPromise } from 'firebase/data-connect';
+import { ConnectorConfig, DataConnect, QueryRef, QueryPromise, ExecuteQueryOptions, MutationRef, MutationPromise } from 'firebase/data-connect';
 
 export const connectorConfig: ConnectorConfig;
 
@@ -91,75 +91,75 @@ export interface GetAllAppDataData {
     name?: string | null;
     points: number;
   } & Student_Key)[];
-    announcements: ({
+  announcements: ({
+    id: UUIDString;
+    date: DateString;
+    title: string;
+    content?: string | null;
+    type?: string | null;
+  } & Announcement_Key)[];
+  assignments: ({
+    id: UUIDString;
+    dueDate: DateString;
+    title: string;
+    subject: string;
+    type: string;
+    createdAt: TimestampString;
+    submissions?: unknown | null;
+  } & Assignment_Key)[];
+  dDays: ({
+    id: UUIDString;
+    name: string;
+    date: DateString;
+  } & DDay_Key)[];
+  weeklyPlans: ({
+    id: UUIDString;
+    weekKey: string;
+    day: string;
+    period: number;
+    subject?: string | null;
+    content?: string | null;
+  } & WeeklyPlan_Key)[];
+  appConfigs: ({
+    id: number;
+    calendarId1?: string | null;
+    calendarId2?: string | null;
+    calendarId3?: string | null;
+    thermometerGoal?: number | null;
+    thermometerReward?: string | null;
+    dashboardLayouts?: string | null;
+  } & AppConfig_Key)[];
+  quickLinks: ({
+    id: UUIDString;
+    title: string;
+    url: string;
+    icon?: string | null;
+    desc?: string | null;
+  } & QuickLink_Key)[];
+  polls: ({
+    id: UUIDString;
+    question: string;
+    options?: string[] | null;
+    votes?: number[] | null;
+  } & Poll_Key)[];
+  newsletters: ({
+    id: UUIDString;
+    date: DateString;
+    title: string;
+    content?: string | null;
+    collected: boolean;
+  } & Newsletter_Key)[];
+  studentRecords: ({
+    id: UUIDString;
+    student: {
       id: UUIDString;
-      date: DateString;
-      title: string;
-      content?: string | null;
-      type?: string | null;
-    } & Announcement_Key)[];
-      assignments: ({
-        id: UUIDString;
-        dueDate: DateString;
-        title: string;
-        subject: string;
-        type: string;
-        createdAt: TimestampString;
-        submissions?: unknown | null;
-      } & Assignment_Key)[];
-        dDays: ({
-          id: UUIDString;
-          name: string;
-          date: DateString;
-        } & DDay_Key)[];
-          weeklyPlans: ({
-            id: UUIDString;
-            weekKey: string;
-            day: string;
-            period: number;
-            subject?: string | null;
-            content?: string | null;
-          } & WeeklyPlan_Key)[];
-            appConfigs: ({
-              id: number;
-              calendarId1?: string | null;
-              calendarId2?: string | null;
-              calendarId3?: string | null;
-              thermometerGoal?: number | null;
-              thermometerReward?: string | null;
-              dashboardLayouts?: string | null;
-            } & AppConfig_Key)[];
-              quickLinks: ({
-                id: UUIDString;
-                title: string;
-                url: string;
-                icon?: string | null;
-                desc?: string | null;
-              } & QuickLink_Key)[];
-                polls: ({
-                  id: UUIDString;
-                  question: string;
-                  options?: string[] | null;
-                  votes?: number[] | null;
-                } & Poll_Key)[];
-                  newsletters: ({
-                    id: UUIDString;
-                    date: DateString;
-                    title: string;
-                    content?: string | null;
-                    collected: boolean;
-                  } & Newsletter_Key)[];
-                    studentRecords: ({
-                      id: UUIDString;
-                      student: {
-                        id: UUIDString;
-                      } & Student_Key;
-                        type: string;
-                        content?: string | null;
-                        category?: string | null;
-                        date: DateString;
-                        createdAt: TimestampString;
-                    } & StudentRecord_Key)[];
+    } & Student_Key;
+    type: string;
+    content?: string | null;
+    category?: string | null;
+    date: DateString;
+    createdAt: TimestampString;
+  } & StudentRecord_Key)[];
 }
 
 export interface GetAttendanceByDateData {
@@ -167,9 +167,9 @@ export interface GetAttendanceByDateData {
     student: {
       id: UUIDString;
     } & Student_Key;
-      date: DateString;
-      status: string;
-      note?: string | null;
+    date: DateString;
+    status: string;
+    note?: string | null;
   })[];
 }
 
@@ -182,9 +182,9 @@ export interface GetAttendanceByMonthData {
     student: {
       id: UUIDString;
     } & Student_Key;
-      date: DateString;
-      status: string;
-      note?: string | null;
+    date: DateString;
+    status: string;
+    note?: string | null;
   })[];
 }
 
@@ -614,8 +614,8 @@ interface GetAllAppDataRef {
 }
 export const getAllAppDataRef: GetAllAppDataRef;
 
-export function getAllAppData(): QueryPromise<GetAllAppDataData, undefined>;
-export function getAllAppData(dc: DataConnect): QueryPromise<GetAllAppDataData, undefined>;
+export function getAllAppData(options?: ExecuteQueryOptions): QueryPromise<GetAllAppDataData, undefined>;
+export function getAllAppData(dc: DataConnect, options?: ExecuteQueryOptions): QueryPromise<GetAllAppDataData, undefined>;
 
 interface GetAttendanceByDateRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -626,8 +626,8 @@ interface GetAttendanceByDateRef {
 }
 export const getAttendanceByDateRef: GetAttendanceByDateRef;
 
-export function getAttendanceByDate(vars: GetAttendanceByDateVariables): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
-export function getAttendanceByDate(dc: DataConnect, vars: GetAttendanceByDateVariables): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
+export function getAttendanceByDate(vars: GetAttendanceByDateVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
+export function getAttendanceByDate(dc: DataConnect, vars: GetAttendanceByDateVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByDateData, GetAttendanceByDateVariables>;
 
 interface GetAttendanceByMonthRef {
   /* Allow users to create refs without passing in DataConnect */
@@ -638,6 +638,6 @@ interface GetAttendanceByMonthRef {
 }
 export const getAttendanceByMonthRef: GetAttendanceByMonthRef;
 
-export function getAttendanceByMonth(vars: GetAttendanceByMonthVariables): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
-export function getAttendanceByMonth(dc: DataConnect, vars: GetAttendanceByMonthVariables): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
+export function getAttendanceByMonth(vars: GetAttendanceByMonthVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
+export function getAttendanceByMonth(dc: DataConnect, vars: GetAttendanceByMonthVariables, options?: ExecuteQueryOptions): QueryPromise<GetAttendanceByMonthData, GetAttendanceByMonthVariables>;
 
